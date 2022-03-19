@@ -4,7 +4,9 @@
     <string name="open">Open</string>
     <string name="copyright">Created By XuanRan</string>
     <string name="group">分类</string>
-    <string name="search">Search</string>
     <string name="d3">3d</string>
     <string name="favourites_title">test</string>
+    <string name="search">Search</string>
+    <string name="wanning">警告</string>
+    <string name="error">错误</string>
 </resources>
