@@ -1,5 +1,6 @@
 package dev.xuanran.codebook.adapter;
 
+import android.animation.Animator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,11 @@ import dev.xuanran.codebook.provider.HomeCardProvider;
  */
 public class HomeCardAdapter extends BaseNodeAdapter {
 
+    @Override
+    protected void startAnim(@NonNull Animator anim, int index) {
+        super.startAnim(anim, index);
+        anim.setDuration(1000);
+    }
 
     @Override
     protected int getItemType(@NotNull List<? extends BaseNode> list, int i) {

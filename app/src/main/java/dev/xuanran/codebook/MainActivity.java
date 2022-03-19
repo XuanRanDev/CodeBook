@@ -11,11 +11,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.animation.AlphaInAnimation;
+import com.chad.library.adapter.base.animation.BaseAnimation;
+import com.chad.library.adapter.base.animation.ScaleInAnimation;
 import com.chad.library.adapter.base.entity.node.BaseNode;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -65,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         homeCardAdapter = new HomeCardAdapter();
         homeCardAdapter.setList(getEntity());
         homeCardAdapter.setAnimationEnable(true);
+        homeCardAdapter.setAdapterAnimation(new ScaleInAnimation());
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(homeCardAdapter);
@@ -131,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < homeCardAdapter.getData().size(); i++) {
                 CardData cardData = (CardData) homeCardAdapter.getData().get(i);
                 if (!cardData.getCardName().contains(query)) {
+                    runDataRefreshLayoutAnimation(recyclerView);
                     homeCardAdapter.removeAt(i);
                     homeCardAdapter.notifyDataSetChanged();
                 }
@@ -140,6 +149,25 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    private void runDataLoadingLayoutAnimation(final RecyclerView recyclerView) {
+        final Context context = recyclerView.getContext();
+        final LayoutAnimationController controller =
+                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
+        recyclerView.setLayoutAnimation(controller);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
+    }
+
+    private void runDataRefreshLayoutAnimation(final RecyclerView recyclerView) {
+        final Context context = recyclerView.getContext();
+        final LayoutAnimationController controller =
+                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
+        recyclerView.setLayoutAnimation(controller);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
