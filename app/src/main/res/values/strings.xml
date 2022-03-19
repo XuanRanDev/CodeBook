@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">CodeBook</string>
+    <string name="clone">Clone</string>
+    <string name="open">Open</string>
+    <string name="copyright">Created By XuanRan</string>
+    <string name="group">分类</string>
+    <string name="search">Search</string>
+    <string name="d3">3d</string>
+    <string name="favourites_title">test</string>
+</resources>
