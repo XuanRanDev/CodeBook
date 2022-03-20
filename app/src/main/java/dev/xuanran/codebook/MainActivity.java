@@ -1,5 +1,15 @@
 package dev.xuanran.codebook;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,37 +20,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.animation.StateListAnimator;
-import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.content.Context;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.view.DragEvent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LayoutAnimationController;
-
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.animation.AlphaInAnimation;
-import com.chad.library.adapter.base.animation.BaseAnimation;
 import com.chad.library.adapter.base.animation.ScaleInAnimation;
 import com.chad.library.adapter.base.entity.node.BaseNode;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.activity_main_collapsingtoolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
     boolean hasFolder = false;
+
 
     List<CardData> list = new ArrayList<>();
 
@@ -125,9 +116,9 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         runDataLoadingLayoutAnimation(recyclerView);
                         swipeRefreshLayout.setRefreshing(false);
-                        Snackbar.make(drawerLayout,"刷新完成！",2000).show();
+                        Snackbar.make(drawerLayout, "刷新完成！", 2000).show();
                     }
-                },1000);
+                }, 1000);
             }
         });
     }

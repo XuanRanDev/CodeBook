@@ -1,11 +1,14 @@
 package dev.xuanran.codebook.provider;
 
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.PopupMenu;
 
 import com.chad.library.adapter.base.entity.node.BaseNode;
 import com.chad.library.adapter.base.provider.BaseNodeProvider;
@@ -34,21 +37,42 @@ public class HomeCardProvider extends BaseNodeProvider implements View.OnClickLi
         CardData cardData = (CardData) baseNode;
         baseViewHolder.setText(R.id.list_cardview_title, cardData.getCardName());
         Button button = baseViewHolder.getView(R.id.list_cardview_button);
+
         button.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.list_cardview_button){
+
+        if (view.getId() == R.id.content_view_dialog_more) {
+            showMoreMenu(view);
+        }
+
+        if (view.getId() == R.id.list_cardview_button) {
             showContent(view);
         }
     }
 
+    private void showMoreMenu(View view) {
+        PopupMenu popup = new PopupMenu(view.getContext(), view);
+        popup.getMenuInflater().inflate(R.menu.dialog_content_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                Toast.makeText(view.getContext(), "Click:" + item.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+        popup.show();
+
+
+    }
+
     private void showContent(View view) {
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(view.getContext(),R.style.ThemeOverlayAppMaterialAlertDialog);
-
-        View contentView = LayoutInflater.from(view.getContext()).inflate(R.layout.content_view_dialog,null);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(view.getContext(), R.style.ThemeOverlayAppMaterialAlertDialog);
+        View contentView = LayoutInflater.from(view.getContext()).inflate(R.layout.content_view_dialog, null);
+        AppCompatImageView more = contentView.findViewById(R.id.content_view_dialog_more);
+        more.setOnClickListener(this);
         builder.setView(contentView);
         builder.show();
     }

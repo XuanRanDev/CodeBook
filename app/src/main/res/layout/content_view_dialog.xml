@@ -27,6 +27,17 @@
             app:layout_constraintTop_toTopOf="parent" />
 
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/content_view_dialog_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/ic_baseline_more_vert_24"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/content_view_dialog_accountID"
             android:layout_width="match_parent"

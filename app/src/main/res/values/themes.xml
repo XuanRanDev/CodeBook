@@ -12,24 +12,17 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-
-        <!--设置取消原有的ActionBar-->
-<!--        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>-->
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
     </style>
 
-    <style name="AlertDialogContent" parent="MaterialAlertDialog.Material3"/>
 
     <style name="ThemeOverlayAppMaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-<!--        <item name="colorPrimary">@color/shrine_pink_100</item>
-        <item name="colorSecondary">@color/shrine_pink_100</item>
-        <item name="colorSurface">@color/shrine_pink_light</item>
-        <item name="colorOnSurface">@color/shrine_pink_900</item>-->
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
         <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.App.Title.Text</item>
         <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button</item>
         <item name="buttonBarNegativeButtonStyle">@style/Widget.App.Button</item>
     </style>
+
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 

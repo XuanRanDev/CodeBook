@@ -13,4 +13,6 @@
     <string name="password">密码</string>
     <string name="CopyAccountID">复制账号</string>
     <string name="CopyPassword">复制密码</string>
+    <string name="editor">编辑</string>
+    <string name="delete">删除</string>
 </resources>
