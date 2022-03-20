@@ -12,6 +12,8 @@ import java.util.List;
 public class CardData extends BaseNode {
     private Integer cardId;
     private String cardName;
+    private String accountId;
+    private String password;
 
     public CardData(Integer cardId, String cardName) {
         this.cardId = cardId;

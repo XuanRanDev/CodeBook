@@ -8,14 +8,20 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.animation.StateListAnimator;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 
@@ -54,6 +60,11 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton floatingActionButton;
     @BindView(R.id.activity_main_appbar)
     AppBarLayout appBarLayout;
+    @BindView(R.id.activity_main_SwipeRefreshLayout)
+    SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.activity_main_collapsingtoolbar)
+    CollapsingToolbarLayout collapsingToolbarLayout;
+    boolean hasFolder = false;
 
     List<CardData> list = new ArrayList<>();
 
@@ -77,8 +88,17 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(homeCardAdapter);
 
-
+        appBarListener();
         initView();
+    }
+
+    /**
+     * AppBarLayout 监听，折叠过后不允许再展开
+     */
+    @SuppressLint("ResourceAsColor")
+    private void appBarListener() {
+        collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);
+        collapsingToolbarLayout.setActivated(false);
     }
 
     private void alertWarning(String info) {
@@ -100,6 +120,19 @@ public class MainActivity extends AppCompatActivity {
 
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+                        Snackbar.make(drawerLayout,"刷新完成！",2000).show();
+                    }
+                },1000);
+            }
+        });
     }
 
     private Collection<? extends BaseNode> getEntity() {
@@ -119,7 +152,8 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return false;
+                //cloneSearchView(searchView);
+                return true;
             }
 
             @Override
@@ -132,21 +166,27 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void filter(String query) {
-        try {
-            Log.e("MainActivity", "新内容：" + query);
+    private void cloneSearchView(SearchView searchView) {
+        searchView.clearFocus();
+        searchView.setFocusable(false);
+        searchView.setActivated(false);
+    }
 
+    private void filter(String query) {
+
+        try {
             for (int i = 0; i < homeCardAdapter.getData().size(); i++) {
                 CardData cardData = (CardData) homeCardAdapter.getData().get(i);
                 if (!cardData.getCardName().contains(query)) {
                     runDataRefreshLayoutAnimation(recyclerView);
                     homeCardAdapter.removeAt(i);
-                    homeCardAdapter.notifyDataSetChanged();
+                    homeCardAdapter.removeAt(i);
                 }
             }
+            homeCardAdapter.notifyDataSetChanged();
+
         } catch (Exception e) {
             alertWarning(e.getMessage());
-            e.printStackTrace();
         }
     }
 
