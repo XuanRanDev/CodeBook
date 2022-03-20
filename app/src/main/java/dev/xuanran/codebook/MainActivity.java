@@ -88,17 +88,13 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(homeCardAdapter);
 
-        appBarListener();
+        initAppBar();
         initView();
     }
 
-    /**
-     * AppBarLayout 监听，折叠过后不允许再展开
-     */
-    @SuppressLint("ResourceAsColor")
-    private void appBarListener() {
+
+    private void initAppBar() {
         collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);
-        collapsingToolbarLayout.setActivated(false);
     }
 
     private void alertWarning(String info) {
@@ -127,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        runDataLoadingLayoutAnimation(recyclerView);
                         swipeRefreshLayout.setRefreshing(false);
                         Snackbar.make(drawerLayout,"刷新完成！",2000).show();
                     }
@@ -152,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //cloneSearchView(searchView);
                 return true;
             }
 
@@ -166,14 +162,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void cloneSearchView(SearchView searchView) {
-        searchView.clearFocus();
-        searchView.setFocusable(false);
-        searchView.setActivated(false);
-    }
-
     private void filter(String query) {
-
         try {
             for (int i = 0; i < homeCardAdapter.getData().size(); i++) {
                 CardData cardData = (CardData) homeCardAdapter.getData().get(i);
