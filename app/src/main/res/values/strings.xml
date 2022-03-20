@@ -15,4 +15,7 @@
     <string name="CopyPassword">复制密码</string>
     <string name="editor">编辑</string>
     <string name="delete">删除</string>
+    <string name="appName">应用名称</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
 </resources>
