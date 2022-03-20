@@ -54,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.activity_main_collapsingtoolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
-    boolean hasFolder = false;
-
 
     List<CardData> list = new ArrayList<>();
 
@@ -66,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ;
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
@@ -153,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void filter(String query) {
         try {
             for (int i = 0; i < homeCardAdapter.getData().size(); i++) {
@@ -160,11 +158,9 @@ public class MainActivity extends AppCompatActivity {
                 if (!cardData.getCardName().contains(query)) {
                     runDataRefreshLayoutAnimation(recyclerView);
                     homeCardAdapter.removeAt(i);
-                    homeCardAdapter.removeAt(i);
                 }
             }
             homeCardAdapter.notifyDataSetChanged();
-
         } catch (Exception e) {
             alertWarning(e.getMessage());
         }
@@ -175,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
         final LayoutAnimationController controller =
                 AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
         recyclerView.setLayoutAnimation(controller);
-        recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
     }
 
@@ -184,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
         final LayoutAnimationController controller =
                 AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
         recyclerView.setLayoutAnimation(controller);
-        recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
     }
 
