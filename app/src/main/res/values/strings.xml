@@ -9,4 +9,8 @@
     <string name="search">Search</string>
     <string name="wanning">警告</string>
     <string name="error">错误</string>
+    <string name="account">账号</string>
+    <string name="password">密码</string>
+    <string name="CopyAccountID">复制账号</string>
+    <string name="CopyPassword">复制密码</string>
 </resources>
