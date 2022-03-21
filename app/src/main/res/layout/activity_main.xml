@@ -5,14 +5,15 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    style="@style/Widget.Material3.DrawerLayout"
+    android:fitsSystemWindows="false"
     tools:openDrawer="start">
 
 
     <include
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"/>
 
 
     <com.google.android.material.navigation.NavigationView

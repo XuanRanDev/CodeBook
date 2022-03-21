@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
@@ -73,8 +74,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 
+        setSupportActionBar(toolbar);
 
 
         homeCardAdapter = new HomeCardAdapter();
@@ -90,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
         //initSystemBarColor();
         initView();
     }
-
 
 
     private void initSystemBarColor() {
