@@ -10,4 +10,12 @@
     <color name="main_background_color">#ededed</color>
     <color name="card_background_color">#FFFFFFFF</color>
 
+
+    <!--Theme1-->
+    <color name="Theme1.toolbar.color">#f5f2f9</color>
+    <color name="Theme1.background.color">#fdfbfe</color>
+    <color name="Theme1.card.color">#fefefe</color>
+    <color name="Theme1.statusBar.color">#b39ddb</color>
+
+
 </resources>

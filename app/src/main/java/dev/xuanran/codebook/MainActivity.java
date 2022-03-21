@@ -44,6 +44,7 @@ import butterknife.ButterKnife;
 import dev.xuanran.codebook.adapter.HomeCardAdapter;
 import dev.xuanran.codebook.bean.CardData;
 
+
 @SuppressLint("NonConstantResourceId")
 public class MainActivity extends AppCompatActivity {
 
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
+
         homeCardAdapter = new HomeCardAdapter();
         homeCardAdapter.setList(getEntity());
         homeCardAdapter.setAnimationEnable(true);
@@ -85,7 +87,16 @@ public class MainActivity extends AppCompatActivity {
 
         initFloatButton();
         initAppBar();
+        //initSystemBarColor();
         initView();
+    }
+
+
+
+    private void initSystemBarColor() {
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
     }
 
     private void initFloatButton() {
@@ -93,13 +104,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
-                View content = LayoutInflater.from(MainActivity.this).inflate(R.layout.add_content_view_dialog,null);
+                View content = LayoutInflater.from(MainActivity.this).inflate(R.layout.add_content_view_dialog, null);
                 builder.setView(content);
                 AlertDialog dialog = builder.show();
 
                 TextInputLayout appName = content.findViewById(R.id.add_content_view_dialog_appName);
                 TextInputLayout accountID = content.findViewById(R.id.add_content_view_dialog_accountID);
-                TextInputLayout password= content.findViewById(R.id.add_content_view_dialog_password);
+                TextInputLayout password = content.findViewById(R.id.add_content_view_dialog_password);
                 Button cancel = content.findViewById(R.id.add_content_view_dialog_cancel);
                 Button save = content.findViewById(R.id.add_content_view_dialog_save);
                 AppCompatImageView more = content.findViewById(R.id.add_content_view_dialog_more);
@@ -110,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
-
                 more.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -125,11 +135,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void showAddPopupMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
-        popupMenu.getMenuInflater().inflate(R.menu.add_more_menu,popupMenu.getMenu());
+        popupMenu.getMenuInflater().inflate(R.menu.add_more_menu, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Snackbar.make(drawerLayout,"Click:" + item.getTitle(),3000).show();
+                Snackbar.make(drawerLayout, "Click:" + item.getTitle(), 3000).show();
                 return false;
             }
         });
