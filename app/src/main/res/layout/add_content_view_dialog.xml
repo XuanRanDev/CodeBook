@@ -101,10 +101,8 @@
                 android:autofillHints="password"
                 android:drawableStart="@drawable/ic_baseline_lock_24"
                 android:drawablePadding="8dp"
-                android:hint="@string/password"
                 android:inputType="textPassword"
-                android:maxLines="1"
-                android:text="123456" />
+                android:maxLines="1" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -119,7 +117,7 @@
 
 
             <Button
-                android:id="@+id/content_view_dialog_cancel"
+                android:id="@+id/add_content_view_dialog_cancel"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -130,7 +128,7 @@
                 android:textColor="?attr/colorOnSurface" />
 
             <Button
-                android:id="@+id/content_view_dialog_save"
+                android:id="@+id/add_content_view_dialog_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"

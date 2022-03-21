@@ -5,15 +5,15 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    style="@style/Widget.Material3.DrawerLayout"
+    android:fitsSystemWindows="false"
     tools:openDrawer="start">
 
 
     <include
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"/>
 
 
     <com.google.android.material.navigation.NavigationView
@@ -21,7 +21,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
         android:background="@color/main_background_color"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/drawer_main"
