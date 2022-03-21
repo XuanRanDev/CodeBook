@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="无账号模式"
+        android:id="@+id/add_menu_withoutAccountID"/>
+    <item
+        android:title="无密码模式"
+        android:id="@+id/add_menu_withoutPassword"/>
+    <item
+        android:id="@+id/add_menu_addComment"
+        android:title="添加备注"/>
+</menu>

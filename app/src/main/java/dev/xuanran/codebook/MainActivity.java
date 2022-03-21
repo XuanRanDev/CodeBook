@@ -11,11 +11,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -30,6 +33,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,8 +96,44 @@ public class MainActivity extends AppCompatActivity {
                 View content = LayoutInflater.from(MainActivity.this).inflate(R.layout.add_content_view_dialog,null);
                 builder.setView(content);
                 AlertDialog dialog = builder.show();
+
+                TextInputLayout appName = content.findViewById(R.id.add_content_view_dialog_appName);
+                TextInputLayout accountID = content.findViewById(R.id.add_content_view_dialog_accountID);
+                TextInputLayout password= content.findViewById(R.id.add_content_view_dialog_password);
+                Button cancel = content.findViewById(R.id.add_content_view_dialog_cancel);
+                Button save = content.findViewById(R.id.add_content_view_dialog_save);
+                AppCompatImageView more = content.findViewById(R.id.add_content_view_dialog_more);
+
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+
+                more.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        showAddPopupMenu(view);
+                    }
+                });
+
+
             }
         });
+    }
+
+    private void showAddPopupMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+        popupMenu.getMenuInflater().inflate(R.menu.add_more_menu,popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Snackbar.make(drawerLayout,"Click:" + item.getTitle(),3000).show();
+                return false;
+            }
+        });
+        popupMenu.show();
     }
 
 
@@ -173,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                 CardData cardData = (CardData) homeCardAdapter.getData().get(i);
                 if (!cardData.getCardName().contains(query)) {
                     runDataRefreshLayoutAnimation(recyclerView);
-                    homeCardAdapter.removeAt(i);
+//                    homeCardAdapter.removeAt(i);
                 }
             }
             homeCardAdapter.notifyDataSetChanged();
