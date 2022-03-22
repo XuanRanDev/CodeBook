@@ -28,6 +28,9 @@ android {
 }
 
 dependencies {
+    def room_version = "2.4.2"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     implementation "androidx.drawerlayout:drawerlayout:1.1.1"
     implementation 'com.jakewharton:butterknife:10.2.3'

@@ -61,7 +61,7 @@ public class HomeCardProvider extends BaseNodeProvider implements View.OnClickLi
      */
     private void setLayoutContent(BaseViewHolder baseViewHolder, BaseNode node) {
         CardData cardData = (CardData) node;
-        baseViewHolder.setText(R.id.list_cardView_title,cardData.getCardName());
+        baseViewHolder.setText(R.id.list_cardView_title,cardData.getAppName());
         baseViewHolder.setText(R.id.list_cardView_id,"# " + cardData.getCardId());
         baseViewHolder.setText(R.id.list_cardView_createDate,new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
     }
@@ -107,7 +107,7 @@ public class HomeCardProvider extends BaseNodeProvider implements View.OnClickLi
         Button copyPassword = contentView.findViewById(R.id.content_view_dialog_copyPassword);
 
         //setValue
-        appName.setText(data.getCardName());
+        appName.setText(data.getAppName());
         accountID.getEditText().setText(data.getAccountId());
         password.getEditText().setText(data.getPassword());
 

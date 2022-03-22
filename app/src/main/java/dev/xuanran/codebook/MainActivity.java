@@ -49,7 +49,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dev.xuanran.codebook.adapter.HomeCardAdapter;
 import dev.xuanran.codebook.bean.CardData;
+import dev.xuanran.codebook.db.AppDatabase;
 import dev.xuanran.codebook.listener.AppBarStatusChangeListener;
+import dev.xuanran.codebook.util.AppExecutors;
 
 
 @SuppressLint("NonConstantResourceId")
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.activity_main_collapsingtoolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
 
-    List<CardData> list = new ArrayList<>();
+    List<CardData> userDataList = new ArrayList<>();
 
     HomeCardAdapter homeCardAdapter;
 
@@ -110,6 +112,17 @@ public class MainActivity extends AppCompatActivity {
         textView.setGravity(Gravity.CENTER);
         textView.setText("————" + getResources().getString(R.string.no_more_data) + "————");
         return textView;
+    }
+
+
+
+    public void retrieveTasks() {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                List list2 = AppDatabase.getInstance(MainActivity.this).userDataDao().getAll();
+            }
+        });
     }
 
 
@@ -220,13 +233,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private Collection<? extends BaseNode> getEntity() {
+    private List<CardData> getEntity() {
         for (int i = 1; i <= 5; i++) {
             CardData data = new CardData(i, "第" + i + "项", "123456", "123456");
             data.setCreateDate(new Date(System.currentTimeMillis()));
-            list.add(data);
+            userDataList.add(data);
         }
-        return list;
+        return userDataList;
     }
 
 
@@ -257,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             for (int i = 0; i < homeCardAdapter.getData().size(); i++) {
                 CardData cardData = (CardData) homeCardAdapter.getData().get(i);
-                if (!cardData.getCardName().contains(query)) {
+                if (!cardData.getAppName().contains(query)) {
                     homeCardAdapter.removeAt(i);
                     runDataRefreshLayoutAnimation(recyclerView);
                 }
