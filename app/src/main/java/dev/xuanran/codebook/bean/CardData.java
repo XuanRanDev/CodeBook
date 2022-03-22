@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 
 import com.chad.library.adapter.base.entity.node.BaseNode;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,10 +15,14 @@ public class CardData extends BaseNode {
     private String cardName;
     private String accountId;
     private String password;
+    private Date createDate;
+    private Date updateDate;
 
-    public CardData(Integer cardId, String cardName) {
+    public CardData(Integer cardId, String cardName, String accountId, String password) {
         this.cardId = cardId;
         this.cardName = cardName;
+        this.accountId = accountId;
+        this.password = password;
     }
 
     public Integer getCardId() {
@@ -34,6 +39,38 @@ public class CardData extends BaseNode {
 
     public void setCardName(String cardName) {
         this.cardName = cardName;
+    }
+
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 
     @Nullable

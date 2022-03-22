@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +15,7 @@ import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -40,6 +42,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -81,10 +84,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 
 
-        homeCardAdapter = new HomeCardAdapter();
-        homeCardAdapter.setList(getEntity());
-        homeCardAdapter.setAnimationEnable(true);
-        homeCardAdapter.setAdapterAnimation(new ScaleInAnimation());
+        initAdapter();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(homeCardAdapter);
@@ -95,12 +95,29 @@ public class MainActivity extends AppCompatActivity {
         initView();
     }
 
+    private void initAdapter() {
+        homeCardAdapter = new HomeCardAdapter();
+        homeCardAdapter.setList(getEntity());
+        homeCardAdapter.setAnimationEnable(true);
+        homeCardAdapter.setAdapterAnimation(new ScaleInAnimation());
+        homeCardAdapter.setFooterView(GenerateBottomView());
+
+    }
+
+    private View GenerateBottomView() {
+        TextView textView = new TextView(this);
+        textView.setPadding(0, 50, 0, 150);
+        textView.setGravity(Gravity.CENTER);
+        textView.setText("————" + getResources().getString(R.string.no_more_data) + "————");
+        return textView;
+    }
+
 
     private void initSystemBarColor() {
         appBarLayout.addOnOffsetChangedListener(
                 new AppBarStatusChangeListener() {
                     @Override
-                    public void onStateChanged(AppBarLayout appBarLayout, State state,int local) {
+                    public void onStateChanged(AppBarLayout appBarLayout, State state, int local) {
                         if (state == State.EXPANDED) {
                             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
                             floatingActionButton.animate().scaleX(1.0F).scaleY(1.0F).alpha(1.0F)
@@ -110,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
                             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
                             floatingActionButton.animate().scaleX(0.0F).scaleY(0.0F).alpha(0.0F).setDuration(500).setInterpolator(new FastOutSlowInInterpolator()).withLayer();
 
-                        }else{
-                            Log.d("FloatDebug","当前位置：" + local);
+                        } else {
+                            Log.d("FloatDebug", "当前位置：" + local);
                         }
                     }
                 });
@@ -124,7 +141,8 @@ public class MainActivity extends AppCompatActivity {
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this, R.style.ThemeOverlayAppMaterialAlertDialog);
                 View content = LayoutInflater.from(MainActivity.this).inflate(R.layout.add_content_view_dialog, null);
                 builder.setView(content);
-                AlertDialog dialog = builder.show();
+                AlertDialog dialog = builder.create();
+                if (!dialog.isShowing()) dialog.show();
 
                 TextInputLayout appName = content.findViewById(R.id.add_content_view_dialog_appName);
                 TextInputLayout accountID = content.findViewById(R.id.add_content_view_dialog_accountID);
@@ -203,8 +221,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Collection<? extends BaseNode> getEntity() {
-        for (int i = 0; i < 30; i++) {
-            list.add(new CardData(i, "第" + i + "项"));
+        for (int i = 1; i <= 5; i++) {
+            CardData data = new CardData(i, "第" + i + "项", "123456", "123456");
+            data.setCreateDate(new Date(System.currentTimeMillis()));
+            list.add(data);
         }
         return list;
     }
