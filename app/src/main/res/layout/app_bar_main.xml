@@ -45,9 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="30dp"
-        android:layout_marginBottom="160dp"
-        android:contentDescription="TODO"
-        app:layout_anchor="@id/activity_main_appbar"
+        app:layout_anchor="@id/activity_main_collapsingtoolbar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_baseline_add_24" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
