@@ -12,6 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@android:color/transparent</item>
 
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
+
 
         <!-- Customize your theme here. -->
 

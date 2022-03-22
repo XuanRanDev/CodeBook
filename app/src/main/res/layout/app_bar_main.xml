@@ -17,7 +17,7 @@
             android:layout_height="200dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary">
+            app:contentScrim="@color/Theme1.toolbar.color">
 
             <ImageView
                 android:layout_width="match_parent"

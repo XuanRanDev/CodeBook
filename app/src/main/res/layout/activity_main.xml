@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/main_background_color"
+        android:background="@color/Theme1.background.color"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/drawer_main"
         style="@style/Widget.MaterialComponents.BottomNavigationView"/>

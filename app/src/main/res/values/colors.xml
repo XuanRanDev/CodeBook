@@ -14,7 +14,8 @@
     <!--Theme1-->
     <color name="Theme1.toolbar.color">#f5f2f9</color>
     <color name="Theme1.background.color">#fdfbfe</color>
-    <color name="Theme1.card.color">#fefefe</color>
+    <color name="Theme1.nav.color">#fdfbfe</color>
+    <color name="Theme1.card.color">#FFFFFFFF</color>
     <color name="Theme1.statusBar.color">#b39ddb</color>
 
 
