@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -44,6 +46,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dev.xuanran.codebook.adapter.HomeCardAdapter;
 import dev.xuanran.codebook.bean.CardData;
+import dev.xuanran.codebook.listener.AppBarStatusChangeListener;
 
 
 @SuppressLint("NonConstantResourceId")
@@ -74,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-
         setSupportActionBar(toolbar);
 
 
@@ -89,22 +90,37 @@ public class MainActivity extends AppCompatActivity {
 
         initFloatButton();
         initAppBar();
-        //initSystemBarColor();
+        initSystemBarColor();
         initView();
     }
 
 
     private void initSystemBarColor() {
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        appBarLayout.addOnOffsetChangedListener(
+                new AppBarStatusChangeListener() {
+                    @Override
+                    public void onStateChanged(AppBarLayout appBarLayout, State state,int local) {
+                        if (state == State.EXPANDED) {
+                            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                            floatingActionButton.animate().scaleX(1.0F).scaleY(1.0F).alpha(1.0F)
+                                    .setInterpolator(new FastOutSlowInInterpolator()).withLayer().setDuration(500)
+                                    .start();
+                        } else if (state == State.COLLAPSED) {
+                            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                            floatingActionButton.animate().scaleX(0.0F).scaleY(0.0F).alpha(0.0F).setDuration(500).setInterpolator(new FastOutSlowInInterpolator()).withLayer();
+
+                        }else{
+                            Log.d("FloatDebug","当前位置：" + local);
+                        }
+                    }
+                });
     }
 
     private void initFloatButton() {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this, R.style.ThemeOverlayAppMaterialAlertDialog);
                 View content = LayoutInflater.from(MainActivity.this).inflate(R.layout.add_content_view_dialog, null);
                 builder.setView(content);
                 AlertDialog dialog = builder.show();
@@ -128,8 +144,6 @@ public class MainActivity extends AppCompatActivity {
                         showAddPopupMenu(view);
                     }
                 });
-
-
             }
         });
     }

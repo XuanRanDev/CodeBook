@@ -6,7 +6,7 @@
     style="?attr/materialCardViewElevatedStyle"
     android:layout_width="match_parent"
     android:layout_height="500dp"
-    app:cardBackgroundColor="@color/card_background_color"
+    app:cardBackgroundColor="@color/Theme1.card.color"
     app:cardCornerRadius="14dp"
     app:cardElevation="3dp">
 

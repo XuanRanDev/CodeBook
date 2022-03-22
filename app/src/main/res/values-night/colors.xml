@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!--Theme1-->
+    <color name="Theme1.toolbar.color">#2a272e</color>
+    <color name="Theme1.background.color">#1d1a21</color>
+    <color name="Theme1.nav.color">#1d1a21</color>
+    <color name="Theme1.card.color">#26252a</color>
+    <color name="Theme1.statusBar.color">#2a272e</color>
+
 </resources>
