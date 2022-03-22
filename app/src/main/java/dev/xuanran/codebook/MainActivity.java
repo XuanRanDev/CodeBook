@@ -44,6 +44,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dev.xuanran.codebook.adapter.HomeCardAdapter;
 import dev.xuanran.codebook.bean.CardData;
+import dev.xuanran.codebook.listener.AppBarStatusChangeListener;
 
 
 @SuppressLint("NonConstantResourceId")
@@ -75,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-
         setSupportActionBar(toolbar);
 
 
@@ -89,22 +89,30 @@ public class MainActivity extends AppCompatActivity {
 
         initFloatButton();
         initAppBar();
-        //initSystemBarColor();
+        initSystemBarColor();
         initView();
     }
 
 
     private void initSystemBarColor() {
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        appBarLayout.addOnOffsetChangedListener(
+                new AppBarStatusChangeListener() {
+                    @Override
+                    public void onStateChanged(AppBarLayout appBarLayout, State state) {
+                        if (state == State.EXPANDED) {
+                            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                        } else if (state == State.COLLAPSED) {
+                            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                        }
+                    }
+                });
     }
 
     private void initFloatButton() {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this, R.style.ThemeOverlayAppMaterialAlertDialog);
                 View content = LayoutInflater.from(MainActivity.this).inflate(R.layout.add_content_view_dialog, null);
                 builder.setView(content);
                 AlertDialog dialog = builder.show();

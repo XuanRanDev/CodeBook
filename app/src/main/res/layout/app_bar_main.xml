@@ -15,46 +15,39 @@
             android:id="@+id/activity_main_collapsingtoolbar"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
             android:fitsSystemWindows="true"
-            app:contentScrim="@color/Theme1.toolbar.color">
+            app:contentScrim="@color/Theme1.toolbar.color"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
                 android:src="@drawable/img"
                 app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7"
-                android:fitsSystemWindows="true"/>
+                app:layout_collapseParallaxMultiplier="0.7" />
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/activity_main_toolbar"
-                app:layout_collapseMode="pin"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
                 app:layout_scrollFlags="scroll|enterAlways" />
-
         </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-
     </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/content_scrolling" />
-
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/activity_main_floating_action_button"
         style="@style/Widget.Material3.FloatingActionButton.Tertiary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="160dp"
+        android:contentDescription="TODO"
         app:layout_anchor="@id/activity_main_appbar"
         app:layout_anchorGravity="bottom|end"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="60dp"
-        app:srcCompat="@drawable/ic_baseline_add_24"
-        android:contentDescription="TODO" />
-
-
-
+        app:srcCompat="@drawable/ic_baseline_add_24" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
