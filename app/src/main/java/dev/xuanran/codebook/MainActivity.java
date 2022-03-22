@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 
 
         homeCardAdapter = new HomeCardAdapter();
@@ -237,8 +238,8 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < homeCardAdapter.getData().size(); i++) {
                 CardData cardData = (CardData) homeCardAdapter.getData().get(i);
                 if (!cardData.getCardName().contains(query)) {
+                    homeCardAdapter.removeAt(i);
                     runDataRefreshLayoutAnimation(recyclerView);
-//                    homeCardAdapter.removeAt(i);
                 }
             }
             homeCardAdapter.notifyDataSetChanged();
