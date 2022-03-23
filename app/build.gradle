@@ -15,10 +15,34 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        debug {
+            storeFile file('D:\\AndroidStudioProject\\SignPassworld\\XuanRan.jks')
+            storePassword 'XuanRan020808'
+            keyAlias = 'XuanRan'
+            keyPassword 'XuanRan020808'
+        }
+        release {
+            storeFile file('D:\\AndroidStudioProject\\SignPassworld\\XuanRan_Release.jks')
+            storePassword 'XuanRan_Release_0808'
+            keyAlias 'XuanRan'
+            keyPassword 'XuanRan_Release_0808'
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            applicationIdSuffix '.Beta'
+            renderscriptDebuggable true
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            multiDexEnabled false
         }
     }
     compileOptions {

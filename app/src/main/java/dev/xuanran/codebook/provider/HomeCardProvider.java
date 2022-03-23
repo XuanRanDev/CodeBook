@@ -74,7 +74,7 @@ public class HomeCardProvider extends BaseNodeProvider {
      *
      * @param view 父View
      */
-    private void showMoreMenu(View view, CardData data, AlertDialog dialog) {
+    private void showMoreMenu(View view, CardData data) {
         PopupMenu popup = new PopupMenu(view.getContext(), view);
         popup.getMenuInflater().inflate(R.menu.dialog_content_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(item -> {
@@ -83,7 +83,7 @@ public class HomeCardProvider extends BaseNodeProvider {
                     Snackbar.make(view, "数据删除后不可恢复，是否继续？", 10000).setAction("确定", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            deleteCardData(view, data, dialog);
+                            deleteCardData(view, data);
                         }
                     }).show();
             }
@@ -98,12 +98,12 @@ public class HomeCardProvider extends BaseNodeProvider {
      * @param data 卡片对象
      */
     @SuppressLint("NotifyDataSetChanged")
-    private void deleteCardData(View ctx, CardData data, AlertDialog dialog) {
+    private void deleteCardData(View ctx, CardData data) {
         AppExecutors.getInstance().diskIO().execute(() -> {
             UserDataDao dao = AppDatabase.getInstance(ctx.getContext()).userDataDao();
             dao.deleteData(data);
+            Snackbar.make(ctx, "已删除,将在下次启动时彻底移除", 5000).show();
         });
-        Snackbar.make(ctx, "已删除,请手动刷新数据", 3000).show();
 
     }
 
@@ -138,7 +138,7 @@ public class HomeCardProvider extends BaseNodeProvider {
             dialog.show();
         }
 
-        more.setOnClickListener(view13 -> showMoreMenu(view13, data, dialog));
+        more.setOnClickListener(view13 -> showMoreMenu(view13, data));
 
         copyAccountID.setOnClickListener(view1 -> {
             ClipboardUtil.setTextToClipboard(view1.getContext(), accountId);
