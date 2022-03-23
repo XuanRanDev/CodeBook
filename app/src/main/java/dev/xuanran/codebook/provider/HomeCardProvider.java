@@ -22,9 +22,12 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Objects;
 
+import dev.xuanran.codebook.MainActivity;
 import dev.xuanran.codebook.R;
 import dev.xuanran.codebook.bean.CardData;
+import dev.xuanran.codebook.util.AesUtil;
 
 /**
  * Created By XuanRan on 2022/3/19
@@ -46,12 +49,7 @@ public class HomeCardProvider extends BaseNodeProvider implements View.OnClickLi
     public void convert(@NonNull BaseViewHolder baseViewHolder, BaseNode baseNode) {
         setLayoutContent(baseViewHolder,baseNode);
         Button bn = baseViewHolder.getView(R.id.list_cardView_view);
-        bn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showContent(view,baseNode);
-            }
-        });
+        bn.setOnClickListener(view -> showContent(view,baseNode));
     }
 
     /**
@@ -63,7 +61,7 @@ public class HomeCardProvider extends BaseNodeProvider implements View.OnClickLi
         CardData cardData = (CardData) node;
         baseViewHolder.setText(R.id.list_cardView_title,cardData.getAppName());
         baseViewHolder.setText(R.id.list_cardView_id,"# " + cardData.getCardId());
-        baseViewHolder.setText(R.id.list_cardView_createDate,new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
+       // baseViewHolder.setText(R.id.list_cardView_createDate,new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
     }
 
     @Override
@@ -80,11 +78,9 @@ public class HomeCardProvider extends BaseNodeProvider implements View.OnClickLi
     private void showMoreMenu(View view) {
         PopupMenu popup = new PopupMenu(view.getContext(), view);
         popup.getMenuInflater().inflate(R.menu.dialog_content_menu, popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-                Toast.makeText(view.getContext(), "Click:" + item.getTitle(), Toast.LENGTH_SHORT).show();
-                return true;
-            }
+        popup.setOnMenuItemClickListener(item -> {
+            Toast.makeText(view.getContext(), "Click:" + item.getTitle(), Toast.LENGTH_SHORT).show();
+            return true;
         });
         popup.show();
     }
@@ -108,8 +104,10 @@ public class HomeCardProvider extends BaseNodeProvider implements View.OnClickLi
 
         //setValue
         appName.setText(data.getAppName());
-        accountID.getEditText().setText(data.getAccountId());
-        password.getEditText().setText(data.getPassword());
+        String accountId = AesUtil.decrypt(data.getAccountId(), MainActivity.AES_PASSWORD);
+        Objects.requireNonNull(accountID.getEditText()).setText(accountId);
+        String dataPassword = AesUtil.decrypt(data.getPassword(),MainActivity.AES_PASSWORD);
+        Objects.requireNonNull(password.getEditText()).setText(dataPassword);
 
         more.setOnClickListener(this);
         builder.setView(contentView);

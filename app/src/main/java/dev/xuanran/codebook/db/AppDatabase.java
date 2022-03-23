@@ -9,11 +9,11 @@ import androidx.room.RoomDatabase;
 import dev.xuanran.codebook.bean.CardData;
 import dev.xuanran.codebook.dao.UserDataDao;
 
-@Database(entities = {CardData.class}, version = 1)
+@Database(entities = {CardData.class}, version = 1,exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     public static final String TAG = AppDatabase.class.getSimpleName();
     public static final Object lock = new Object();
-    public static final String DATABASES_NAME = "UserName";
+    public static final String DATABASES_NAME = "UserData";
     public static AppDatabase appDatabase;
 
     public abstract UserDataDao userDataDao();
