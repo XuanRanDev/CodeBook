@@ -61,7 +61,7 @@ public class HomeCardProvider extends BaseNodeProvider implements View.OnClickLi
         CardData cardData = (CardData) node;
         baseViewHolder.setText(R.id.list_cardView_title,cardData.getAppName());
         baseViewHolder.setText(R.id.list_cardView_id,"# " + cardData.getCardId());
-       // baseViewHolder.setText(R.id.list_cardView_createDate,new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
+        baseViewHolder.setText(R.id.list_cardView_createDate,"创建时间：" + new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
     }
 
     @Override

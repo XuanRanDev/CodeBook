@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
     public static final int EVENT_TYPE_FROM_UPDATE_DATA = 1; // 事件由更新触发
     public static final int EVENT_TYPE_FROM_SET_NEW_DATA = 2; // 事件由设置数据触发
 
-    public static final String AES_PASSWORD = "abcabcabcabc";
+    public static final String AES_PASSWORD = "abcabcabcabcabca";
 
     HomeCardAdapter homeCardAdapter;
 
@@ -182,14 +182,18 @@ public class MainActivity extends AppCompatActivity
             cancel.setOnClickListener(view1 -> dialog.dismiss());
             more.setOnClickListener(this::showAddPopupMenu);
             save.setOnClickListener(view13 -> {
-                String appNameStr = Objects.requireNonNull(appName.getEditText()).getText().toString();
-                String accountIDStr = Objects.requireNonNull(accountID.getEditText()).getText().toString();
-                String passwordStr = Objects.requireNonNull(password.getEditText()).getText().toString();
+                String appNameStr = Objects.requireNonNull(appName.getEditText()).getText().toString().trim();
+                String accountIDStr = Objects.requireNonNull(accountID.getEditText()).getText().toString().trim();
+                String passwordStr = Objects.requireNonNull(password.getEditText()).getText().toString().trim();
 
+                if (appNameStr.equals("") && accountIDStr.equals("") && passwordStr.equals("")){
+                    Snackbar.make(view13,"请检查所填信息中是否包含空格" ,3000).show();
+                    return;
+                }
 
                 String encryptAccountID = AesUtil.encrypt(accountIDStr, AES_PASSWORD);
                 String encryptPassword = AesUtil.encrypt(passwordStr, AES_PASSWORD);
-                CardData cardData = new CardData(appNameStr, encryptAccountID, encryptPassword);
+                CardData cardData = new CardData(appNameStr, encryptAccountID, encryptPassword,System.currentTimeMillis());
                 InsertDataToDataBases(cardData, dialog);
                 //addNewDataToAdapter(cardData);
             });
