@@ -43,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
             app:layout_constraintTop_toBottomOf="@id/content_view_dialog_title"
             tools:ignore="MissingConstraints">
@@ -91,7 +91,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="145dp"
             android:gravity="right"
             android:orientation="horizontal"
             android:paddingEnd="20dp"
