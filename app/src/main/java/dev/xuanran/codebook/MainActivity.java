@@ -273,8 +273,23 @@ public class MainActivity extends AppCompatActivity
         AppExecutors.getInstance().diskIO().execute(() -> {
             UserDataDao dao = AppDatabase.getInstance(MainActivity.this).userDataDao();
             List<CardData> all = dao.getAll();
+            if (all.size() == 0){
+                runOnUiThread(this::showEmptyLayout);
+                return;
+            }
+            if (homeCardAdapter.isUseEmpty()) homeCardAdapter.setUseEmpty(false);
             runOnUiThread(() -> analyticalEventType(all, EventType));
         });
+    }
+
+    /**
+     * 为Adapter显示空布局
+     */
+    @SuppressLint("InflateParams")
+    private void showEmptyLayout() {
+        View inflate = LayoutInflater.from(this).inflate(R.layout.empty_data, null);
+        homeCardAdapter.setEmptyView(inflate);
+        homeCardAdapter.setUseEmpty(true);
     }
 
     /**
