@@ -3,6 +3,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('D:\\AndroidStudioProject\\SignPassworld\\XuanRan_Release.jks')
+            storePassword "XuanRan_Release_0808"
+            keyAlias "XuanRan"
+            keyPassword 'XuanRan_Release_0808'
+        }
+    }
     compileSdk 32
 
     defaultConfig {
@@ -13,36 +21,13 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    signingConfigs {
-        debug {
-            storeFile file('D:\\AndroidStudioProject\\SignPassworld\\XuanRan.jks')
-            storePassword 'XuanRan020808'
-            keyAlias = 'XuanRan'
-            keyPassword 'XuanRan020808'
-        }
-        release {
-            storeFile file('D:\\AndroidStudioProject\\SignPassworld\\XuanRan_Release.jks')
-            storePassword 'XuanRan_Release_0808'
-            keyAlias 'XuanRan'
-            keyPassword 'XuanRan_Release_0808'
-        }
+        signingConfig signingConfigs.release
     }
 
     buildTypes {
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            debuggable false
-            signingConfig signingConfigs.release
-        }
-        debug {
-            applicationIdSuffix '.Beta'
-            renderscriptDebuggable true
-            signingConfig signingConfigs.debug
             minifyEnabled false
-            multiDexEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
