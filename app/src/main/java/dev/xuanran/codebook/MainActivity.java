@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
     public static final int EVENT_TYPE_FROM_UPDATE_DATA = 1; // 事件由更新触发
     public static final int EVENT_TYPE_FROM_SET_NEW_DATA = 2; // 事件由设置数据触发
 
-    public static final String AES_PASSWORD = "11111111111";
+    public static final String AES_PASSWORD = "abcabcabcabc";
 
     HomeCardAdapter homeCardAdapter;
 
@@ -99,11 +99,17 @@ public class MainActivity extends AppCompatActivity
         initView();
     }
 
+    /**
+     * 初始化RecyclerView
+     */
     private void initRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(homeCardAdapter);
     }
 
+    /**
+     * 初始化布局适配器
+     */
     private void initAdapter() {
         homeCardAdapter = new HomeCardAdapter();
         // Read data from the database and pass in Settings to RecyclerView
@@ -113,6 +119,10 @@ public class MainActivity extends AppCompatActivity
         homeCardAdapter.setFooterView(GenerateBottomView());
     }
 
+    /**
+     * 生成底部无数据View
+     * @return View
+     */
     private View GenerateBottomView() {
         TextView textView = new TextView(this);
         textView.setPadding(0, 50, 0, 150);
@@ -121,7 +131,9 @@ public class MainActivity extends AppCompatActivity
         return textView;
     }
 
-
+    /**
+     * 监听AppBar改变更改状态栏背景
+     */
     private void initSystemBarColor() {
         appBarLayout.addOnOffsetChangedListener(
                 new AppBarStatusChangeListener() {
@@ -140,11 +152,18 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-
+    /**
+     * 添加新的数据到适配器
+     * @param cardData data
+     */
     private void addNewDataToAdapter(CardData cardData){
         homeCardAdapter.addData(cardData);
     }
 
+
+    /**
+     * 设置浮动按钮相关操作
+     */
     private void initFloatButton() {
         floatingActionButton.setOnClickListener(view -> {
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this, R.style.ThemeOverlayAppMaterialAlertDialog);
@@ -172,7 +191,7 @@ public class MainActivity extends AppCompatActivity
                 String encryptPassword = AesUtil.encrypt(passwordStr, AES_PASSWORD);
                 CardData cardData = new CardData(appNameStr, encryptAccountID, encryptPassword);
                 InsertDataToDataBases(cardData, dialog);
-                addNewDataToAdapter(cardData);
+                //addNewDataToAdapter(cardData);
             });
         });
     }
@@ -187,11 +206,15 @@ public class MainActivity extends AppCompatActivity
             UserDataDao userDataDao = AppDatabase.getInstance(MainActivity.this).userDataDao();
             userDataDao.insertData(cardData);
             dialog.dismiss();
-            //getUserDataFromDatabases(EVENT_TYPE_FROM_UPDATE_DATA);
+            getUserDataFromDatabases(EVENT_TYPE_FROM_UPDATE_DATA);
             Snackbar.make(drawerLayout, "已自动更新数据", 3000).show();
         });
     }
 
+    /**
+     * 显示泡泡菜单
+     * @param view View
+     */
     private void showAddPopupMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
         popupMenu.getMenuInflater().inflate(R.menu.add_more_menu, popupMenu.getMenu());
@@ -203,6 +226,9 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    /**
+     * 设置Appbar展开时的文字颜色
+     */
     private void initAppBar() {
         collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);
     }
