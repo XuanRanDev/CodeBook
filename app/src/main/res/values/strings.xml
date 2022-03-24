@@ -22,4 +22,15 @@
     <string name="empty_layout_comment">你来到了一个荒无人烟的地方…</string>
     <string name="nullContent">null</string>
     <string name="view">查看</string>
+    <string name="bankCard">银行卡</string>
+    <string name="idCard">身份证</string>
+    <string name="harvestAddress">收货地址</string>
+    <string name="pleaseInputIdCard">请在此键入您的身份证号码</string>
+    <string name="idCardOwn">身份证持有者</string>
+    <string name="ownBank">所属银行名称</string>
+    <string name="pleaseInputCardNum">请在此键入您的银行卡号码</string>
+    <string name="pleaseInputCardPassword">请在此键入您的银行卡密码(可空)</string>
+    <string name="pleaseInputHarvestAddress">请在此键入您的收货地址</string>
+    <string name="harvestAddressName">收货地址名称</string>
+    <string name="pleaseCheckData">请检查所填信息中是否包含空格</string>
 </resources>

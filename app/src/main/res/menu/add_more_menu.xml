@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:title="无账号模式"
-        android:id="@+id/add_menu_withoutAccountID"/>
+        android:title="银行卡账号模式"
+        android:id="@+id/add_menu_bankCard"/>
     <item
-        android:title="无密码模式"
-        android:id="@+id/add_menu_withoutPassword"/>
+        android:title="身份证号模式"
+        android:id="@+id/add_menu_idCard"/>
+    <item
+        android:title="收获地址模式"
+        android:id="@+id/add_menu_harvestAddress"/>
     <item
         android:id="@+id/add_menu_addComment"
         android:title="添加备注"/>

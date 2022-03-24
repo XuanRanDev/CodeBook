@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -119,6 +120,32 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
         baseViewHolder.setText(R.id.list_cardView_title, cardData.getAppName());
         baseViewHolder.setText(R.id.list_cardView_id, "# " + cardData.getCardId());
         baseViewHolder.setText(R.id.list_cardView_createDate, new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
+        baseViewHolder.setText(R.id.list_cardView_tag_text,getTagClass(cardData.getTag()));
+        ImageView tagImage = baseViewHolder.getView(R.id.list_cardView_img_tag);
+        if (getTagClass(cardData.getTag()) == null) tagImage.setVisibility(View.GONE);
+    }
+
+    /**
+     * 根据TAG值返回具体类型
+     * @param tag tag code
+     * @return 字符串类的文本
+     */
+    private String getTagClass(Integer tag) {
+        if (tag == null) return null;
+        if (tag == 1){ // 银行卡模式
+            return getString(R.string.idCard);
+        }
+        if (tag == 2){
+            return getString(R.string.bankCard);
+        }
+        if (tag == 3){
+            return getString(R.string.harvestAddress);
+        }
+        return null;
+    }
+
+    private String getString(int resId) {
+        return getContext().getResources().getString(resId);
     }
 
     /**
@@ -183,6 +210,8 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
         if (!dialog.isShowing()) {
             dialog.show();
         }
+
+        if (data.getTag() == 1) password.setVisibility(View.GONE);
 
         more.setOnClickListener(view13 -> showMoreMenu(view13, data));
 
