@@ -5,14 +5,17 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -52,8 +55,7 @@ import dev.xuanran.codebook.util.AppExecutors;
 
 
 @SuppressLint("NonConstantResourceId")
-public class MainActivity extends AppCompatActivity
-{
+public class MainActivity extends AppCompatActivity {
     // View
     @BindView(R.id.activity_main_toolbar)
     Toolbar toolbar;
@@ -74,9 +76,13 @@ public class MainActivity extends AppCompatActivity
     public static final int EVENT_TYPE_FROM_UPDATE_DATA = 1; // 事件由更新触发
     public static final int EVENT_TYPE_FROM_SET_NEW_DATA = 2; // 事件由设置数据触发
 
-    public static final String AES_PASSWORD = "abcabcabcabc";
+    public static final String AES_PASSWORD = "abcabcabcabcabca";
+    // AppBarLayout 状态 true 展开 / false 关闭
+    boolean appBarStatus = true;
 
     HomeCardAdapter homeCardAdapter;
+    SearchView searchView;
+    private long firstTime;
 
 
     @Override
@@ -121,6 +127,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * 生成底部无数据View
+     *
      * @return View
      */
     private View GenerateBottomView() {
@@ -144,9 +151,11 @@ public class MainActivity extends AppCompatActivity
                             floatingActionButton.animate().scaleX(1.0F).scaleY(1.0F).alpha(1.0F)
                                     .setInterpolator(new FastOutSlowInInterpolator()).withLayer().setDuration(500)
                                     .start();
+                            appBarStatus = false;
                         } else if (state == State.COLLAPSED) {
                             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
                             floatingActionButton.animate().scaleX(0.0F).scaleY(0.0F).alpha(0.0F).setDuration(500).setInterpolator(new FastOutSlowInInterpolator()).withLayer();
+                            appBarStatus = true;
                         }
                     }
                 });
@@ -154,9 +163,10 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * 添加新的数据到适配器
+     *
      * @param cardData data
      */
-    private void addNewDataToAdapter(CardData cardData){
+    private void addNewDataToAdapter(CardData cardData) {
         homeCardAdapter.addData(cardData);
     }
 
@@ -180,16 +190,20 @@ public class MainActivity extends AppCompatActivity
             AppCompatImageView more = content.findViewById(R.id.add_content_view_dialog_more);
 
             cancel.setOnClickListener(view1 -> dialog.dismiss());
-            more.setOnClickListener(this::showAddPopupMenu);
+            more.setOnClickListener(view12 -> showAddPopupMenu(view12, accountID, password));
             save.setOnClickListener(view13 -> {
-                String appNameStr = Objects.requireNonNull(appName.getEditText()).getText().toString();
-                String accountIDStr = Objects.requireNonNull(accountID.getEditText()).getText().toString();
-                String passwordStr = Objects.requireNonNull(password.getEditText()).getText().toString();
+                String appNameStr = Objects.requireNonNull(appName.getEditText()).getText().toString().trim();
+                String accountIDStr = Objects.requireNonNull(accountID.getEditText()).getText().toString().trim();
+                String passwordStr = Objects.requireNonNull(password.getEditText()).getText().toString().trim();
 
+                if (appNameStr.equals("") && accountIDStr.equals("") && passwordStr.equals("")) {
+                    Snackbar.make(view13, "请检查所填信息中是否包含空格", 3000).show();
+                    return;
+                }
 
                 String encryptAccountID = AesUtil.encrypt(accountIDStr, AES_PASSWORD);
                 String encryptPassword = AesUtil.encrypt(passwordStr, AES_PASSWORD);
-                CardData cardData = new CardData(appNameStr, encryptAccountID, encryptPassword);
+                CardData cardData = new CardData(appNameStr, encryptAccountID, encryptPassword, System.currentTimeMillis());
                 InsertDataToDataBases(cardData, dialog);
                 //addNewDataToAdapter(cardData);
             });
@@ -213,18 +227,28 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * 显示泡泡菜单
+     *
      * @param view View
      */
-    private void showAddPopupMenu(View view) {
+    private void showAddPopupMenu(View view, TextInputLayout accountEdit, TextInputLayout passwordEdit) {
         PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
         popupMenu.getMenuInflater().inflate(R.menu.add_more_menu, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(item -> {
+            analyticalPopupMenuClick(item, accountEdit, passwordEdit);
             Snackbar.make(drawerLayout, "Click:" + item.getTitle(), 3000).show();
             return false;
         });
         popupMenu.show();
     }
 
+    /**
+     * 解析泡泡窗口的按钮点击事件
+     *
+     * @param item 所按下的按钮
+     */
+    private void analyticalPopupMenuClick(MenuItem item, TextInputLayout accountEdit, TextInputLayout passwordEdit) {
+
+    }
 
     /**
      * 设置Appbar展开时的文字颜色
@@ -233,6 +257,11 @@ public class MainActivity extends AppCompatActivity
         collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);
     }
 
+    /**
+     * 显示警告对话框
+     *
+     * @param info 所要显示的信息
+     */
     private void alertWarning(String info) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(R.string.error);
@@ -242,7 +271,9 @@ public class MainActivity extends AppCompatActivity
         builder.show();
     }
 
-
+    /**
+     * 初始化相关View
+     */
     private void initView() {
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this,
                 drawerLayout,
@@ -269,8 +300,23 @@ public class MainActivity extends AppCompatActivity
         AppExecutors.getInstance().diskIO().execute(() -> {
             UserDataDao dao = AppDatabase.getInstance(MainActivity.this).userDataDao();
             List<CardData> all = dao.getAll();
+            if (all.size() == 0) {
+                runOnUiThread(this::showEmptyLayout);
+                return;
+            }
+            if (homeCardAdapter.isUseEmpty()) homeCardAdapter.setUseEmpty(false);
             runOnUiThread(() -> analyticalEventType(all, EventType));
         });
+    }
+
+    /**
+     * 为Adapter显示空布局
+     */
+    @SuppressLint("InflateParams")
+    private void showEmptyLayout() {
+        View inflate = LayoutInflater.from(this).inflate(R.layout.empty_data, null);
+        homeCardAdapter.setEmptyView(inflate);
+        homeCardAdapter.setUseEmpty(true);
     }
 
     /**
@@ -315,13 +361,18 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem search = menu.findItem(R.id.app_bar_search);
-        SearchView searchView = (SearchView) search.getActionView();
+        searchView = (SearchView) search.getActionView();
         searchView.setQueryHint("搜索...");
+        searchView.setOnSearchClickListener(view -> appBarLayout.setExpanded(false));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return true;
+                searchView.clearFocus();
+                searchView.onActionViewCollapsed();
+                appBarLayout.setExpanded(true, true);
+                return false;
             }
+
 
             @Override
             public boolean onQueryTextChange(String query) {
@@ -329,6 +380,14 @@ public class MainActivity extends AppCompatActivity
                 filter(query);
                 return false;
             }
+        });
+
+
+        ImageView closeView = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        closeView.setOnClickListener(view -> {
+            searchView.clearFocus();
+            searchView.onActionViewCollapsed();
+            appBarLayout.setExpanded(true, true);
         });
         return super.onCreateOptionsMenu(menu);
     }
@@ -349,13 +408,15 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /**    private void runDataLoadingLayoutAnimation(final RecyclerView recyclerView) {
-        final Context context = recyclerView.getContext();
-        final LayoutAnimationController controller =
-                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
-        recyclerView.setLayoutAnimation(controller);
-        recyclerView.scheduleLayoutAnimation();
-    }*/
+    /**
+     * private void runDataLoadingLayoutAnimation(final RecyclerView recyclerView) {
+     * final Context context = recyclerView.getContext();
+     * final LayoutAnimationController controller =
+     * AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
+     * recyclerView.setLayoutAnimation(controller);
+     * recyclerView.scheduleLayoutAnimation();
+     * }
+     */
 
     private void runDataRefreshLayoutAnimation(final RecyclerView recyclerView) {
         final Context context = recyclerView.getContext();
@@ -369,5 +430,47 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         return true;
+    }
+
+    /**
+     * 处理按钮返回事件，这段方法写的比较难以理解，可能存在未知的bug
+     * @param keyCode 由哪个按钮触发
+     * @param event 按钮事件
+     * @return other
+     */
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+            searchView.clearFocus();
+            searchView.onActionViewCollapsed();
+            if (!appBarStatus) {
+                appBarLayout.setExpanded(true, true);
+                long secondTime = System.currentTimeMillis();
+                if (secondTime - firstTime > 3000 ) {
+                    firstTime = secondTime;
+                    Snackbar.make(drawerLayout, "再按一次退出", 3000).setBackgroundTint(Color.parseColor("#FFFF8A80")).setAction("OK", view -> finish()).show();
+                    return true;
+                } else {
+                    finish();
+                }
+            } else {
+                appBarLayout.setExpanded(true, true);
+                return true;
+            }
+
+        }
+
+        return super.onKeyUp(keyCode, event);
+    }
+
+    private void enableSearchView(View view, boolean enabled) {
+        view.setEnabled(enabled);
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                View child = viewGroup.getChildAt(i);
+                enableSearchView(child, enabled);
+            }
+        }
     }
 }

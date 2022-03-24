@@ -4,8 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/drawable/baseline_folder_24.xml" value="0.2037037037037037" />
+        <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/drawable/calendar-range-outline.xml" value="0.142" />
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/drawable/custom_popup_background.xml" value="0.2512820512820513" />
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/drawable/ic_add_white_24dp.xml" value="0.2037037037037037" />
+        <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.142" />
+        <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/drawable/ic_baseline_date_range_24.xml" value="0.142" />
+        <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/drawable/ic_baseline_edit_24.xml" value="0.142" />
+        <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/drawable/ic_outline_date_range_24.xml" value="0.142" />
+        <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/drawable/ic_tag_multiple_outline.xml" value="0.142" />
+        <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/drawable/tag-multiple-outline.xml" value="0.142" />
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/aa.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/activity_main.xml" value="0.16893115942028986" />
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/add_content_view_dialog.xml" value="0.2" />
@@ -13,7 +20,8 @@
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/content_no_moredata.xml" value="0.4" />
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/content_scrolling.xml" value="0.2390625" />
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/content_view_dialog.xml" value="0.264" />
-        <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/list_cardview.xml" value="0.1" />
+        <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/empty_data.xml" value="0.2" />
+        <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/list_cardview.xml" value="0.33951497860199714" />
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/main2.xml" value="0.16893115942028986" />
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/layout/nav_header_main.xml" value="0.16893115942028986" />
         <entry key="..\:/AndroidStudioProject/CodeBook/app/src/main/res/menu/add_more_menu.xml" value="0.25364583333333335" />

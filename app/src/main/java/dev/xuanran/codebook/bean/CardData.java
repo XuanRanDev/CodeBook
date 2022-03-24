@@ -23,16 +23,16 @@ public class CardData extends BaseNode {
     private String accountId;
     @ColumnInfo(name = "password")
     private String password;
-//    @ColumnInfo(name = "createDate")
-    //private Date createDate;
-//    @ColumnInfo(name = "updateDate")
-    //private Date updateDate;
+    @ColumnInfo(name = "createDate")
+    private long createDate;
+    @ColumnInfo(name = "updateDate")
+    private long updateDate;
 
-
-    public CardData(String appName, String accountId, String password) {
+    public CardData(String appName, String accountId, String password, long createDate) {
         this.appName = appName;
         this.accountId = accountId;
         this.password = password;
+        this.createDate = createDate;
     }
 
     public Integer getCardId() {
@@ -67,6 +67,21 @@ public class CardData extends BaseNode {
         this.password = password;
     }
 
+    public long getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(long createDate) {
+        this.createDate = createDate;
+    }
+
+    public long getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(long updateDate) {
+        this.updateDate = updateDate;
+    }
 
     @Nullable
     @Override
