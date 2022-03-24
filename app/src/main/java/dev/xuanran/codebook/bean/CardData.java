@@ -88,4 +88,16 @@ public class CardData extends BaseNode {
     public List<BaseNode> getChildNode() {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "CardData{" +
+                "cardId=" + cardId +
+                ", appName='" + appName + '\'' +
+                ", accountId='" + accountId + '\'' +
+                ", password='" + password + '\'' +
+                ", createDate=" + createDate +
+                ", updateDate=" + updateDate +
+                '}';
+    }
 }

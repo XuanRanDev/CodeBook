@@ -1,7 +1,5 @@
 package dev.xuanran.codebook.dao;
 
-import android.service.autofill.UserData;
-
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -19,8 +17,8 @@ public interface UserDataDao {
     @Query("select * from UserData")
     List<CardData> getAll();
 
-/*    @Query("select * from UserData where cardId in (:appNames)")
-    List<CardData> getAllByID(String[] appNames);*/
+    @Query("select * from UserData where appName like '%'+:queryCondition+'%'")
+    List<CardData> getAllByName(String queryCondition);
 
     @Query("select * from UserData where appName like :appName")
     CardData findDataByName(String appName);

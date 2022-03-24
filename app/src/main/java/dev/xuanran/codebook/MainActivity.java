@@ -15,7 +15,9 @@ import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
+import android.widget.Filter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.animation.ScaleInAnimation;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -79,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String AES_PASSWORD = "abcabcabcabcabca";
     // AppBarLayout 状态 true 展开 / false 关闭
     boolean appBarStatus = true;
+    public static final String TAG = MainActivity.class.getSimpleName();
 
     HomeCardAdapter homeCardAdapter;
     SearchView searchView;
@@ -117,12 +121,15 @@ public class MainActivity extends AppCompatActivity {
      * 初始化布局适配器
      */
     private void initAdapter() {
-        homeCardAdapter = new HomeCardAdapter();
+        homeCardAdapter = new HomeCardAdapter(R.layout.list_cardview);
+        homeCardAdapter.setEmptyView(R.layout.empty_data);
         // Read data from the database and pass in Settings to RecyclerView
         getUserDataFromDatabases(EVENT_TYPE_FROM_SET_NEW_DATA);
         homeCardAdapter.setAnimationEnable(true);
-        homeCardAdapter.setAdapterAnimation(new ScaleInAnimation());
+        homeCardAdapter.setAnimationWithDefault(BaseQuickAdapter.AnimationType.SlideInBottom);
+        homeCardAdapter.setAnimationFirstOnly(false);
         homeCardAdapter.setFooterView(GenerateBottomView());
+
     }
 
     /**
@@ -310,14 +317,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 为Adapter显示空布局
+     * 为Adapter显示空布局，存在Bug
      */
     @SuppressLint("InflateParams")
     private void showEmptyLayout() {
-        View inflate = LayoutInflater.from(this).inflate(R.layout.empty_data, null);
-        homeCardAdapter.setEmptyView(inflate);
         homeCardAdapter.setUseEmpty(true);
     }
+
+
 
     /**
      * 解析事件类型，负责分发数据
@@ -382,7 +389,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         ImageView closeView = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
         closeView.setOnClickListener(view -> {
             searchView.clearFocus();
@@ -392,20 +398,14 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void filter(String query) {
-        try {
-            for (int i = 0; i < homeCardAdapter.getData().size(); i++) {
-                CardData cardData = (CardData) homeCardAdapter.getData().get(i);
-                if (!cardData.getAppName().contains(query)) {
-                    homeCardAdapter.removeAt(i);
-                    runDataRefreshLayoutAnimation(recyclerView);
-                }
-            }
-            homeCardAdapter.notifyDataSetChanged();
-        } catch (Exception e) {
-            alertWarning(e.getMessage());
-        }
+    /**
+     * 过滤数据
+     *
+     * @param query 查询条件
+     */
+    private synchronized void filter(String query) {
+        Filter filter = homeCardAdapter.getFilter();
+        filter.filter(query);
     }
 
     /**
@@ -434,8 +434,9 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 处理按钮返回事件，这段方法写的比较难以理解，可能存在未知的bug
+     *
      * @param keyCode 由哪个按钮触发
-     * @param event 按钮事件
+     * @param event   按钮事件
      * @return other
      */
     @Override
@@ -446,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
             if (!appBarStatus) {
                 appBarLayout.setExpanded(true, true);
                 long secondTime = System.currentTimeMillis();
-                if (secondTime - firstTime > 3000 ) {
+                if (secondTime - firstTime > 3000) {
                     firstTime = secondTime;
                     Snackbar.make(drawerLayout, "再按一次退出", 3000).setBackgroundTint(Color.parseColor("#FFFF8A80")).setAction("OK", view -> finish()).show();
                     return true;
