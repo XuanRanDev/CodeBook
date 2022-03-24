@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity
             AppCompatImageView more = content.findViewById(R.id.add_content_view_dialog_more);
 
             cancel.setOnClickListener(view1 -> dialog.dismiss());
-            more.setOnClickListener(this::showAddPopupMenu);
+            more.setOnClickListener(view12 -> showAddPopupMenu(view12,accountID,password));
             save.setOnClickListener(view13 -> {
                 String appNameStr = Objects.requireNonNull(appName.getEditText()).getText().toString().trim();
                 String accountIDStr = Objects.requireNonNull(accountID.getEditText()).getText().toString().trim();
@@ -219,14 +219,23 @@ public class MainActivity extends AppCompatActivity
      * 显示泡泡菜单
      * @param view View
      */
-    private void showAddPopupMenu(View view) {
+    private void showAddPopupMenu(View view,TextInputLayout accountEdit,TextInputLayout passwordEdit) {
         PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
         popupMenu.getMenuInflater().inflate(R.menu.add_more_menu, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(item -> {
+            analyticalPopupMenuClick(item,accountEdit,passwordEdit);
             Snackbar.make(drawerLayout, "Click:" + item.getTitle(), 3000).show();
             return false;
         });
         popupMenu.show();
+    }
+
+    /**
+     * 解析泡泡窗口的按钮点击事件
+     * @param item 所按下的按钮
+     */
+    private void analyticalPopupMenuClick(MenuItem item,TextInputLayout accountEdit,TextInputLayout passwordEdit) {
+
     }
 
 

@@ -66,7 +66,7 @@ public class HomeCardProvider extends BaseNodeProvider {
         CardData cardData = (CardData) node;
         baseViewHolder.setText(R.id.list_cardView_title, cardData.getAppName());
         baseViewHolder.setText(R.id.list_cardView_id, "# " + cardData.getCardId());
-        baseViewHolder.setText(R.id.list_cardView_createDate, "创建时间：" + new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
+        baseViewHolder.setText(R.id.list_cardView_createDate,  new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
     }
 
     /**
@@ -78,14 +78,8 @@ public class HomeCardProvider extends BaseNodeProvider {
         PopupMenu popup = new PopupMenu(view.getContext(), view);
         popup.getMenuInflater().inflate(R.menu.dialog_content_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.dialog_content_menu_delete:
-                    Snackbar.make(view, "数据删除后不可恢复，是否继续？", 10000).setAction("确定", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            deleteCardData(view, data);
-                        }
-                    }).show();
+            if (item.getItemId() == R.id.dialog_content_menu_delete) {
+                Snackbar.make(view, "数据删除后不可恢复，是否继续？", 10000).setAction("确定", view1 -> deleteCardData(view1, data)).show();
             }
             return true;
         });
