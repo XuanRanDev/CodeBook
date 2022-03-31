@@ -33,4 +33,17 @@
     <string name="pleaseInputHarvestAddress">请在此键入您的收货地址</string>
     <string name="harvestAddressName">收货地址名称</string>
     <string name="pleaseCheckData">请检查所填信息中是否包含空格</string>
+    <string name="userRole">用户协议</string>
+    <string name="userRule">用户协议</string>
+    <string name="about">关于</string>
+    <string name="appSecurity">App安全性</string>
+    <string name="donate">捐赠</string>
+    <string name="other">其他</string>
+    <string name="copyCardID">复制身份证号码</string>
+    <string name="cardID">身份证号码</string>
+    <string name="copyBankID">复制卡号</string>
+    <string name="BankID">银行卡账号</string>
+    <string name="BackPassword">复制密码</string>
+    <string name="copyAddress">复制地址</string>
+    <string name="address">收获地址</string>
 </resources>

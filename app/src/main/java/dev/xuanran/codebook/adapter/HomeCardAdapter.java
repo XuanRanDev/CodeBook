@@ -210,7 +210,27 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
             dialog.show();
         }
 
-        if (data.getTag() == 1) password.setVisibility(View.GONE);
+        if (password.getEditText().getText().toString().equals("")){
+            password.setVisibility(View.GONE);
+            copyPassword.setVisibility(View.GONE);
+        }
+
+        if (data.getTag() == 1) {
+            accountID.setHint(getString(R.string.cardID));
+            copyAccountID.setText(getString(R.string.copyCardID));
+        }
+        if (data.getTag() == 2 ){
+            accountID.setHint(getString(R.string.BankID));
+            password.setHint(getString(R.string.BackPassword));
+            copyAccountID.setText(getString(R.string.copyBankID));
+            copyPassword.setText(getString(R.string.CopyPassword));
+        }
+        if (data.getTag() == 3) {
+            accountID.setHint(getString(R.string.address));
+            copyAccountID.setText(getString(R.string.copyAddress));
+            copyPassword.setVisibility(View.GONE);
+            password.setVisibility(View.GONE);
+        }
 
         more.setOnClickListener(view13 -> showMoreMenu(view13, data));
 

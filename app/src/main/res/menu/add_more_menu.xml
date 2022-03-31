@@ -9,7 +9,4 @@
     <item
         android:title="收获地址模式"
         android:id="@+id/add_menu_harvestAddress"/>
-    <item
-        android:id="@+id/add_menu_addComment"
-        android:title="添加备注"/>
 </menu>
