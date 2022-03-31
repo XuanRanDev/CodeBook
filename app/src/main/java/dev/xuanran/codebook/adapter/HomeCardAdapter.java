@@ -121,8 +121,7 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
         baseViewHolder.setText(R.id.list_cardView_id, "# " + cardData.getCardId());
         baseViewHolder.setText(R.id.list_cardView_createDate, new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
         baseViewHolder.setText(R.id.list_cardView_tag_text,getTagClass(cardData.getTag()));
-        ImageView tagImage = baseViewHolder.getView(R.id.list_cardView_img_tag);
-        if (getTagClass(cardData.getTag()) == null) tagImage.setVisibility(View.GONE);
+
     }
 
     /**
@@ -141,7 +140,7 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
         if (tag == 3){
             return getString(R.string.harvestAddress);
         }
-        return null;
+        return "账号和密码";
     }
 
     private String getString(int resId) {
@@ -223,6 +222,8 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
             ClipboardUtil.setTextToClipboard(view12.getContext(), dataPassword);
             Snackbar.make(view12, "已复制，请谨防恶意应用读取", 50000).setBackgroundTint(Color.RED).setAction("OK", null).show();
         });
+
+        // Hide view...
     }
 
 

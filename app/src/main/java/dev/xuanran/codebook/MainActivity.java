@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                                 appName.setHint(R.string.harvestAddressName);
                                 accountID.setHint(R.string.pleaseInputHarvestAddress);
                                 password.setVisibility(View.GONE);
-                                saveModel.set(2);
+                                saveModel.set(3);
                                 break;
                         }
                         return false;
