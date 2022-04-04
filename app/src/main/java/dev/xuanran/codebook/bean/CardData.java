@@ -17,6 +17,8 @@ import java.util.List;
 public class CardData extends BaseNode {
     @PrimaryKey(autoGenerate = true)
     private Integer cardId;
+    @ColumnInfo(name = "tag")
+    private Integer tag;
     @ColumnInfo(name = "appName")
     private String appName;
     @ColumnInfo(name = "accountID")
@@ -81,6 +83,15 @@ public class CardData extends BaseNode {
 
     public void setUpdateDate(long updateDate) {
         this.updateDate = updateDate;
+    }
+
+
+    public Integer getTag() {
+        return tag;
+    }
+
+    public void setTag(Integer tag) {
+        this.tag = tag;
     }
 
     @Nullable

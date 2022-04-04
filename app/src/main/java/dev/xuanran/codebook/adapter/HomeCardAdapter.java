@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -119,6 +120,31 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
         baseViewHolder.setText(R.id.list_cardView_title, cardData.getAppName());
         baseViewHolder.setText(R.id.list_cardView_id, "# " + cardData.getCardId());
         baseViewHolder.setText(R.id.list_cardView_createDate, new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
+        baseViewHolder.setText(R.id.list_cardView_tag_text,getTagClass(cardData.getTag()));
+
+    }
+
+    /**
+     * 根据TAG值返回具体类型
+     * @param tag tag code
+     * @return 字符串类的文本
+     */
+    private String getTagClass(Integer tag) {
+        if (tag == null) return null;
+        if (tag == 1){ // 银行卡模式
+            return getString(R.string.idCard);
+        }
+        if (tag == 2){
+            return getString(R.string.bankCard);
+        }
+        if (tag == 3){
+            return getString(R.string.harvestAddress);
+        }
+        return "账号和密码";
+    }
+
+    private String getString(int resId) {
+        return getContext().getResources().getString(resId);
     }
 
     /**
@@ -184,6 +210,28 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
             dialog.show();
         }
 
+        if (password.getEditText().getText().toString().equals("")){
+            password.setVisibility(View.GONE);
+            copyPassword.setVisibility(View.GONE);
+        }
+
+        if (data.getTag() == 1) {
+            accountID.setHint(getString(R.string.cardID));
+            copyAccountID.setText(getString(R.string.copyCardID));
+        }
+        if (data.getTag() == 2 ){
+            accountID.setHint(getString(R.string.BankID));
+            password.setHint(getString(R.string.BackPassword));
+            copyAccountID.setText(getString(R.string.copyBankID));
+            copyPassword.setText(getString(R.string.CopyPassword));
+        }
+        if (data.getTag() == 3) {
+            accountID.setHint(getString(R.string.address));
+            copyAccountID.setText(getString(R.string.copyAddress));
+            copyPassword.setVisibility(View.GONE);
+            password.setVisibility(View.GONE);
+        }
+
         more.setOnClickListener(view13 -> showMoreMenu(view13, data));
 
         copyAccountID.setOnClickListener(view1 -> {
@@ -194,6 +242,8 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
             ClipboardUtil.setTextToClipboard(view12.getContext(), dataPassword);
             Snackbar.make(view12, "已复制，请谨防恶意应用读取", 50000).setBackgroundTint(Color.RED).setAction("OK", null).show();
         });
+
+        // Hide view...
     }
 
 

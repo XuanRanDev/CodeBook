@@ -17,7 +17,6 @@ import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -35,7 +34,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.animation.ScaleInAnimation;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -45,6 +43,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -183,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initFloatButton() {
         floatingActionButton.setOnClickListener(view -> {
+            AtomicInteger saveModel = new AtomicInteger(); // 不显示标签
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this, R.style.ThemeOverlayAppMaterialAlertDialog);
             View content = LayoutInflater.from(MainActivity.this).inflate(R.layout.add_content_view_dialog, null);
             builder.setView(content);
@@ -197,20 +197,59 @@ public class MainActivity extends AppCompatActivity {
             AppCompatImageView more = content.findViewById(R.id.add_content_view_dialog_more);
 
             cancel.setOnClickListener(view1 -> dialog.dismiss());
-            more.setOnClickListener(view12 -> showAddPopupMenu(view12, accountID, password));
+            more.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+                    popupMenu.getMenuInflater().inflate(R.menu.add_more_menu, popupMenu.getMenu());
+                    popupMenu.setOnMenuItemClickListener(item -> {
+                        switch (item.getItemId()){
+                            case R.id.add_menu_idCard:
+                                appName.setHint(R.string.idCardOwn);
+                                accountID.setHint(R.string.pleaseInputIdCard);
+                                password.setVisibility(View.GONE);
+                                saveModel.set(1);
+                                break;
+                            case R.id.add_menu_bankCard:
+                                appName.setHint(R.string.ownBank);
+                                accountID.setHint(R.string.pleaseInputCardNum);
+                                password.setVisibility(View.VISIBLE);
+                                password.setHint(R.string.pleaseInputCardPassword);
+                                saveModel.set(2);
+                                break;
+                            case R.id.add_menu_harvestAddress:
+                                appName.setHint(R.string.harvestAddressName);
+                                accountID.setHint(R.string.pleaseInputHarvestAddress);
+                                password.setVisibility(View.GONE);
+                                saveModel.set(3);
+                                break;
+                        }
+                        return false;
+                    });
+                    popupMenu.show();
+                }
+            });
             save.setOnClickListener(view13 -> {
                 String appNameStr = Objects.requireNonNull(appName.getEditText()).getText().toString().trim();
                 String accountIDStr = Objects.requireNonNull(accountID.getEditText()).getText().toString().trim();
                 String passwordStr = Objects.requireNonNull(password.getEditText()).getText().toString().trim();
 
-                if (appNameStr.equals("") && accountIDStr.equals("") && passwordStr.equals("")) {
-                    Snackbar.make(view13, "请检查所填信息中是否包含空格", 3000).show();
-                    return;
+                if (saveModel.get() == 0){
+                    if (appNameStr.equals("") && accountIDStr.equals("") && passwordStr.equals("")) {
+                        Snackbar.make(view13, getString(R.string.pleaseCheckData), 3000).show();
+                        return;
+                    }
+                }else{
+                    if (appNameStr.equals("") && accountIDStr.equals("") && saveModel.get() != 0) {
+                        Snackbar.make(view13, getString(R.string.pleaseCheckData), 3000).show();
+                        return;
+                    }
                 }
 
                 String encryptAccountID = AesUtil.encrypt(accountIDStr, AES_PASSWORD);
                 String encryptPassword = AesUtil.encrypt(passwordStr, AES_PASSWORD);
                 CardData cardData = new CardData(appNameStr, encryptAccountID, encryptPassword, System.currentTimeMillis());
+                cardData.setTag(saveModel.get());
                 InsertDataToDataBases(cardData, dialog);
                 //addNewDataToAdapter(cardData);
             });
@@ -238,14 +277,7 @@ public class MainActivity extends AppCompatActivity {
      * @param view View
      */
     private void showAddPopupMenu(View view, TextInputLayout accountEdit, TextInputLayout passwordEdit) {
-        PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
-        popupMenu.getMenuInflater().inflate(R.menu.add_more_menu, popupMenu.getMenu());
-        popupMenu.setOnMenuItemClickListener(item -> {
-            analyticalPopupMenuClick(item, accountEdit, passwordEdit);
-            Snackbar.make(drawerLayout, "Click:" + item.getTitle(), 3000).show();
-            return false;
-        });
-        popupMenu.show();
+
     }
 
     /**

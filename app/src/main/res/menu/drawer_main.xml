@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <group android:checkableBehavior="none" />
     <item
         android:id="@+id/main_item"
-        android:title="@string/group">
+        android:title="@string/other">
         <menu>
+
             <item
-                android:id="@+id/inbox_item"
-                android:icon="@drawable/baseline_folder_24"
-                android:title="@string/search"
-                android:checkable="true"/>
+                android:id="@+id/donate"
+                android:checkable="true"
+                android:icon="@drawable/ic_baseline_mood_24"
+                android:title="@string/donate" />
+
             <item
-                android:id="@+id/outbox_item"
-                android:icon="@drawable/baseline_folder_24"
-                android:title="@string/d3"
-                android:checkable="true"/>
+                android:id="@+id/userRule"
+                android:checkable="true"
+                android:icon="@drawable/ic_baseline_rule_24"
+                android:title="@string/userRule" />
             <item
-                android:id="@+id/favourites_item"
-                android:icon="@drawable/baseline_folder_24"
-                android:title="@string/favourites_title"
-                android:checkable="true"/>
+                android:id="@+id/about"
+                android:checkable="true"
+                android:icon="@drawable/ic_baseline_info_24"
+                android:title="@string/about" />
         </menu>
     </item>
 </menu>

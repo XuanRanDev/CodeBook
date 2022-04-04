@@ -13,9 +13,9 @@
         android:layout_marginTop="24dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+        android:textAppearance="?attr/textAppearanceHeadline4"
         android:textColor="?attr/colorOnSurface"
-        android:text="Created By XuanRan" />
+        android:text="Welcome!" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -23,7 +23,7 @@
         android:layout_marginBottom="24dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:textAppearance="?attr/textAppearanceTitleSmall"
+        android:textAppearance="?attr/textAppearanceBodySmall"
         android:textColor="?attr/colorOnSurfaceVariant"
-        android:text="Created By XuanRan" />
+        android:text="XuanRanDev@qq.com" />
 </LinearLayout>
