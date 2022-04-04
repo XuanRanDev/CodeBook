@@ -1,7 +1,11 @@
 package dev.xuanran.codebook;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -18,6 +22,7 @@ import android.widget.Button;
 import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -41,8 +46,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
@@ -54,6 +62,9 @@ import dev.xuanran.codebook.db.AppDatabase;
 import dev.xuanran.codebook.listener.AppBarStatusChangeListener;
 import dev.xuanran.codebook.util.AesUtil;
 import dev.xuanran.codebook.util.AppExecutors;
+import dev.xuanran.codebook.util.FileUtil;
+import dev.xuanran.codebook.util.MD5Util;
+import dev.xuanran.codebook.util.SharedUtil;
 
 
 @SuppressLint("NonConstantResourceId")
@@ -92,6 +103,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SharedUtil.init(this);
+        if(SharedUtil.getSharedPreferences().getBoolean(SharedUtil.HAS_DATA,false)){
+            RequestPassword();
+        }else {
+            showRule();
+        }
 
         //ViewBinder
         ButterKnife.bind(this);
@@ -109,6 +126,54 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * 显示一系列的用户规则
+     */
+    private void showRule() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(getString(R.string.userRule));
+        builder.setMessage(FileUtil.readTxtFromAssetsFile(this,"rule.txt"));
+        builder.setPositiveButton(getString(R.string.ok),null);
+        AlertDialog alertDialog = builder.create();
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(timer.purge());
+            }
+        },5000);
+        alertDialog.show();
+    }
+
+    /**
+     * 请求指纹验证
+     */
+    @TargetApi(23)
+    private void reqFingerprintVerification(){
+
+    }
+
+    private void RequestPassword() {
+        View view = LayoutInflater.from(this).inflate(R.layout.verify_password, null);
+        TextInputLayout textInputLayout= view.findViewById(R.id.verify_input);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(getString(R.string.verifyPassword));
+        builder.setView(view);
+        builder.setCancelable(false);
+        builder.setPositiveButton(getString(R.string.ok),null);
+        builder.setNegativeButton(getString(R.string.exit), null);
+        builder.setNeutralButton(getString(R.string.forgetPassword), null);
+        AlertDialog alert = builder.create();
+        alert.show();
+        alert.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        
+    }
+
+    /**
      * 初始化RecyclerView
      */
     private void initRecyclerView() {
@@ -123,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
         homeCardAdapter = new HomeCardAdapter(R.layout.list_cardview);
         homeCardAdapter.setEmptyView(R.layout.empty_data);
         // Read data from the database and pass in Settings to RecyclerView
-        getUserDataFromDatabases(EVENT_TYPE_FROM_SET_NEW_DATA);
         homeCardAdapter.setAnimationEnable(true);
         homeCardAdapter.setAnimationWithDefault(BaseQuickAdapter.AnimationType.SlideInBottom);
         homeCardAdapter.setAnimationFirstOnly(false);
