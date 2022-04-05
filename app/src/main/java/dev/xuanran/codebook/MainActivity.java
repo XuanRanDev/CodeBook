@@ -4,10 +4,9 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -19,6 +18,7 @@ import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,7 +46,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -62,13 +61,17 @@ import dev.xuanran.codebook.db.AppDatabase;
 import dev.xuanran.codebook.listener.AppBarStatusChangeListener;
 import dev.xuanran.codebook.util.AesUtil;
 import dev.xuanran.codebook.util.AppExecutors;
+import dev.xuanran.codebook.util.ClipboardUtil;
 import dev.xuanran.codebook.util.FileUtil;
-import dev.xuanran.codebook.util.MD5Util;
 import dev.xuanran.codebook.util.SharedUtil;
 
 
 @SuppressLint("NonConstantResourceId")
 public class MainActivity extends AppCompatActivity {
+
+    // TAG
+    public static final String TAG = MainActivity.class.getSimpleName();
+
     // View
     @BindView(R.id.activity_main_toolbar)
     Toolbar toolbar;
@@ -89,10 +92,11 @@ public class MainActivity extends AppCompatActivity {
     public static final int EVENT_TYPE_FROM_UPDATE_DATA = 1; // 事件由更新触发
     public static final int EVENT_TYPE_FROM_SET_NEW_DATA = 2; // 事件由设置数据触发
 
+    // AES密码
     public static final String AES_PASSWORD = "abcabcabcabcabca";
+
     // AppBarLayout 状态 true 展开 / false 关闭
     boolean appBarStatus = true;
-    public static final String TAG = MainActivity.class.getSimpleName();
 
     HomeCardAdapter homeCardAdapter;
     SearchView searchView;
@@ -104,9 +108,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         SharedUtil.init(this);
-        if(SharedUtil.getSharedPreferences().getBoolean(SharedUtil.HAS_DATA,false)){
+        if (SharedUtil.getSharedPreferences().getBoolean(SharedUtil.HAS_DATA, false)) {
             RequestPassword();
-        }else {
+        } else {
             showRule();
         }
 
@@ -131,35 +135,80 @@ public class MainActivity extends AppCompatActivity {
     private void showRule() {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(getString(R.string.userRule));
-        builder.setMessage(FileUtil.readTxtFromAssetsFile(this,"rule.txt"));
-        builder.setPositiveButton(getString(R.string.ok),null);
-        AlertDialog alertDialog = builder.create();
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
+        builder.setMessage(FileUtil.readTxtFromAssetsFile(this, "rule.txt"));
+        builder.setCancelable(false);
+        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
-            public void run() {
-                alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(timer.purge());
+            public void onClick(DialogInterface dialogInterface, int i) {
+                showChooseUnlockWay();
             }
-        },5000);
+        });
+        builder.setNegativeButton(getString(R.string.exit), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+        builder.setNeutralButton(getString(R.string.wechatPublic), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(MainActivity.this, "已复制微信公众号名称", Toast.LENGTH_SHORT).show();
+                ClipboardUtil.setTextToClipboard(MainActivity.this,"XuanRan");
+                finish();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
         alertDialog.show();
+        TimeCount timeCount = new TimeCount(2000,1000,alertDialog.getButton(DialogInterface.BUTTON_POSITIVE));
+        timeCount.start();
+
+    }
+
+    /**
+     * 显示应用程序的加密方式对话框
+     * 仅限在首次启动时调用
+     */
+    private void showChooseUnlockWay() {
+        final int[] flag = {0};
+        String[] items = new String[]{getString(R.string.password), getString(R.string.fingerprint)};
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(getString(R.string.authenticationMethod));
+        builder.setCancelable(false);
+        builder.setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                flag[0] = i;
+            }
+        });
+        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (flag[0] == 0){
+                    // 设置密码
+                }else {
+                    // 请求指纹
+                }
+            }
+        });
+        builder.show();
     }
 
     /**
      * 请求指纹验证
      */
     @TargetApi(23)
-    private void reqFingerprintVerification(){
+    private void reqFingerprintVerification() {
 
     }
 
     private void RequestPassword() {
         View view = LayoutInflater.from(this).inflate(R.layout.verify_password, null);
-        TextInputLayout textInputLayout= view.findViewById(R.id.verify_input);
+        TextInputLayout textInputLayout = view.findViewById(R.id.verify_input);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(getString(R.string.verifyPassword));
         builder.setView(view);
         builder.setCancelable(false);
-        builder.setPositiveButton(getString(R.string.ok),null);
+        builder.setPositiveButton(getString(R.string.ok), null);
         builder.setNegativeButton(getString(R.string.exit), null);
         builder.setNeutralButton(getString(R.string.forgetPassword), null);
         AlertDialog alert = builder.create();
@@ -170,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        
+
     }
 
     /**
@@ -267,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
                     PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
                     popupMenu.getMenuInflater().inflate(R.menu.add_more_menu, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(item -> {
-                        switch (item.getItemId()){
+                        switch (item.getItemId()) {
                             case R.id.add_menu_idCard:
                                 appName.setHint(R.string.idCardOwn);
                                 accountID.setHint(R.string.pleaseInputIdCard);
@@ -298,12 +347,12 @@ public class MainActivity extends AppCompatActivity {
                 String accountIDStr = Objects.requireNonNull(accountID.getEditText()).getText().toString().trim();
                 String passwordStr = Objects.requireNonNull(password.getEditText()).getText().toString().trim();
 
-                if (saveModel.get() == 0){
+                if (saveModel.get() == 0) {
                     if (appNameStr.equals("") && accountIDStr.equals("") && passwordStr.equals("")) {
                         Snackbar.make(view13, getString(R.string.pleaseCheckData), 3000).show();
                         return;
                     }
-                }else{
+                } else {
                     if (appNameStr.equals("") && accountIDStr.equals("") && saveModel.get() != 0) {
                         Snackbar.make(view13, getString(R.string.pleaseCheckData), 3000).show();
                         return;
@@ -419,7 +468,6 @@ public class MainActivity extends AppCompatActivity {
     private void showEmptyLayout() {
         homeCardAdapter.setUseEmpty(true);
     }
-
 
 
     /**
@@ -560,14 +608,26 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyUp(keyCode, event);
     }
 
-    private void enableSearchView(View view, boolean enabled) {
-        view.setEnabled(enabled);
-        if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
-            for (int i = 0; i < viewGroup.getChildCount(); i++) {
-                View child = viewGroup.getChildAt(i);
-                enableSearchView(child, enabled);
-            }
+    class TimeCount extends CountDownTimer{
+
+        Button bn;
+
+        public TimeCount(long millisInFuture, long countDownInterval,Button bn) {
+            super(millisInFuture, countDownInterval);
+            this.bn = bn;
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void onTick(long l) {
+            bn.setClickable(false);
+            bn.setText(getString(R.string.ok)+"("+l / 1000 +") ");
+        }
+
+        @Override
+        public void onFinish() {
+            bn.setClickable(true);
+            bn.setText(getString(R.string.ok));
         }
     }
 }

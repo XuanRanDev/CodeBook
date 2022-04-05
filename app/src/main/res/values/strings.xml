@@ -34,7 +34,7 @@
     <string name="harvestAddressName">收货地址名称</string>
     <string name="pleaseCheckData">请检查所填信息中是否包含空格</string>
     <string name="userRole">用户协议</string>
-    <string name="userRule">CodeBook 用户协议</string>
+    <string name="userRule">用户协议</string>
     <string name="about">关于</string>
     <string name="appSecurity">App安全性</string>
     <string name="donate">捐赠</string>
@@ -51,4 +51,7 @@
     <string name="ok">确定</string>
     <string name="verifyPassword">验证密码</string>
     <string name="forgetPassword">忘记密码</string>
+    <string name="wechatPublic">微信公众号</string>
+    <string name="fingerprint">指纹</string>
+    <string name="authenticationMethod">选择认证方式</string>
 </resources>
