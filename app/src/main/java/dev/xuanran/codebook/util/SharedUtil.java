@@ -13,6 +13,8 @@ public class SharedUtil {
      */
     public static final String HAS_DATA = "has_data";
     public static final String PASS_MD5 = "pass_md5";
+    public static final String USE_PASSWORD = "use_password";
+    public static final String USE_FINGERPRINT = "use_fingerprint";
 
     public static SharedPreferences sharedPreferences;
 
@@ -26,5 +28,13 @@ public class SharedUtil {
 
     public static SharedPreferences.Editor getSharedEdit(){
         return sharedPreferences.edit();
+    }
+
+    public static boolean usePassword(){
+        return sharedPreferences.getBoolean(USE_PASSWORD,false);
+    }
+
+    public static boolean useFingerprint(){
+        return sharedPreferences.getBoolean(USE_FINGERPRINT,false);
     }
 }

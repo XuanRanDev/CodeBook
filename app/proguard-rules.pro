@@ -37,3 +37,6 @@
 # 抛出异常时保留代码行号
 -keepattributes SourceFile,LineNumberTable
 
+-keep class com.yf.verify.** {*;}
+
+

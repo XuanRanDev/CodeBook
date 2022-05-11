@@ -1,8 +1,6 @@
 package dev.xuanran.codebook;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,12 +11,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,11 +39,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.yf.verify.callback.FingerprintAuthenticatedCallback;
+import com.yf.verify.fingerprint.FingerprintCharacter;
+import com.yf.verify.fingerprint.FingerprintCharacterStepBuilder;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
@@ -67,10 +62,7 @@ import dev.xuanran.codebook.util.SharedUtil;
 
 
 @SuppressLint("NonConstantResourceId")
-public class MainActivity extends AppCompatActivity {
-
-    // TAG
-    public static final String TAG = MainActivity.class.getSimpleName();
+public class MainActivity extends AppCompatActivity implements FingerprintAuthenticatedCallback {
 
     // View
     @BindView(R.id.activity_main_toolbar)
@@ -96,12 +88,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String AES_PASSWORD = "abcabcabcabcabca";
 
     // AppBarLayout 状态 true 展开 / false 关闭
-    boolean appBarStatus = true;
-
-    HomeCardAdapter homeCardAdapter;
-    SearchView searchView;
+    private boolean appBarStatus = true;
+    private HomeCardAdapter homeCardAdapter;
+    private SearchView searchView;
     private long firstTime;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         SharedUtil.init(this);
         if (SharedUtil.getSharedPreferences().getBoolean(SharedUtil.HAS_DATA, false)) {
-            RequestPassword();
+            if (SharedUtil.useFingerprint()) requestFingerprintVerification();
+            if (SharedUtil.usePassword()) RequestPassword();
         } else {
             showRule();
         }
@@ -137,29 +128,15 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle(getString(R.string.userRule));
         builder.setMessage(FileUtil.readTxtFromAssetsFile(this, "rule.txt"));
         builder.setCancelable(false);
-        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                showChooseUnlockWay();
-            }
-        });
-        builder.setNegativeButton(getString(R.string.exit), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                finish();
-            }
-        });
-        builder.setNeutralButton(getString(R.string.wechatPublic), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Toast.makeText(MainActivity.this, "已复制微信公众号名称", Toast.LENGTH_SHORT).show();
-                ClipboardUtil.setTextToClipboard(MainActivity.this,"XuanRan");
-                finish();
-            }
+        builder.setPositiveButton(getString(R.string.ok), (dialogInterface, i) -> showChooseUnlockWay());
+        builder.setNegativeButton(getString(R.string.exit), (dialogInterface, i) -> finish());
+        builder.setNeutralButton(getString(R.string.wechatPublic), (dialogInterface, i) -> {
+            Toast.makeText(MainActivity.this, "已复制微信公众号名称", Toast.LENGTH_SHORT).show();
+            ClipboardUtil.setTextToClipboard(MainActivity.this, "XuanRan");
         });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-        TimeCount timeCount = new TimeCount(2000,1000,alertDialog.getButton(DialogInterface.BUTTON_POSITIVE));
+        TimeCount timeCount = new TimeCount(0, 1000, alertDialog.getButton(DialogInterface.BUTTON_POSITIVE));
         timeCount.start();
 
     }
@@ -174,21 +151,16 @@ public class MainActivity extends AppCompatActivity {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(getString(R.string.authenticationMethod));
         builder.setCancelable(false);
-        builder.setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                flag[0] = i;
+        builder.setSingleChoiceItems(items, 0, (dialogInterface, i) -> flag[0] = i);
+        builder.setPositiveButton(getString(R.string.ok), (dialogInterface, i) -> {
+            if (flag[0] == 0) {
+                // 设置密码
+                SharedUtil.getSharedEdit().putBoolean(SharedUtil.USE_PASSWORD, true).commit();
+            } else {
+                // 请求指纹
+                SharedUtil.getSharedEdit().putBoolean(SharedUtil.USE_FINGERPRINT, true).commit();
             }
-        });
-        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (flag[0] == 0){
-                    // 设置密码
-                }else {
-                    // 请求指纹
-                }
-            }
+            SharedUtil.getSharedEdit().putBoolean(SharedUtil.HAS_DATA, true).commit();
         });
         builder.show();
     }
@@ -196,10 +168,16 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 请求指纹验证
      */
-    @TargetApi(23)
-    private void reqFingerprintVerification() {
+    private void requestFingerprintVerification() {
+        FingerprintCharacter fingerprintAuthenticatedCharacter = FingerprintCharacterStepBuilder
+                .newBuilder()
+                .setKeystoreAlias("key")
+                .setFingerprintCallback(this)
+                .build();
 
+        fingerprintAuthenticatedCharacter.show(this);
     }
+
 
     private void RequestPassword() {
         View view = LayoutInflater.from(this).inflate(R.layout.verify_password, null);
@@ -213,11 +191,8 @@ public class MainActivity extends AppCompatActivity {
         builder.setNeutralButton(getString(R.string.forgetPassword), null);
         AlertDialog alert = builder.create();
         alert.show();
-        alert.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        alert.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view1 -> {
 
-            }
         });
 
     }
@@ -280,15 +255,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     * 添加新的数据到适配器
-     *
-     * @param cardData data
-     */
-    private void addNewDataToAdapter(CardData cardData) {
-        homeCardAdapter.addData(cardData);
-    }
-
 
     /**
      * 设置浮动按钮相关操作
@@ -310,37 +276,34 @@ public class MainActivity extends AppCompatActivity {
             AppCompatImageView more = content.findViewById(R.id.add_content_view_dialog_more);
 
             cancel.setOnClickListener(view1 -> dialog.dismiss());
-            more.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
-                    popupMenu.getMenuInflater().inflate(R.menu.add_more_menu, popupMenu.getMenu());
-                    popupMenu.setOnMenuItemClickListener(item -> {
-                        switch (item.getItemId()) {
-                            case R.id.add_menu_idCard:
-                                appName.setHint(R.string.idCardOwn);
-                                accountID.setHint(R.string.pleaseInputIdCard);
-                                password.setVisibility(View.GONE);
-                                saveModel.set(1);
-                                break;
-                            case R.id.add_menu_bankCard:
-                                appName.setHint(R.string.ownBank);
-                                accountID.setHint(R.string.pleaseInputCardNum);
-                                password.setVisibility(View.VISIBLE);
-                                password.setHint(R.string.pleaseInputCardPassword);
-                                saveModel.set(2);
-                                break;
-                            case R.id.add_menu_harvestAddress:
-                                appName.setHint(R.string.harvestAddressName);
-                                accountID.setHint(R.string.pleaseInputHarvestAddress);
-                                password.setVisibility(View.GONE);
-                                saveModel.set(3);
-                                break;
-                        }
-                        return false;
-                    });
-                    popupMenu.show();
-                }
+            more.setOnClickListener(view12 -> {
+                PopupMenu popupMenu = new PopupMenu(view12.getContext(), view12);
+                popupMenu.getMenuInflater().inflate(R.menu.add_more_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    switch (item.getItemId()) {
+                        case R.id.add_menu_idCard:
+                            appName.setHint(R.string.idCardOwn);
+                            accountID.setHint(R.string.pleaseInputIdCard);
+                            password.setVisibility(View.GONE);
+                            saveModel.set(1);
+                            break;
+                        case R.id.add_menu_bankCard:
+                            appName.setHint(R.string.ownBank);
+                            accountID.setHint(R.string.pleaseInputCardNum);
+                            password.setVisibility(View.VISIBLE);
+                            password.setHint(R.string.pleaseInputCardPassword);
+                            saveModel.set(2);
+                            break;
+                        case R.id.add_menu_harvestAddress:
+                            appName.setHint(R.string.harvestAddressName);
+                            accountID.setHint(R.string.pleaseInputHarvestAddress);
+                            password.setVisibility(View.GONE);
+                            saveModel.set(3);
+                            break;
+                    }
+                    return false;
+                });
+                popupMenu.show();
             });
             save.setOnClickListener(view13 -> {
                 String appNameStr = Objects.requireNonNull(appName.getEditText()).getText().toString().trim();
@@ -364,7 +327,6 @@ public class MainActivity extends AppCompatActivity {
                 CardData cardData = new CardData(appNameStr, encryptAccountID, encryptPassword, System.currentTimeMillis());
                 cardData.setTag(saveModel.get());
                 InsertDataToDataBases(cardData, dialog);
-                //addNewDataToAdapter(cardData);
             });
         });
     }
@@ -385,42 +347,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 显示泡泡菜单
-     *
-     * @param view View
-     */
-    private void showAddPopupMenu(View view, TextInputLayout accountEdit, TextInputLayout passwordEdit) {
-
-    }
-
-    /**
-     * 解析泡泡窗口的按钮点击事件
-     *
-     * @param item 所按下的按钮
-     */
-    private void analyticalPopupMenuClick(MenuItem item, TextInputLayout accountEdit, TextInputLayout passwordEdit) {
-
-    }
-
-    /**
      * 设置Appbar展开时的文字颜色
      */
     private void initAppBar() {
         collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);
-    }
-
-    /**
-     * 显示警告对话框
-     *
-     * @param info 所要显示的信息
-     */
-    private void alertWarning(String info) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(R.string.error);
-        builder.setMessage(info);
-        builder.setCancelable(false);
-        builder.setPositiveButton("OK", null);
-        builder.show();
     }
 
     /**
@@ -552,24 +482,6 @@ public class MainActivity extends AppCompatActivity {
         filter.filter(query);
     }
 
-    /**
-     * private void runDataLoadingLayoutAnimation(final RecyclerView recyclerView) {
-     * final Context context = recyclerView.getContext();
-     * final LayoutAnimationController controller =
-     * AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
-     * recyclerView.setLayoutAnimation(controller);
-     * recyclerView.scheduleLayoutAnimation();
-     * }
-     */
-
-    private void runDataRefreshLayoutAnimation(final RecyclerView recyclerView) {
-        final Context context = recyclerView.getContext();
-        final LayoutAnimationController controller =
-                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
-        recyclerView.setLayoutAnimation(controller);
-        recyclerView.scheduleLayoutAnimation();
-    }
-
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -608,11 +520,51 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyUp(keyCode, event);
     }
 
-    class TimeCount extends CountDownTimer{
+    // *****************请求指纹验证API***************************
+
+    /**
+     * 指纹验证成功
+     */
+    @Override
+    public void onFingerprintSucceed() {
+        Toast.makeText(this, "指纹验证成功", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * 指纹验证失败
+     */
+    @Override
+    public void onFingerprintFailed() {
+        Toast.makeText(this, "指纹验证失败", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * 取消验证
+     */
+    @Override
+    public void onFingerprintCancel() {
+        Toast.makeText(this, "取消指纹验证", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * 没有录入指纹或者不支持指纹识别
+     */
+    @Override
+    public void onNoEnrolledFingerprints() {
+        Toast.makeText(this, "没有录入指纹锁", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onNonsupportFingerprint() {
+        Toast.makeText(this, "不支持指纹识别", Toast.LENGTH_SHORT).show();
+    }
+
+
+    class TimeCount extends CountDownTimer {
 
         Button bn;
 
-        public TimeCount(long millisInFuture, long countDownInterval,Button bn) {
+        public TimeCount(long millisInFuture, long countDownInterval, Button bn) {
             super(millisInFuture, countDownInterval);
             this.bn = bn;
         }
@@ -621,7 +573,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onTick(long l) {
             bn.setClickable(false);
-            bn.setText(getString(R.string.ok)+"("+l / 1000 +") ");
+            bn.setText(getString(R.string.ok) + "(" + l / 1000 + ") ");
         }
 
         @Override
