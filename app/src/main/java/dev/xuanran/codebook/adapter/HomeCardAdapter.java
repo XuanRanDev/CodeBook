@@ -43,7 +43,7 @@ import dev.xuanran.codebook.util.ClipboardUtil;
 public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> implements DraggableModule {
     private static final String DATE_FORMAT = "yyyy.MM.dd";
 
-    private static Collection<? extends CardData> data = null;
+    public Collection<? extends CardData> data = null;
 
     public HomeCardAdapter(int layoutResId) {
         super(layoutResId);
@@ -67,6 +67,7 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
     }
 
 
+    @SuppressLint("NotifyDataSetChanged")
     public void filter(String s) {
         List<CardData> list = data == null ? getData() : (List<CardData>) data;
         List<CardData> dataList = null;
@@ -78,47 +79,6 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
         this.setList(dataList);
         notifyDataSetChanged();
     }
-/*
-
-    @Override
-    public Filter getFilter() {
-
-        return new Filter() {
-            //执行过滤操作
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                String charString = charSequence.toString();
-                if (charString.isEmpty()) {
-                    //没有过滤的内容，则使用源数据
-                    mFilterList = mSourceList;
-                } else {
-                    List<CardData> cardData = new ArrayList<>();
-                    for (int i = 0; i < mSourceList.size(); i++) {
-                        if (mSourceList.get(i).getAppName().contains(charString)){
-                            cardData.add(mSourceList.get(i));
-                        }
-                    }
-                    mFilterList = cardData;
-                }
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = mFilterList;
-                return filterResults;
-            }
-            //把过滤后的值返回出来
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                mFilterList = (ArrayList<CardData>) filterResults.values;
-                if (mFilterList.size() == 0){
-                    setEmptyView(R.layout.loading);
-                    setUseEmpty(true);
-                }else if (isUseEmpty()){
-                    setUseEmpty(false);
-                }
-                notifyDataSetChanged();
-            }
-        };
-    }
-*/
 
     /**
      * 设置卡片视图内容

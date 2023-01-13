@@ -380,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
      */
     @SuppressLint("NotifyDataSetChanged")
     private void setDataToAdapter(List<CardData> list) {
+        homeCardAdapter.data = null;
         homeCardAdapter.setList(list);
         homeCardAdapter.notifyDataSetChanged();
     }
@@ -438,16 +439,6 @@ public class MainActivity extends AppCompatActivity {
     private synchronized void filter(String query) {
         homeCardAdapter.filter(query.toLowerCase());
     }
-
-    /**
-     * private void runDataLoadingLayoutAnimation(final RecyclerView recyclerView) {
-     * final Context context = recyclerView.getContext();
-     * final LayoutAnimationController controller =
-     * AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
-     * recyclerView.setLayoutAnimation(controller);
-     * recyclerView.scheduleLayoutAnimation();
-     * }
-     */
 
     private void runDataRefreshLayoutAnimation(final RecyclerView recyclerView) {
         final Context context = recyclerView.getContext();
