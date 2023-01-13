@@ -46,4 +46,5 @@
     <string name="BackPassword">复制密码</string>
     <string name="copyAddress">复制地址</string>
     <string name="address">收获地址</string>
+    <string name="userData">数据</string>
 </resources>
