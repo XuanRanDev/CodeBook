@@ -436,8 +436,7 @@ public class MainActivity extends AppCompatActivity {
      * @param query 查询条件
      */
     private synchronized void filter(String query) {
-        Filter filter = homeCardAdapter.getFilter();
-        filter.filter(query);
+        homeCardAdapter.filter(query.toLowerCase());
     }
 
     /**

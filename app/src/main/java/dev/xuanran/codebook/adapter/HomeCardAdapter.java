@@ -5,9 +5,6 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,11 +22,11 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import dev.xuanran.codebook.MainActivity;
 import dev.xuanran.codebook.R;
@@ -43,10 +40,10 @@ import dev.xuanran.codebook.util.ClipboardUtil;
 /**
  * Created By XuanRan on 2022/3/24
  */
-public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> implements Filterable, DraggableModule {
+public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> implements DraggableModule {
     private static final String DATE_FORMAT = "yyyy.MM.dd";
-    private List<CardData> mSourceList = new ArrayList<>();
-    private List<CardData> mFilterList = new ArrayList<>();
+
+    private static Collection<? extends CardData> data = null;
 
     public HomeCardAdapter(int layoutResId) {
         super(layoutResId);
@@ -65,14 +62,27 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
 
     @Override
     public void setList(@Nullable Collection<? extends CardData> list) {
-        mSourceList = (List<CardData>) list;
-        //这里需要初始化filterList
-        mFilterList = (List<CardData>) list;
+        if (data == null) data = list;
         super.setList(list);
     }
 
+
+    public void filter(String s) {
+        List<CardData> list = data == null ? getData() : (List<CardData>) data;
+        List<CardData> dataList = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            dataList = list.stream()
+                    .filter(cardData -> cardData.getAppName().toLowerCase().contains(s))
+                    .collect(Collectors.toList());
+        }
+        this.setList(dataList);
+        notifyDataSetChanged();
+    }
+/*
+
     @Override
     public Filter getFilter() {
+
         return new Filter() {
             //执行过滤操作
             @Override
@@ -108,6 +118,7 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
             }
         };
     }
+*/
 
     /**
      * 设置卡片视图内容
@@ -120,24 +131,25 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
         baseViewHolder.setText(R.id.list_cardView_title, cardData.getAppName());
         baseViewHolder.setText(R.id.list_cardView_id, "# " + cardData.getCardId());
         baseViewHolder.setText(R.id.list_cardView_createDate, new SimpleDateFormat(DATE_FORMAT, Locale.CHINA).format(cardData.getCreateDate()));
-        baseViewHolder.setText(R.id.list_cardView_tag_text,getTagClass(cardData.getTag()));
+        baseViewHolder.setText(R.id.list_cardView_tag_text, getTagClass(cardData.getTag()));
 
     }
 
     /**
      * 根据TAG值返回具体类型
+     *
      * @param tag tag code
      * @return 字符串类的文本
      */
     private String getTagClass(Integer tag) {
         if (tag == null) return null;
-        if (tag == 1){ // 银行卡模式
+        if (tag == 1) { // 银行卡模式
             return getString(R.string.idCard);
         }
-        if (tag == 2){
+        if (tag == 2) {
             return getString(R.string.bankCard);
         }
-        if (tag == 3){
+        if (tag == 3) {
             return getString(R.string.harvestAddress);
         }
         return "账号和密码";
@@ -210,7 +222,7 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
             dialog.show();
         }
 
-        if (password.getEditText().getText().toString().equals("")){
+        if (password.getEditText().getText().toString().equals("")) {
             password.setVisibility(View.GONE);
             copyPassword.setVisibility(View.GONE);
         }
@@ -219,7 +231,7 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
             accountID.setHint(getString(R.string.cardID));
             copyAccountID.setText(getString(R.string.copyCardID));
         }
-        if (data.getTag() == 2 ){
+        if (data.getTag() == 2) {
             accountID.setHint(getString(R.string.BankID));
             password.setHint(getString(R.string.BackPassword));
             copyAccountID.setText(getString(R.string.copyBankID));
@@ -246,14 +258,4 @@ public class HomeCardAdapter extends BaseQuickAdapter<CardData, BaseViewHolder> 
         // Hide view...
     }
 
-
-    @Override
-    public int getItemCount() {
-       return mFilterList.size();
-    }
-/*
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
-    }*/
 }
