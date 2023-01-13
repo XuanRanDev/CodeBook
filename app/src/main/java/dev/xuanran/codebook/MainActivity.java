@@ -325,6 +325,10 @@ public class MainActivity extends AppCompatActivity {
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             getUserDataFromDatabases(EVENT_TYPE_FROM_UPDATE_DATA);
+            searchView.clearFocus();
+            searchView.onActionViewCollapsed();
+            appBarLayout.setExpanded(true, true);
+
             Snackbar.make(drawerLayout, "刷新完成！", 3000).show();
             swipeRefreshLayout.setRefreshing(false);
         });
