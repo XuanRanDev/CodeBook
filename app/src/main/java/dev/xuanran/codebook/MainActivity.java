@@ -153,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onStateChanged(AppBarLayout appBarLayout, State state, int local) {
                         if (state == State.EXPANDED) {
+                            floatingActionButton.setEnabled(true);
                             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
                             floatingActionButton.animate().scaleX(1.0F).scaleY(1.0F).alpha(1.0F)
                                     .setInterpolator(new FastOutSlowInInterpolator()).withLayer().setDuration(500)
@@ -161,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
                         } else if (state == State.COLLAPSED) {
                             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
                             floatingActionButton.animate().scaleX(0.0F).scaleY(0.0F).alpha(0.0F).setDuration(500).setInterpolator(new FastOutSlowInInterpolator()).withLayer();
+                            floatingActionButton.setEnabled(false);
                             appBarStatus = true;
                         }
                     }
