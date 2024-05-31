@@ -1,6 +1,7 @@
 package dev.xuanran.codebook;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -31,6 +34,8 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 import dev.xuanran.codebook.adapter.AccountAdapter;
@@ -69,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             }
             if (id == R.id.menu_data_import) {
                 selectFileForImport();
+            }
+            if (id == R.id.donate) {
+                showDonateDialog();
             }
             drawerLayout.closeDrawer(navigationView);
             return true;
@@ -110,6 +118,47 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         toggle.syncState();
     }
+
+
+    private void showDonateDialog() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_donate, null);
+        // 设置对话框视图
+        builder.setView(dialogView);
+        // 设置取消按钮
+        builder.setNegativeButton("取消", (dialog, which) -> {
+            // 取消按钮的点击事件
+            dialog.dismiss();
+        });
+        // 设置打开支付宝按钮
+        builder.setPositiveButton("打开支付宝", (dialog, which) -> {
+            // 打开支付宝的逻辑，可以使用Intent打开支付宝
+            // 示例代码，实际上您需要根据支付宝的具体情况进行处理
+            Intent intent = getPackageManager().getLaunchIntentForPackage("com.eg.android.AlipayGphone");
+            if (intent != null) {
+                startActivity(intent);
+                return;
+            }
+            // 支付宝未安装的处理逻辑
+            Toast.makeText(this, "未安装支付宝应用", Toast.LENGTH_SHORT).show();
+        });
+
+        // 创建对话框并显示
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // 设置对话框文本提示和图片
+        ImageView imageView = dialogView.findViewById(R.id.iv_donate_image);
+        try {
+            InputStream inputStream = getAssets().open("donate_image.png");
+            Drawable drawable = Drawable.createFromStream(inputStream, null);
+            imageView.setImageDrawable(drawable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void showExportDialog() {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);

@@ -31,4 +31,5 @@
     <string name="import_error">数据导入失败</string>
     <string name="select_file">选择文件</string>
     <string name="export_error">导出失败</string>
+    <string name="donate_tips">首先非常感谢您的捐赠，正是您的支持才有项目作者维护下去的动力。\n\n您可以点击下方打开支付宝按钮直接打开支付宝的捐赠页面，也可截图保存二维码图片使用微信/支付宝扫码捐赠。</string>
 </resources>
