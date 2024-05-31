@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">CodeBook</string>
+    <string name="navigation_drawer_open">Open\n</string>
+    <string name="navigation_drawer_close">Close</string>
+    <string name="view">查看</string>
+    <string name="cancel">取消</string>
+    <string name="save">保存</string>
+</resources>

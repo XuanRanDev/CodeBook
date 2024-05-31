@@ -1,0 +1,51 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'dev.xuanran.codebook'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "dev.xuanran.codebook"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    // 其他依赖
+    implementation 'org.projectlombok:lombok:1.18.26'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+
+    // Room dependencies
+    implementation "androidx.room:room-runtime:2.6.1"
+    annotationProcessor "androidx.room:room-compiler:2.6.1"
+
+    // AES encryption library
+    implementation "org.bouncycastle:bcprov-jdk15on:1.69"
+
+    // Fingerprint authentication
+    implementation "androidx.biometric:biometric:1.1.0"
+
+    // Fingerprint authentication
+    implementation "androidx.biometric:biometric:1.1.0"
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+}
