@@ -50,6 +50,7 @@ import java.util.Date;
 import dev.xuanran.codebook.bean.account.AccountEntity;
 import dev.xuanran.codebook.bean.account.adapter.AccountAdapter;
 import dev.xuanran.codebook.bean.account.model.AccountViewModel;
+import dev.xuanran.codebook.callback.CipherStrategyCallback;
 import dev.xuanran.codebook.callback.ExportCallback;
 import dev.xuanran.codebook.callback.ImportCallback;
 import dev.xuanran.codebook.service.CipherStrategy;
@@ -57,7 +58,7 @@ import dev.xuanran.codebook.service.impl.FingerprintCipherStrategy;
 import dev.xuanran.codebook.service.impl.PasswordCipherStrategy;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
-        View.OnClickListener {
+        View.OnClickListener, CipherStrategyCallback {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -75,8 +76,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
      * CipherStrategy 对象，用于进行加密/解密操作
      */
     private CipherStrategy cipherStrategy;
+    private AlertDialog verifyDialog;
 
-    private static final String PREFS_NAME = "config";
+    private static final String PREFS_NAME = "pass_config";
     private static final String KEY_ENCRYPTION_TYPE = "encryption_type";
     private static final String ENCRYPTION_TYPE_FINGERPRINT = "fingerprint";
     private static final String ENCRYPTION_TYPE_PASSWORD = "password";
@@ -105,6 +107,19 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     /**
+     * 显示验证弹窗
+     */
+    private void showVerifyDialog() {
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_verfiy, null);
+        MaterialAlertDialogBuilder verifyDialogBuild = new MaterialAlertDialogBuilder(this);
+        verifyDialogBuild.setCancelable(false);
+        verifyDialogBuild.setView(dialogView);
+        verifyDialog = verifyDialogBuild.create();
+        verifyDialog.show();
+    }
+
+    /**
      * 弹出加密方式选择对话框
      */
     private void showEncryptionTypeDialog() {
@@ -113,11 +128,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         builder.setCancelable(false);
         builder.setMessage(R.string.choose_encryption_method_tips);
         builder.setPositiveButton(R.string.fingerprint, (dialogInterface, i) -> {
-            encryptionType = ENCRYPTION_TYPE_FINGERPRINT;
             startFingerprintFlow();
         });
         builder.setNegativeButton(R.string.password, (dialogInterface, i) -> {
-            encryptionType = ENCRYPTION_TYPE_PASSWORD;
             startPasswordFlow();
         });
         builder.setCancelable(false);
@@ -171,10 +184,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                         if (encryptionType.isEmpty()) {
                             generateSecretKey();
                             sharedPreferences.edit()
-                                    .putString(KEY_ENCRYPTION_TYPE, encryptionType)
+                                    .putString(KEY_ENCRYPTION_TYPE, ENCRYPTION_TYPE_FINGERPRINT)
                                     .apply();
                         }
-                        cipherStrategy = new FingerprintCipherStrategy();
+                        onCipherStrategyCreated(new FingerprintCipherStrategy());
                     }
 
                     @Override
@@ -201,17 +214,16 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         View dialogView = inflater.inflate(R.layout.dialog_password_enter, null);
         EditText passwordInput = dialogView.findViewById(R.id.password_input);
         TextView passwordInputTips = dialogView.findViewById(R.id.password_input_tips);
-
-        passwordInput.setHint(R.string.set_password);
         passwordInputTips.setText(R.string.set_password_tips);
         builder.setTitle(R.string.enter_password);
         builder.setView(dialogView);
+        builder.setCancelable(false);
         builder.setPositiveButton(R.string.ok, (dialog, which) -> {
             String password = passwordInput.getText().toString();
-            cipherStrategy = new PasswordCipherStrategy(password);
+            onCipherStrategyCreated(new PasswordCipherStrategy(password));
             if (encryptionType.isEmpty()) {
                 sharedPreferences.edit()
-                        .putString(KEY_ENCRYPTION_TYPE, encryptionType)
+                        .putString(KEY_ENCRYPTION_TYPE, ENCRYPTION_TYPE_PASSWORD)
                         .apply();
             }
         });
@@ -234,40 +246,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         drawerLayout.addDrawerListener(toggle);
 
         toggle.syncState();
-
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.menu_data_export) {
-                showExportDialog();
-            }
-            if (id == R.id.menu_data_import) {
-                selectFileForImport();
-            }
-            if (id == R.id.donate) {
-                showDonateDialog();
-            }
-            drawerLayout.closeDrawer(navigationView);
-            return true;
-        });
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new AccountAdapter();
-        recyclerView.setAdapter(adapter);
-
-        accountViewModel = new ViewModelProvider(this).get(AccountViewModel.class);
-        accountViewModel.getAllAccounts().observe(this, adapter::setAccounts);
-
-        fab.setOnClickListener(view -> {
-            showAddAccountDialog();
-        });
-
-        appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
-            if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
-                fab.hide();
-            } else if (verticalOffset == 0) {
-                fab.show();
-            }
-        });
     }
 
 
@@ -438,5 +416,47 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public void onClick(View view) {
 
+    }
+
+    @Override
+    public void onCipherStrategyCreated(CipherStrategy cipherStrategy) {
+        this.cipherStrategy = cipherStrategy;
+        initData();
+    }
+
+    private void initData() {
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.menu_data_export) {
+                showExportDialog();
+            }
+            if (id == R.id.menu_data_import) {
+                selectFileForImport();
+            }
+            if (id == R.id.donate) {
+                showDonateDialog();
+            }
+            drawerLayout.closeDrawer(navigationView);
+            return true;
+        });
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new AccountAdapter();
+        recyclerView.setAdapter(adapter);
+
+        accountViewModel = new ViewModelProvider(this).get(AccountViewModel.class);
+        accountViewModel.getAllAccounts().observe(this, adapter::setAccounts);
+
+        fab.setOnClickListener(view -> {
+            showAddAccountDialog();
+        });
+
+        appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+            if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
+                fab.hide();
+            } else if (verticalOffset == 0) {
+                fab.show();
+            }
+        });
     }
 }
