@@ -80,4 +80,21 @@ public class AccountEntity {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
+    @Override
+    public String toString() {
+        return appName + "," + username + "," + password + "," + remark + "," + tags + "," + createTime.getTime();
+    }
+
+    public static AccountEntity fromString(String data) {
+        String[] fields = data.split(",");
+        AccountEntity account = new AccountEntity();
+        account.setAppName(fields[0]);
+        account.setUsername(fields[1]);
+        account.setPassword(fields[2]);
+        account.setRemark(fields[3]);
+        account.setTags(fields[4]);
+        account.setCreateTime(new Date(Long.parseLong(fields[5])));
+        return account;
+    }
 }

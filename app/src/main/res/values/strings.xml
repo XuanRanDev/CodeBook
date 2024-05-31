@@ -20,4 +20,15 @@
     <string name="please_enter_the_application_name">请输入应用名称</string>
     <string name="please_enter_the_user_name">请输入用户名/账号</string>
     <string name="please_enter_the_password">请输入密码</string>
+    <string name="export_import_data_tips">导出数据时，程序会将您在数据库中储存的所有数据进行AES-128加密后导出为TXT文件。
+        \n\n导入数据时，您需要输入数据的导入密码，仅在密码验证成功后数据才能完成导入。
+    </string>
+    <string name="enter_password">请输入数据加密/解密密码</string>
+    <string name="export">导出</string>
+    <string name="importStr">导入</string>
+    <string name="export_success">数据导出成功</string>
+    <string name="import_success">数据导入成功</string>
+    <string name="import_error">数据导入失败</string>
+    <string name="select_file">选择文件</string>
+    <string name="export_error">导出失败</string>
 </resources>

@@ -1,5 +1,7 @@
 package dev.xuanran.codebook;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -7,7 +9,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,26 +30,25 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.File;
 import java.util.Date;
 
 import dev.xuanran.codebook.adapter.AccountAdapter;
 import dev.xuanran.codebook.bean.AccountEntity;
+import dev.xuanran.codebook.callback.ExportCallback;
+import dev.xuanran.codebook.callback.ImportCallback;
 import dev.xuanran.codebook.model.AccountViewModel;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
+        View.OnClickListener {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private AppBarLayout appBarLayout;
-    private CollapsingToolbarLayout collapsingToolbarLayout;
-    private Toolbar toolbar;
     private FloatingActionButton fab;
     private RecyclerView recyclerView;
     private AccountViewModel accountViewModel;
-
     private AccountAdapter adapter;
-
-
     private SearchView searchView;
 
 
@@ -60,6 +64,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
+            if (id == R.id.menu_data_export) {
+                showExportDialog();
+            }
+            if (id == R.id.menu_data_import) {
+                selectFileForImport();
+            }
             drawerLayout.closeDrawer(navigationView);
             return true;
         });
@@ -88,8 +98,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         appBarLayout = findViewById(R.id.app_bar_layout);
-        collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
-        toolbar = findViewById(R.id.toolbar);
+        CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         fab = findViewById(R.id.fab);
         recyclerView = findViewById(R.id.recycler_view);
 
@@ -97,7 +107,75 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
+
         toggle.syncState();
+    }
+
+    private void showExportDialog() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_password, null);
+        EditText passwordInput = dialogView.findViewById(R.id.password_input);
+        builder.setTitle(R.string.export_data);
+        builder.setView(dialogView);
+        builder.setPositiveButton(R.string.export, (dialog, which) -> {
+            String password = passwordInput.getText().toString();
+            accountViewModel.exportData(password, new ExportCallback() {
+                @Override
+                public void onSuccess(File file) {
+                    runOnUiThread(() ->
+                            Toast.makeText(MainActivity.this, R.string.export_success, Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.export_error, Toast.LENGTH_SHORT).show());
+                }
+            });
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
+    }
+
+    private void selectFileForImport() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_file)), 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            showImportDialog(uri);
+        }
+    }
+
+    private void showImportDialog(Uri uri) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_password, null);
+        EditText passwordInput = dialogView.findViewById(R.id.password_input);
+        builder.setTitle(R.string.import_data);
+        builder.setView(dialogView);
+        builder.setPositiveButton(R.string.importStr, (dialog, which) -> {
+            String password = passwordInput.getText().toString();
+            accountViewModel.importData(password, uri, new ImportCallback() {
+                @Override
+                public void onSuccess() {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.import_success, Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.import_error, Toast.LENGTH_SHORT).show());
+                }
+            });
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
     }
 
     private void showAddAccountDialog() {
@@ -151,8 +229,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextChange(String newText) {
         appBarLayout.setExpanded(false);
-
-// 添加一个搜索观察者
         accountViewModel.searchAccounts(newText).observe(this, accounts -> {
             adapter.setAccounts(accounts);
         });
