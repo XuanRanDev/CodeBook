@@ -1,0 +1,33 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/image_fingerprint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_fingerprint_24"
+        android:contentDescription="Fingerprint Icon"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/text_fingerprint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="请验证指纹"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="取消"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="16dp"/>
+
+</LinearLayout>

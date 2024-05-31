@@ -1,9 +1,14 @@
 package dev.xuanran.codebook;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.hardware.fingerprint.FingerprintManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +26,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -42,10 +48,13 @@ import dev.xuanran.codebook.adapter.AccountAdapter;
 import dev.xuanran.codebook.bean.AccountEntity;
 import dev.xuanran.codebook.callback.ExportCallback;
 import dev.xuanran.codebook.callback.ImportCallback;
+import dev.xuanran.codebook.fragment.FingerprintDialog;
 import dev.xuanran.codebook.model.AccountViewModel;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
         View.OnClickListener {
+
+
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -56,11 +65,29 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private AccountAdapter adapter;
     private SearchView searchView;
 
+    private SharedPreferences sharedPreferences;
+    private String encryptionType;
+
+    private static final String PREFS_NAME = "config";
+    private static final String KEY_ENCRYPTION_TYPE = "encryption_type";
+    private static final String ENCRYPTION_TYPE_FINGERPRINT = "fingerprint";
+    private static final String ENCRYPTION_TYPE_PASSWORD = "password";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        encryptionType = sharedPreferences.getString(KEY_ENCRYPTION_TYPE, "");
+
+        if (encryptionType.isEmpty()) {
+            showEncryptionTypeDialog();
+        } else {
+            startAppropriateFlow();
+        }
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
@@ -100,6 +127,81 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 fab.show();
             }
         });
+    }
+
+    private void showEncryptionTypeDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("选择加密方式");
+        builder.setItems(new CharSequence[]{"指纹验证", "密码验证"}, (dialog, which) -> {
+            switch (which) {
+                case 0:
+                    encryptionType = ENCRYPTION_TYPE_FINGERPRINT;
+                    break;
+                case 1:
+                    encryptionType = ENCRYPTION_TYPE_PASSWORD;
+                    break;
+            }
+            sharedPreferences.edit().putString(KEY_ENCRYPTION_TYPE, encryptionType).apply();
+            startAppropriateFlow();
+        });
+        builder.setCancelable(false);
+        builder.show();
+    }
+
+    private void startAppropriateFlow() {
+        if (ENCRYPTION_TYPE_FINGERPRINT.equals(encryptionType)) {
+            // 启动指纹验证流程
+            startFingerprintFlow();
+        } else if (ENCRYPTION_TYPE_PASSWORD.equals(encryptionType)) {
+            // 启动密码验证流程
+            startPasswordFlow();
+        }
+    }
+
+    private void startFingerprintFlow() {
+        FingerprintManager fingerprintManager = (FingerprintManager) getSystemService(Context.FINGERPRINT_SERVICE);
+        if (fingerprintManager != null && fingerprintManager.isHardwareDetected()) {
+                FingerprintDialog fingerprintDialog = new FingerprintDialog();
+                fingerprintDialog.show(getSupportFragmentManager(), "fingerprint_dialog");
+                fingerprintDialog.setFingerprintAuthenticationCallback(new FingerprintDialog.FingerprintAuthenticationCallback() {
+                    @Override
+                    public void onFingerprintAuthenticationSucceeded() {
+                        // 指纹验证成功，使用系统生成的 AES 加密密钥进行数据加密和解密
+                        // 这里可以调用相应的加密/解密方法
+                        // 示例：String encryptedData = AESUtils.encrypt(data, generatedKey);
+                    }
+
+                    @Override
+                    public void onFingerprintAuthenticationFailed() {
+                        // 指纹验证失败，提示用户选择其他加密方式或退出应用
+                        Toast.makeText(MainActivity.this, "指纹验证失败，请选择其他加密方式", Toast.LENGTH_SHORT).show();
+                        startPasswordFlow();
+                    }
+                });
+
+        } else {
+            // 设备不支持指纹识别，提示用户选择其他加密方式或退出应用
+             Toast.makeText(MainActivity.this, "设备不支持指纹识别，请选择其他加密方式", Toast.LENGTH_SHORT).show();
+             startPasswordFlow();
+        }
+    }
+
+
+    private void startPasswordFlow() {
+        // 弹出密码验证对话框，让用户输入密码
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("密码验证");
+        EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+        builder.setPositiveButton("确定", (dialog, which) -> {
+            String password = input.getText().toString();
+            // 使用用户输入的密码生成 AES 加密密钥进行数据加密和解密
+            // 这里可以调用相应的加密/解密方法
+            // 示例：String encryptedData = AESUtils.encrypt(data, generatedKey);
+        });
+        builder.setNegativeButton("取消", (dialog, which) -> dialog.cancel());
+        builder.show();
     }
 
     private void initView() {
