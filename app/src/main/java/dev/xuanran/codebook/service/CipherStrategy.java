@@ -11,7 +11,7 @@ public interface CipherStrategy {
      * @return 加密结果
      * @throws Exception 加密错误
      */
-    String encryptData(String data) throws Exception;
+    String encryptData(String data);
 
     /**
      * 解密数据
@@ -19,5 +19,5 @@ public interface CipherStrategy {
      * @return 解密结果
      * @throws Exception 解密错误
      */
-    String decryptData(String encryptedData) throws Exception;
+    String decryptData(String encryptedData);
 }

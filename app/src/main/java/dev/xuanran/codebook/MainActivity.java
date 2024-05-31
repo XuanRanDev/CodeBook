@@ -374,8 +374,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             String password = passwordInputLayout.getEditText().getText().toString();
             AccountEntity accountEntity = new AccountEntity();
             accountEntity.setAppName(appName);
-            accountEntity.setUsername(accountID);
-            accountEntity.setPassword(password);
+            accountEntity.setUsername(cipherStrategy.encryptData(accountID));
+            accountEntity.setPassword(cipherStrategy.encryptData(password));
             accountEntity.setCreateTime(new Date());
             accountViewModel.insert(accountEntity);
             dialog.cancel();
