@@ -1,5 +1,6 @@
 package dev.xuanran.codebook.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -9,17 +10,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +30,9 @@ import dev.xuanran.codebook.R;
 import dev.xuanran.codebook.bean.AccountEntity;
 
 public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
+    @SuppressLint("SimpleDateFormat")
+    public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
     private List<AccountEntity> accounts = new ArrayList<>();
 
     @NonNull
@@ -43,7 +48,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
         AccountEntity currentAccount = accounts.get(position);
         holder.title.setText(currentAccount.getAppName());
         holder.id.setText("# " + currentAccount.getId());
-        holder.createDate.setText("Create Date"); // replace with actual date
+        holder.createDate.setText(simpleDateFormat.format(currentAccount.getCreateTime()));
         holder.tagText.setText(currentAccount.getTags());
 
         holder.viewButton.setOnClickListener(v -> {
@@ -75,11 +80,11 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
         Button copyPasswordButton = dialogView.findViewById(R.id.content_view_dialog_copyPassword);
 
         title.setText(account.getAppName());
-        Objects.requireNonNull(accountIDInputLayout.getEditText()).setText(account.getAccount());
+        Objects.requireNonNull(accountIDInputLayout.getEditText()).setText(account.getUsername());
         Objects.requireNonNull(passwordInputLayout.getEditText()).setText(account.getPassword());
 
         copyAccountIDButton.setOnClickListener(v -> {
-            copyToClipboard(view.getContext(), "Account ID", account.getAccount());
+            copyToClipboard(view.getContext(), "Account ID", account.getUsername());
             Toast.makeText(view.getContext(), "Account ID copied", Toast.LENGTH_SHORT).show();
         });
 

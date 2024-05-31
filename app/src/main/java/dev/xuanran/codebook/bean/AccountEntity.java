@@ -5,6 +5,8 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.util.Date;
+
 @Entity(tableName = "account_table")
 public class AccountEntity {
     @PrimaryKey(autoGenerate = true)
@@ -12,11 +14,16 @@ public class AccountEntity {
 
     @ColumnInfo(name = "app_name")
     private String appName;
-    private String account;
+
+    @ColumnInfo(name = "username")
+    private String username;
     private String password;
 
     private String remark;
     private String tags;
+
+    @ColumnInfo(name = "create_time")
+    private Date createTime;
 
     public Long getId() {
         return id;
@@ -26,12 +33,12 @@ public class AccountEntity {
         this.id = id;
     }
 
-    public String getAccount() {
-        return account;
+    public String getUsername() {
+        return username;
     }
 
-    public void setAccount(String account) {
-        this.account = account;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -64,5 +71,13 @@ public class AccountEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

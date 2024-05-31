@@ -25,6 +25,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.Date;
+
 import dev.xuanran.codebook.adapter.AccountAdapter;
 import dev.xuanran.codebook.bean.AccountEntity;
 import dev.xuanran.codebook.model.AccountViewModel;
@@ -116,8 +118,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             String password = passwordInputLayout.getEditText().getText().toString();
             AccountEntity accountEntity = new AccountEntity();
             accountEntity.setAppName(appName);
-            accountEntity.setAccount(accountID);
+            accountEntity.setUsername(accountID);
             accountEntity.setPassword(password);
+            accountEntity.setCreateTime(new Date());
             accountViewModel.insert(accountEntity);
             dialog.cancel();
         });
