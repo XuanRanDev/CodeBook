@@ -32,6 +32,7 @@ import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,6 +47,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 
 import dev.xuanran.codebook.bean.account.AccountEntity;
 import dev.xuanran.codebook.bean.account.adapter.AccountAdapter;
@@ -445,7 +447,16 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         recyclerView.setAdapter(adapter);
 
         accountViewModel = new ViewModelProvider(this).get(AccountViewModel.class);
-        accountViewModel.getAllAccounts().observe(this, adapter::setAccounts);
+        accountViewModel.getAllAccounts().observe(this, new Observer<List<AccountEntity>>() {
+            @Override
+            public void onChanged(List<AccountEntity> accountEntities) {
+                accountEntities.forEach(m -> {
+                    m.setUsername(cipherStrategy.decryptData(m.getUsername()));
+                    m.setPassword(cipherStrategy.decryptData(m.getPassword()));
+                });
+                adapter.setAccounts(accountEntities);
+            }
+        });
 
         fab.setOnClickListener(view -> {
             showAddAccountDialog();
