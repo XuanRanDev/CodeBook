@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +27,14 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull AccountViewHolder holder, int position) {
         AccountEntity currentAccount = accounts.get(position);
-        holder.title.setText(currentAccount.getName());
-        holder.id.setText(String.valueOf(currentAccount.getId()));
+        holder.title.setText(currentAccount.getAppName());
+        holder.id.setText("# " + currentAccount.getId());
         holder.createDate.setText("Create Date"); // replace with actual date
         holder.tagText.setText(currentAccount.getTags());
 
         holder.viewButton.setOnClickListener(v -> {
             // Handle view button click
-            Toast.makeText(v.getContext(), "View button clicked for " + currentAccount.getName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(v.getContext(), "View button clicked for " + currentAccount.getAppName(), Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -52,16 +53,8 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
     }
 
     public void filter(String text) {
-        List<AccountEntity> filteredList = new ArrayList<>();
-        for (AccountEntity account : accounts) {
-            // 根据条件过滤数据
-            if (account.getName().toLowerCase().contains(text.toLowerCase())) {
-                filteredList.add(account);
-            }
-        }
-        // 更新数据集
-        accounts = filteredList;
-        notifyDataSetChanged();
+
     }
+
 
 }

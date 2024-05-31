@@ -7,7 +7,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,7 +52,42 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 
+        initView();
 
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                // Handle home action
+            } else if (id == R.id.nav_settings) {
+                // Handle settings action
+            } else if (id == R.id.nav_about) {
+                // Handle about action
+            }
+            drawerLayout.closeDrawer(navigationView);
+            return true;
+        });
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new AccountAdapter();
+        recyclerView.setAdapter(adapter);
+
+        accountViewModel = new ViewModelProvider(this).get(AccountViewModel.class);
+        accountViewModel.getAllAccounts().observe(this, adapter::setAccounts);
+
+        fab.setOnClickListener(view -> {
+            showAddAccountDialog();
+        });
+
+        appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+            if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
+                fab.hide();
+            } else if (verticalOffset == 0) {
+                fab.show();
+            }
+        });
+    }
+
+    private void initView() {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         appBarLayout = findViewById(R.id.app_bar_layout);
@@ -67,47 +101,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.nav_home) {
-                    // Handle home action
-                } else if (id == R.id.nav_settings) {
-                    // Handle settings action
-                } else if (id == R.id.nav_about) {
-                    // Handle about action
-                }
-                drawerLayout.closeDrawer(navigationView);
-                return true;
-            }
-        });
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new AccountAdapter();
-        recyclerView.setAdapter(adapter);
-
-        accountViewModel = new ViewModelProvider(this).get(AccountViewModel.class);
-        // Update RecyclerView
-        accountViewModel.getAllAccounts().observe(this, adapter::setAccounts);
-
-        fab.setOnClickListener(view -> {
-            // Handle FAB click action
-            showAddAccountDialog();
-        });
-
-        appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
-            if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
-                // Collapsed
-                fab.hide();
-            } else if (verticalOffset == 0) {
-                // Expanded
-                fab.show();
-            } else {
-                // Somewhere in between
-            }
-        });
     }
 
     private void showAddAccountDialog() {
@@ -116,26 +109,23 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         View dialogView = inflater.inflate(R.layout.add_content_view_dialog, null);
         builder.setView(dialogView);
 
-        // Find views in the dialog layout
         TextInputLayout appNameInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_appName);
         TextInputLayout accountIDInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_accountID);
         TextInputLayout passwordInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_password);
 
         builder.setPositiveButton("Save", (dialogInterface, i) -> {
-            // Save data to the database or perform other actions
             String appName = appNameInputLayout.getEditText().getText().toString();
             String accountID = accountIDInputLayout.getEditText().getText().toString();
             String password = passwordInputLayout.getEditText().getText().toString();
 
             AccountEntity accountEntity = new AccountEntity();
-            accountEntity.setName(appName);
+            accountEntity.setAppName(appName);
             accountEntity.setAccount(accountID);
             accountEntity.setPassword(password);
             accountViewModel.insert(accountEntity);
 
             dialogInterface.dismiss();
-            // Perform action with the data
-            // For example, add the data to a list or save it to a database
+
         });
         builder.setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss());
 
@@ -152,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint("搜索...");
         searchView.setOnSearchClickListener(view -> appBarLayout.setExpanded(false));
-
+        searchView.setOnQueryTextListener(this);
         return true;
     }
 
@@ -167,7 +157,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextChange(String newText) {
         appBarLayout.setExpanded(false);
-        adapter.filter(newText);
+
+// 添加一个搜索观察者
+        accountViewModel.searchAccounts(newText).observe(this, accounts -> {
+            adapter.setAccounts(accounts);
+        });
         return false;
     }
 }

@@ -15,7 +15,7 @@ public class AccountRepository {
     public AccountRepository(Application application) {
         AccountDatabase database = AccountDatabase.getInstance(application);
         accountDao = database.accountDao();
-        allAccounts = accountDao.getAllAccounts();
+        allAccounts = accountDao.selectAccountByNameOrAccount(""); // 默认查询空字符串
     }
 
     public void insert(AccountEntity account) {
@@ -33,6 +33,11 @@ public class AccountRepository {
     public LiveData<List<AccountEntity>> getAllAccounts() {
         return allAccounts;
     }
+
+    public LiveData<List<AccountEntity>> searchAccounts(String query) {
+        return accountDao.selectAccountByNameOrAccount(query);
+    }
+
 
     private static class InsertAccountAsyncTask extends AsyncTask<AccountEntity, Void, Void> {
         private AccountDao accountDao;

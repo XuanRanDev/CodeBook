@@ -35,4 +35,8 @@ public class AccountViewModel extends AndroidViewModel {
     public LiveData<List<AccountEntity>> getAllAccounts() {
         return allAccounts;
     }
+
+    public LiveData<List<AccountEntity>> searchAccounts(String query) {
+        return repository.searchAccounts(query);
+    }
 }

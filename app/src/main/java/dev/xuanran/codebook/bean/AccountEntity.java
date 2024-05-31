@@ -1,18 +1,21 @@
 package dev.xuanran.codebook.bean;
 
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
-import lombok.Data;
 
 @Entity(tableName = "account_table")
 public class AccountEntity {
     @PrimaryKey(autoGenerate = true)
     private Long id;
-    private String name;
+
+    @ColumnInfo(name = "app_name")
+    private String appName;
     private String account;
     private String password;
+
+    private String remark;
     private String tags;
 
     public Long getId() {
@@ -21,14 +24,6 @@ public class AccountEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getAccount() {
@@ -53,5 +48,21 @@ public class AccountEntity {
 
     public void setTags(String tags) {
         this.tags = tags;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }
