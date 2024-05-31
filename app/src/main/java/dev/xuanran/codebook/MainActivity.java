@@ -56,13 +56,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                // Handle home action
-            } else if (id == R.id.nav_settings) {
-                // Handle settings action
-            } else if (id == R.id.nav_about) {
-                // Handle about action
-            }
             drawerLayout.closeDrawer(navigationView);
             return true;
         });

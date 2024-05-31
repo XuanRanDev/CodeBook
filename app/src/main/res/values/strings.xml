@@ -9,4 +9,11 @@
     <string name="CopyAccountID">复制账号</string>
     <string name="CopyPassword">复制密码</string>
     <string name="delete">删除</string>
+    <string name="other">其他</string>
+    <string name="donate">捐赠</string>
+    <string name="userRule">用户协议</string>
+    <string name="about">关于</string>
+    <string name="data">数据</string>
+    <string name="export_data">导出数据</string>
+    <string name="import_data">导入数据</string>
 </resources>

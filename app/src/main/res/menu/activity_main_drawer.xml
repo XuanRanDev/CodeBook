@@ -1,11 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="none" />
+
+
     <item
-        android:id="@+id/nav_home"
-        android:title="Home" />
+        android:id="@+id/menu_data"
+        android:title="@string/data">
+        <menu>
+
+            <item
+                android:id="@+id/menu_data_export"
+                android:checkable="true"
+                android:icon="@drawable/baseline_file_export_24"
+                android:title="@string/export_data" />
+
+            <item
+                android:id="@+id/menu_data_import"
+                android:checkable="true"
+                android:icon="@drawable/baseline_file_import_24"
+                android:title="@string/import_data" />
+
+        </menu>
+    </item>
+
     <item
-        android:id="@+id/nav_settings"
-        android:title="Settings" />
-    <item
-        android:id="@+id/nav_about"
-        android:title="About" />
+        android:id="@+id/main_item"
+        android:title="@string/other">
+        <menu>
+
+            <item
+                android:id="@+id/donate"
+                android:checkable="true"
+                android:icon="@drawable/ic_baseline_mood_24"
+                android:title="@string/donate" />
+
+            <item
+                android:id="@+id/userRule"
+                android:checkable="true"
+                android:icon="@drawable/ic_baseline_rule_24"
+                android:title="@string/userRule" />
+            <item
+                android:id="@+id/about"
+                android:checkable="true"
+                android:icon="@drawable/ic_baseline_info_24"
+                android:title="@string/about" />
+        </menu>
+    </item>
 </menu>
