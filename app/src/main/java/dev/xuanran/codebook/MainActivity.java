@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputLayout;
@@ -27,7 +29,7 @@ import dev.xuanran.codebook.adapter.AccountAdapter;
 import dev.xuanran.codebook.bean.AccountEntity;
 import dev.xuanran.codebook.model.AccountViewModel;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, View.OnClickListener{
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -97,32 +99,28 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     private void showAddAccountDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.add_content_view_dialog, null);
         builder.setView(dialogView);
-
         TextInputLayout appNameInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_appName);
         TextInputLayout accountIDInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_accountID);
         TextInputLayout passwordInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_password);
-
-        builder.setPositiveButton("Save", (dialogInterface, i) -> {
+        Button cancel = dialogView.findViewById(R.id.add_content_view_dialog_cancel);
+        Button save = dialogView.findViewById(R.id.add_content_view_dialog_save);
+        AlertDialog dialog = builder.create();
+        cancel.setOnClickListener(view -> dialog.cancel());
+        save.setOnClickListener(view -> {
             String appName = appNameInputLayout.getEditText().getText().toString();
             String accountID = accountIDInputLayout.getEditText().getText().toString();
             String password = passwordInputLayout.getEditText().getText().toString();
-
             AccountEntity accountEntity = new AccountEntity();
             accountEntity.setAppName(appName);
             accountEntity.setAccount(accountID);
             accountEntity.setPassword(password);
             accountViewModel.insert(accountEntity);
-
-            dialogInterface.dismiss();
-
+            dialog.cancel();
         });
-        builder.setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss());
-
-        AlertDialog dialog = builder.create();
         dialog.show();
     }
 
@@ -156,5 +154,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             adapter.setAccounts(accounts);
         });
         return false;
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 }

@@ -16,4 +16,8 @@
     <string name="data">数据</string>
     <string name="export_data">导出数据</string>
     <string name="import_data">导入数据</string>
+    <string name="add_an_application">添加应用</string>
+    <string name="please_enter_the_application_name">请输入应用名称</string>
+    <string name="please_enter_the_user_name">请输入用户名/账号</string>
+    <string name="please_enter_the_password">请输入密码</string>
 </resources>

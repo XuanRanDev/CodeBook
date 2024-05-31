@@ -19,8 +19,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="21dp"
             android:layout_marginTop="25dp"
-            android:text="添加应用"
-            android:textSize="20dp"
+            android:text="@string/add_an_application"
+            android:textSize="20sp"
             android:textColor="?attr/colorOnSurface"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="appName"
-                android:hint="@string/app_name"
+                android:hint="@string/please_enter_the_application_name"
                 android:inputType="text"
                 android:maxLines="1" />
 
@@ -75,6 +75,7 @@
                 android:autofillHints="username"
                 android:drawablePadding="8dp"
                 android:inputType="text"
+                android:hint="@string/please_enter_the_user_name"
                 android:maxLines="1" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -97,6 +98,7 @@
                 android:layout_height="wrap_content"
                 android:autofillHints="password"
                 android:drawablePadding="8dp"
+                android:hint="@string/please_enter_the_password"
                 android:inputType="textPassword"
                 android:maxLines="1" />
 
