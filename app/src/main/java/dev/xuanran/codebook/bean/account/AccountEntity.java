@@ -1,4 +1,4 @@
-package dev.xuanran.codebook.bean;
+package dev.xuanran.codebook.bean.account;
 
 
 import androidx.room.ColumnInfo;

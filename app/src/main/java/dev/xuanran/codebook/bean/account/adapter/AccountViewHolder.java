@@ -1,4 +1,4 @@
-package dev.xuanran.codebook.adapter;
+package dev.xuanran.codebook.bean.account.adapter;
 
 import android.view.View;
 import android.widget.Button;

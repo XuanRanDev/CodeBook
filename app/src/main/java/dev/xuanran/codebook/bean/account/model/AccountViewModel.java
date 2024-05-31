@@ -1,4 +1,4 @@
-package dev.xuanran.codebook.model;
+package dev.xuanran.codebook.bean.account.model;
 
 import android.app.Application;
 import android.net.Uri;
@@ -13,8 +13,8 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import dev.xuanran.codebook.bean.AccountEntity;
-import dev.xuanran.codebook.bean.AccountRepository;
+import dev.xuanran.codebook.bean.account.AccountEntity;
+import dev.xuanran.codebook.bean.account.AccountRepository;
 import dev.xuanran.codebook.callback.ExportCallback;
 import dev.xuanran.codebook.callback.ImportCallback;
 import dev.xuanran.codebook.util.CryptoUtils;

@@ -1,4 +1,4 @@
-package dev.xuanran.codebook.adapter;
+package dev.xuanran.codebook.bean.account.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.ClipData;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 import dev.xuanran.codebook.R;
-import dev.xuanran.codebook.bean.AccountEntity;
+import dev.xuanran.codebook.bean.account.AccountEntity;
 
 public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
     @SuppressLint("SimpleDateFormat")

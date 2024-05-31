@@ -1,4 +1,4 @@
-package dev.xuanran.codebook.db;
+package dev.xuanran.codebook.bean.db;
 
 import androidx.room.Database;
 import androidx.room.Room;
@@ -7,8 +7,8 @@ import androidx.room.TypeConverters;
 
 import android.content.Context;
 
-import dev.xuanran.codebook.bean.AccountDao;
-import dev.xuanran.codebook.bean.AccountEntity;
+import dev.xuanran.codebook.bean.account.AccountDao;
+import dev.xuanran.codebook.bean.account.AccountEntity;
 import dev.xuanran.codebook.util.Converters;
 
 @Database(entities = {AccountEntity.class}, version = 1)

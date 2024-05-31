@@ -1,4 +1,4 @@
-package dev.xuanran.codebook.bean;
+package dev.xuanran.codebook.bean.account;
 
 import android.app.Application;
 import androidx.lifecycle.LiveData;
@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 
 import java.util.List;
 
-import dev.xuanran.codebook.db.AccountDatabase;
+import dev.xuanran.codebook.bean.db.AccountDatabase;
 
 public class AccountRepository {
     private AccountDao accountDao;

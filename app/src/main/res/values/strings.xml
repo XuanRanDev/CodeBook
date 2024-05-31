@@ -23,7 +23,7 @@
     <string name="export_import_data_tips">导出数据时，程序会将您在数据库中储存的所有数据进行AES-128加密后导出为TXT文件。
         \n\n导入数据时，您需要输入数据的导入密码，仅在密码验证成功后数据才能完成导入。
     </string>
-    <string name="enter_password">请输入数据加密/解密密码</string>
+    <string name="enter_password">输入密码</string>
     <string name="export">导出</string>
     <string name="importStr">导入</string>
     <string name="export_success">数据导出成功</string>
@@ -32,4 +32,19 @@
     <string name="select_file">选择文件</string>
     <string name="export_error">导出失败</string>
     <string name="donate_tips">首先非常感谢您的捐赠，正是您的支持才有项目作者维护下去的动力。\n\n您可以点击下方打开支付宝按钮直接打开支付宝的捐赠页面，也可截图保存二维码图片使用微信/支付宝扫码捐赠。</string>
+    <string name="choose_encryption_method">选择加密方式</string>
+    <string name="choose_encryption_method_tips">CodeBook 必须要求您指定一种加密方式。\n\n指纹方式：您需要授权您的指纹，CodeBook会使用操作系统底层的硬件加密生成高强度的加密算法来对您的数据进行加/解密，您需要在每次启动时授权您的指纹。(仅在设置支持指纹的情况下)\n\n密码方式：CodeBook会要求您提供一个密码，然后使用此密码做为随机种子生成高强度加密密钥，来对您的数据加/解密，您需要在每次启动时输入此密码，若此密码忘记，您的数据将无法找回。</string>
+    <string name="fingerprint">指纹</string>
+    <string name="password">密码</string>
+    <string name="fingerprint_not_supported">指纹识别不可用或您的设备不支持指纹</string>
+    <string name="fingerprint_title">验证指纹</string>
+    <string name="fingerprint_subtitle">请使用指纹验证进行身份验证</string>
+    <string name="password_title">密码验证</string>
+    <string name="enter_decryption_password">请输入数据解密密码</string>
+    <string name="enter_decryption_password_tips">若数据解密密码丢失，数据无法找回。</string>
+    <string name="ok">确定</string>
+    <string name="exit">退出</string>
+    <string name="set_password">请输入要设置的密码</string>
+    <string name="set_password_tips">密码设置后若忘记，将无法找回您的数据。</string>
+    <string name="search_hint">搜索...</string>
 </resources>
