@@ -1,33 +1,34 @@
 package dev.xuanran.codebook;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputLayout;
 
-import dev.xuanran.codebook.R;
 import dev.xuanran.codebook.adapter.AccountAdapter;
 import dev.xuanran.codebook.bean.AccountEntity;
 import dev.xuanran.codebook.model.AccountViewModel;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -38,6 +39,12 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private AccountViewModel accountViewModel;
 
+    private AccountAdapter adapter;
+
+
+    private SearchView searchView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-
 
 
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -79,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        AccountAdapter adapter = new AccountAdapter();
+        adapter = new AccountAdapter();
         recyclerView.setAdapter(adapter);
 
         accountViewModel = new ViewModelProvider(this).get(AccountViewModel.class);
@@ -135,5 +141,33 @@ public class MainActivity extends AppCompatActivity {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) searchItem.getActionView();
+        searchView.setQueryHint("搜索...");
+        searchView.setOnSearchClickListener(view -> appBarLayout.setExpanded(false));
+
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        searchView.clearFocus();
+        searchView.onActionViewCollapsed();
+        appBarLayout.setExpanded(true, true);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        appBarLayout.setExpanded(false);
+        adapter.filter(newText);
+        return false;
     }
 }

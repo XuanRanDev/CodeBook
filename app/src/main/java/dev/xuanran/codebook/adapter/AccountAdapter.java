@@ -50,4 +50,18 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
     public AccountEntity getAccountAt(int position) {
         return accounts.get(position);
     }
+
+    public void filter(String text) {
+        List<AccountEntity> filteredList = new ArrayList<>();
+        for (AccountEntity account : accounts) {
+            // 根据条件过滤数据
+            if (account.getName().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(account);
+            }
+        }
+        // 更新数据集
+        accounts = filteredList;
+        notifyDataSetChanged();
+    }
+
 }
