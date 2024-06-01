@@ -12,6 +12,8 @@ import javax.crypto.SecretKey;
 
 public class CipherHelper {
 
+    private static SecretKey cachedSecretKey = null;
+
     /**
      * 在设备的 Android 密钥库（AndroidKeyStore）中生成一个随机的 AES 密钥。
      * 这个密钥可以用于加密和解密数据，并且该密钥受设备的生物识别（如指纹）保护。
@@ -39,13 +41,16 @@ public class CipherHelper {
 
 
     public static SecretKey getSecretKey() {
-        try {
-            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-            keyStore.load(null);
-            return ((SecretKey) keyStore.getKey(CIPHER_KEYSTORE_ALIAS, null));
-        } catch (Exception e) {
-            throw new RuntimeException("无法获取安全硬件中的加密数据");
+        if (cachedSecretKey == null) {
+            try {
+                KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+                keyStore.load(null);
+                cachedSecretKey = (SecretKey) keyStore.getKey(CIPHER_KEYSTORE_ALIAS, null);
+            } catch (Exception e) {
+                throw new RuntimeException("无法获取安全硬件中的加密数据", e);
+            }
         }
+        return cachedSecretKey;
     }
 
 }
