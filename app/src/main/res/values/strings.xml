@@ -58,4 +58,7 @@
     <string name="deleted">数据已删除</string>
     <string name="copy">复制</string>
     <string name="copy_success">复制成功</string>
+    <string name="input_remark">请输入备注</string>
+    <string name="input_remark_tips">备注信息不加密存储，且创建完成后不支持编辑，敬请谅解。</string>
+    <string name="exit_tips">再按一次退出</string>
 </resources>

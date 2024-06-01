@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.biometric.BiometricManager;
@@ -352,6 +353,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     private void showAddAccountDialog() {
+        AccountEntity accountEntity = new AccountEntity();
+
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.add_content_view_dialog, null);
@@ -359,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         TextInputLayout appNameInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_appName);
         TextInputLayout accountIDInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_accountID);
         TextInputLayout passwordInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_password);
+        ImageView more = dialogView.findViewById(R.id.add_content_view_dialog_more);
         Button cancel = dialogView.findViewById(R.id.add_content_view_dialog_cancel);
         Button save = dialogView.findViewById(R.id.add_content_view_dialog_save);
         AlertDialog dialog = builder.create();
@@ -367,7 +371,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             String appName = appNameInputLayout.getEditText().getText().toString();
             String accountID = accountIDInputLayout.getEditText().getText().toString();
             String password = passwordInputLayout.getEditText().getText().toString();
-            AccountEntity accountEntity = new AccountEntity();
             accountEntity.setAppName(appName);
             accountEntity.setUsername(accountID);
             accountEntity.setPassword(password);
@@ -375,7 +378,32 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             accountViewModel.insert(accountEntity);
             dialog.cancel();
         });
+        more.setOnClickListener(view ->{
+            PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+            popupMenu.getMenuInflater().inflate(R.menu.add_popup_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(item -> {
+
+               if (item.getItemId() == R.id.dialog_popup_menu_remark) {
+                   showRemarkDialog(view, accountEntity);
+               }
+                return false;
+            });
+            popupMenu.show();
+        });
         dialog.show();
+    }
+
+    private void showRemarkDialog(View view, AccountEntity account) {
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_create_remark, null);
+        TextInputLayout edittext = dialogView.findViewById(R.id.dialog_create_remark_edittext);
+        new MaterialAlertDialogBuilder(view.getContext())
+                .setView(dialogView)
+                .setPositiveButton(R.string.ok, (dialog, which) -> {
+                    account.setRemark(edittext.getEditText().getText().toString());
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
 
@@ -464,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 long secondTime = System.currentTimeMillis();
                 if (secondTime - firstTime > 3000) {
                     firstTime = secondTime;
-                    Snackbar.make(drawerLayout, "再按一次退出", 3000).setBackgroundTint(Color.parseColor("#FFFF8A80")).setAction("OK", view -> finish()).show();
+                    Snackbar.make(drawerLayout, R.string.exit_tips, 3000).setBackgroundTint(Color.parseColor("#FFFF8A80")).setAction("OK", view -> finish()).show();
                     return true;
                 } else {
                     finish();
