@@ -14,13 +14,13 @@ public class PasswordUtils {
      * 迭代次数决定了 PBKDF2 算法执行的次数。每次迭代都会对输入密码进行哈希运算，这个过程会重复 ITERATION_COUNT 次。
      * 通过增加迭代次数，可以增加密钥导出过程的计算量，从而增加暴力破解的难度。换句话说，较高的迭代次数可以提高安全性，但也会增加生成密钥所需的时间。
      */
-    private static final int ITERATION_COUNT = 10000;
+    private static final int ITERATION_COUNT = 100;
 
     /**
      * 密钥长度决定了生成密钥的位数。对于 AES 加密算法，常见的密钥长度是 128 位、192 位和 256 位。
      * 密钥越长，理论上加密强度越高，但也会增加计算开销。在大多数情况下，128 位或 256 位密钥长度是常用的选择。
      */
-    private static final int KEY_LENGTH = 256;
+    private static final int KEY_LENGTH = 128;
 
     /**
      * 从用户提供的密码生成一个加密密钥。
