@@ -496,11 +496,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             return true;
         });
 
+        accountViewModel = new ViewModelProvider(this).get(AccountViewModel.class);
+
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new AccountAdapter();
+        adapter = new AccountAdapter(accountViewModel);
         recyclerView.setAdapter(adapter);
 
-        accountViewModel = new ViewModelProvider(this).get(AccountViewModel.class);
         accountViewModel.getAllAccounts().observe(this, new Observer<List<AccountEntity>>() {
             @Override
             public void onChanged(List<AccountEntity> accountEntities) {

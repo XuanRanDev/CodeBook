@@ -50,4 +50,12 @@
     <string name="verify_title">完成验证</string>
     <string name="finish_verfig">完成身份验证后继续</string>
     <string name="password_error">密码验证错误，请重试</string>
+    <string name="account_copy">账号/用户名已复制</string>
+    <string name="password_copy_tips">密码已复制</string>
+    <string name="remark">备注</string>
+    <string name="confirm_delete">确认删除</string>
+    <string name="confirm_delete_tips">数据删除后不可恢复，确定删除？</string>
+    <string name="deleted">数据已删除</string>
+    <string name="copy">复制</string>
+    <string name="copy_success">复制成功</string>
 </resources>

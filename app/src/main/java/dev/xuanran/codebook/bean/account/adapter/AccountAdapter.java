@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -28,12 +27,19 @@ import java.util.Objects;
 
 import dev.xuanran.codebook.R;
 import dev.xuanran.codebook.bean.account.AccountEntity;
+import dev.xuanran.codebook.bean.account.model.AccountViewModel;
 
 public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
     @SuppressLint("SimpleDateFormat")
     public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
+    private final AccountViewModel accountViewModel;
+
     private List<AccountEntity> accounts = new ArrayList<>();
+
+    public AccountAdapter(AccountViewModel accountViewModel) {
+        this.accountViewModel = accountViewModel;
+    }
 
     @NonNull
     @Override
@@ -85,12 +91,12 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
 
         copyAccountIDButton.setOnClickListener(v -> {
             copyToClipboard(view.getContext(), "Account", account.getUsername());
-            Toast.makeText(view.getContext(), "Account ID copied", Toast.LENGTH_SHORT).show();
+            Snackbar.make(dialogView, R.string.account_copy, 3000).show();
         });
 
         copyPasswordButton.setOnClickListener(v -> {
             copyToClipboard(view.getContext(), "Password", account.getPassword());
-            Toast.makeText(view.getContext(), "Password copied", Toast.LENGTH_SHORT).show();
+            Snackbar.make(dialogView, R.string.password_copy_tips, 3000).show();
         });
 
         more.setOnClickListener(view13 -> showMoreMenu(view13, account));
@@ -116,11 +122,37 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
         popup.getMenuInflater().inflate(R.menu.dialog_content_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.dialog_content_menu_delete) {
-                Snackbar.make(view, "数据删除后不可恢复，是否继续？", 10000).show();
+                showDeleteConfirmation(view, data);
+            }
+            if (item.getItemId() == R.id.dialog_content_menu_remark) {
+                showRemark(view, data);
             }
             return true;
         });
         popup.show();
+    }
+
+    private void showDeleteConfirmation(View view, AccountEntity account) {
+        new MaterialAlertDialogBuilder(view.getContext())
+                .setTitle(R.string.confirm_delete)
+                .setMessage(R.string.confirm_delete_tips)
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
+                    accountViewModel.delete(account);
+                    Snackbar.make(view, R.string.deleted, Snackbar.LENGTH_SHORT).show();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void showRemark(View view, AccountEntity account) {
+        new MaterialAlertDialogBuilder(view.getContext())
+                .setMessage(account.getRemark())
+                .setPositiveButton(R.string.copy, (dialog, which) -> {
+                    copyToClipboard(view.getContext(), "remark", account.getRemark());
+                    Snackbar.make(view, R.string.copy_success, Snackbar.LENGTH_SHORT).show();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
 }

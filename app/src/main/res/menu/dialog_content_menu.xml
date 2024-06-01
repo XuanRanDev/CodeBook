@@ -4,4 +4,9 @@
         android:id="@+id/dialog_content_menu_delete"
         android:icon="@drawable/baseline_delete_outline_24"
         android:title="@string/delete" />
+
+    <item
+        android:id="@+id/dialog_content_menu_remark"
+        android:icon="@drawable/baseline_bookmark_24"
+        android:title="@string/remark" />
 </menu>
