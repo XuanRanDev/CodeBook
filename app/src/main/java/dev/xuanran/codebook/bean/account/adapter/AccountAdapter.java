@@ -84,7 +84,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
         Objects.requireNonNull(passwordInputLayout.getEditText()).setText(account.getPassword());
 
         copyAccountIDButton.setOnClickListener(v -> {
-            copyToClipboard(view.getContext(), "Account ID", account.getUsername());
+            copyToClipboard(view.getContext(), "Account", account.getUsername());
             Toast.makeText(view.getContext(), "Account ID copied", Toast.LENGTH_SHORT).show();
         });
 

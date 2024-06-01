@@ -1,15 +1,13 @@
 package dev.xuanran.codebook;
 
-import static dev.xuanran.codebook.util.CipherHelper.generateSecretKey;
-
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +40,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.File;
@@ -74,14 +73,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private SharedPreferences sharedPreferences;
     private String encryptionType;
 
+    private String validateData;
     /**
      * CipherStrategy 对象，用于进行加密/解密操作
      */
-    private CipherStrategy cipherStrategy;
-    private AlertDialog verifyDialog;
+    public static CipherStrategy cipherStrategy;
 
+    private boolean appBarStatus = true;
+
+    private long firstTime;
     private static final String PREFS_NAME = "pass_config";
     private static final String KEY_ENCRYPTION_TYPE = "encryption_type";
+    public static final String KEY_VALIDATE = "validate_key";
     private static final String ENCRYPTION_TYPE_FINGERPRINT = "fingerprint";
     private static final String ENCRYPTION_TYPE_PASSWORD = "password";
 
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         encryptionType = sharedPreferences.getString(KEY_ENCRYPTION_TYPE, "");
+        validateData = sharedPreferences.getString(KEY_VALIDATE, "");
 
         if (encryptionType.isEmpty()) {
             // 如果没有设置加密方式，则弹出对话框让用户选择加密方式
@@ -103,9 +107,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         } else {
             startAppropriateFlow();
         }
-
         initView();
-
     }
 
     /**
@@ -117,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         MaterialAlertDialogBuilder verifyDialogBuild = new MaterialAlertDialogBuilder(this);
         verifyDialogBuild.setCancelable(false);
         verifyDialogBuild.setView(dialogView);
-        verifyDialog = verifyDialogBuild.create();
+        AlertDialog verifyDialog = verifyDialogBuild.create();
         verifyDialog.show();
     }
 
@@ -125,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
      * 弹出加密方式选择对话框
      */
     private void showEncryptionTypeDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(R.string.choose_encryption_method);
         builder.setCancelable(false);
         builder.setMessage(R.string.choose_encryption_method_tips);
@@ -177,25 +179,21 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                         super.onAuthenticationError(errorCode, errString);
                         Toast.makeText(getApplicationContext(), "指纹认证错误: " + errString, Toast.LENGTH_SHORT).show();
+                        startAppropriateFlow();
                     }
 
                     @Override
                     public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                         super.onAuthenticationSucceeded(result);
                         Toast.makeText(getApplicationContext(), "指纹认证成功", Toast.LENGTH_SHORT).show();
-                        if (encryptionType.isEmpty()) {
-                            generateSecretKey();
-                            sharedPreferences.edit()
-                                    .putString(KEY_ENCRYPTION_TYPE, ENCRYPTION_TYPE_FINGERPRINT)
-                                    .apply();
-                        }
-                        onCipherStrategyCreated(new FingerprintCipherStrategy());
+                        onCipherStrategyCreated(new FingerprintCipherStrategy(), ENCRYPTION_TYPE_FINGERPRINT);
                     }
 
                     @Override
                     public void onAuthenticationFailed() {
                         super.onAuthenticationFailed();
                         Toast.makeText(getApplicationContext(), "指纹认证失败", Toast.LENGTH_SHORT).show();
+                        startAppropriateFlow();
                     }
                 });
 
@@ -222,12 +220,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         builder.setCancelable(false);
         builder.setPositiveButton(R.string.ok, (dialog, which) -> {
             String password = passwordInput.getText().toString();
-            onCipherStrategyCreated(new PasswordCipherStrategy(password));
-            if (encryptionType.isEmpty()) {
-                sharedPreferences.edit()
-                        .putString(KEY_ENCRYPTION_TYPE, ENCRYPTION_TYPE_PASSWORD)
-                        .apply();
-            }
+            onCipherStrategyCreated(new PasswordCipherStrategy(password), ENCRYPTION_TYPE_PASSWORD);
         });
         builder.setNegativeButton(R.string.exit, (dialogInterface, i) -> finish());
         builder.show();
@@ -376,8 +369,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             String password = passwordInputLayout.getEditText().getText().toString();
             AccountEntity accountEntity = new AccountEntity();
             accountEntity.setAppName(appName);
-            accountEntity.setUsername(cipherStrategy.encryptData(accountID));
-            accountEntity.setPassword(cipherStrategy.encryptData(password));
+            accountEntity.setUsername(accountID);
+            accountEntity.setPassword(password);
             accountEntity.setCreateTime(new Date());
             accountViewModel.insert(accountEntity);
             dialog.cancel();
@@ -389,7 +382,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint(getString(R.string.search_hint));
@@ -420,10 +412,72 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     }
 
+    /**
+     * 验证方法
+     *
+     * @param cipherStrategy 选择的策略模式
+     * @param encryption     策略模式类型
+     */
     @Override
-    public void onCipherStrategyCreated(CipherStrategy cipherStrategy) {
-        this.cipherStrategy = cipherStrategy;
-        initData();
+    public void onCipherStrategyCreated(CipherStrategy cipherStrategy, String encryption) {
+        MainActivity.cipherStrategy = cipherStrategy;
+        if (encryptionType.isEmpty()) {
+            sharedPreferences.edit()
+                    .putString(KEY_VALIDATE, cipherStrategy.encryptData("123456"))
+                    .putString(KEY_ENCRYPTION_TYPE, encryption)
+                    .apply();
+        }
+        boolean completeVerification = encryptionType.isEmpty();
+        // 测试解密数据
+        if (!encryptionType.isEmpty()) {
+            try {
+                cipherStrategy.validate(validateData);
+                completeVerification = true;
+            } catch (Exception e) {
+                startAppropriateFlow();
+                showTips(getString(R.string.password_error));
+            }
+        }
+        if (completeVerification) {
+            initData();
+        }
+    }
+
+    public void showTips(String message) {
+        Snackbar.make(drawerLayout, message, 3000).show();
+    }
+
+    /**
+     * 处理按钮返回事件，这段方法写的比较难以理解，可能存在未知的bug
+     *
+     * @param keyCode 由哪个按钮触发
+     * @param event   按钮事件
+     * @return other
+     */
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+            searchView.clearFocus();
+            searchView.onActionViewCollapsed();
+            if (!appBarStatus) {
+                appBarLayout.setExpanded(true, true);
+                long secondTime = System.currentTimeMillis();
+                if (secondTime - firstTime > 3000) {
+                    firstTime = secondTime;
+                    Snackbar.make(drawerLayout, "再按一次退出", 3000).setBackgroundTint(Color.parseColor("#FFFF8A80")).setAction("OK", view -> finish()).show();
+                    return true;
+                } else {
+                    finish();
+                }
+            } else {
+                appBarLayout.setExpanded(true, true);
+                return true;
+            }
+
+        }
+
+        return super.onKeyUp(keyCode, event);
+
     }
 
     private void initData() {
@@ -450,10 +504,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         accountViewModel.getAllAccounts().observe(this, new Observer<List<AccountEntity>>() {
             @Override
             public void onChanged(List<AccountEntity> accountEntities) {
-                accountEntities.forEach(m -> {
-                    m.setUsername(cipherStrategy.decryptData(m.getUsername()));
-                    m.setPassword(cipherStrategy.decryptData(m.getPassword()));
-                });
                 adapter.setAccounts(accountEntities);
             }
         });

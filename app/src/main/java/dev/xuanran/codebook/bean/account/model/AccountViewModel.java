@@ -2,23 +2,26 @@ package dev.xuanran.codebook.bean.account.model;
 
 import android.app.Application;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Objects;
 
+import dev.xuanran.codebook.MainActivity;
 import dev.xuanran.codebook.bean.account.AccountEntity;
 import dev.xuanran.codebook.bean.account.AccountRepository;
 import dev.xuanran.codebook.callback.ExportCallback;
 import dev.xuanran.codebook.callback.ImportCallback;
 import dev.xuanran.codebook.util.CryptoUtils;
-
 public class AccountViewModel extends AndroidViewModel {
     private AccountRepository repository;
     private LiveData<List<AccountEntity>> allAccounts;
@@ -26,14 +29,32 @@ public class AccountViewModel extends AndroidViewModel {
     public AccountViewModel(@NonNull Application application) {
         super(application);
         repository = new AccountRepository(application);
-        allAccounts = repository.getAllAccounts();
+        allAccounts = Transformations.map(repository.getAllAccounts(), this::decryptAccounts);
+    }
+
+    private List<AccountEntity> decryptAccounts(List<AccountEntity> accounts) {
+        if (accounts != null) {
+            for (AccountEntity account : accounts) {
+                String username = account.getUsername();
+                String decryptData = MainActivity.cipherStrategy.decryptData(username);
+                Log.e("XuanRan", "原始数据：" + username);
+                Log.e("XuanRan", "解密数据：" + decryptData);
+                account.setUsername(decryptData);
+                account.setPassword(MainActivity.cipherStrategy.decryptData(account.getPassword()));
+            }
+        }
+        return accounts;
     }
 
     public void insert(AccountEntity account) {
+        account.setUsername(MainActivity.cipherStrategy.encryptData(account.getUsername()));
+        account.setPassword(MainActivity.cipherStrategy.encryptData(account.getPassword()));
         repository.insert(account);
     }
 
     public void update(AccountEntity account) {
+        account.setUsername(MainActivity.cipherStrategy.encryptData(account.getUsername()));
+        account.setPassword(MainActivity.cipherStrategy.encryptData(account.getPassword()));
         repository.update(account);
     }
 
@@ -46,9 +67,8 @@ public class AccountViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<AccountEntity>> searchAccounts(String query) {
-        return repository.searchAccounts(query);
+        return Transformations.map(repository.searchAccounts(query), this::decryptAccounts);
     }
-
 
     public void exportData(String password, ExportCallback callback) {
         new Thread(() -> {
@@ -56,6 +76,8 @@ public class AccountViewModel extends AndroidViewModel {
                 List<AccountEntity> accounts = allAccounts.getValue();
                 StringBuilder data = new StringBuilder();
                 for (AccountEntity account : accounts) {
+                    account.setUsername(MainActivity.cipherStrategy.decryptData(account.getUsername()));
+                    account.setPassword(MainActivity.cipherStrategy.decryptData(account.getPassword()));
                     data.append(account.toString()).append("\n");
                 }
                 String encryptedData = CryptoUtils.encrypt(data.toString(), password);
@@ -84,9 +106,10 @@ public class AccountViewModel extends AndroidViewModel {
                 String decryptedData = CryptoUtils.decrypt(data.toString(), password);
                 String[] accounts = decryptedData.split("\n");
 
-//                repository.deleteAll();
                 for (String accountData : accounts) {
                     AccountEntity account = AccountEntity.fromString(accountData);
+                    account.setUsername(MainActivity.cipherStrategy.encryptData(account.getUsername()));
+                    account.setPassword(MainActivity.cipherStrategy.encryptData(account.getPassword()));
                     repository.insert(account);
                 }
 
@@ -97,5 +120,4 @@ public class AccountViewModel extends AndroidViewModel {
             }
         }).start();
     }
-
 }

@@ -45,8 +45,9 @@
     <string name="ok">确定</string>
     <string name="exit">退出</string>
     <string name="set_password">请输入要设置的密码</string>
-    <string name="set_password_tips">密码设置后若忘记，将无法找回您的数据。</string>
+    <string name="set_password_tips">密码若忘记，将无法找回您的数据。</string>
     <string name="search_hint">搜索...</string>
     <string name="verify_title">完成验证</string>
     <string name="finish_verfig">完成身份验证后继续</string>
+    <string name="password_error">密码验证错误，请重试</string>
 </resources>
