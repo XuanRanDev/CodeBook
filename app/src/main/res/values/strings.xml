@@ -2,6 +2,15 @@
     <string name="app_name">CodeBook</string>
     <string name="navigation_drawer_open">Open\n</string>
     <string name="navigation_drawer_close">Close</string>
+
+
+    <!-- Other strings -->
+    <string name="about_title">关于 CodeBook</string>
+    <string name="about_message">感谢使用 CodeBook 应用程序！\n\nEmail：XuanRanDev@qq.com\n\n您可以在我们的 GitHub 页面查看项目的更多信息。</string>
+    <string name="github_link">访问我们的 GitHub 主页</string>
+    <string name="github_url">\n\nhttps://github.com/XuanRanDev/CodeBook</string>
+
+
     <string name="view">查看</string>
     <string name="cancel">取消</string>
     <string name="save">保存</string>
@@ -61,4 +70,5 @@
     <string name="input_remark">请输入备注</string>
     <string name="input_remark_tips">备注信息不加密存储，且创建完成后不支持编辑，敬请谅解。</string>
     <string name="exit_tips">再按一次退出</string>
+    <string name="user_rule">用户协议</string>
 </resources>

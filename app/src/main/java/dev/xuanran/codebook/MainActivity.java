@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,6 +59,8 @@ import dev.xuanran.codebook.callback.ImportCallback;
 import dev.xuanran.codebook.service.CipherStrategy;
 import dev.xuanran.codebook.service.impl.FingerprintCipherStrategy;
 import dev.xuanran.codebook.service.impl.PasswordCipherStrategy;
+import dev.xuanran.codebook.util.CipherHelper;
+import dev.xuanran.codebook.util.FileUtils;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
         View.OnClickListener, CipherStrategyCallback {
@@ -186,6 +189,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     @Override
                     public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                         super.onAuthenticationSucceeded(result);
+                        if (encryptionType.isEmpty()) {
+                            CipherHelper.generateSecretKey();
+                        }
                         Toast.makeText(getApplicationContext(), "指纹认证成功", Toast.LENGTH_SHORT).show();
                         onCipherStrategyCreated(new FingerprintCipherStrategy(), ENCRYPTION_TYPE_FINGERPRINT);
                     }
@@ -448,6 +454,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
      */
     @Override
     public void onCipherStrategyCreated(CipherStrategy cipherStrategy, String encryption) {
+
         MainActivity.cipherStrategy = cipherStrategy;
         if (encryptionType.isEmpty()) {
             sharedPreferences.edit()
@@ -474,6 +481,40 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     public void showTips(String message) {
         Snackbar.make(drawerLayout, message, 3000).show();
     }
+
+    private void showAboutDialog() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_about, null);
+        builder.setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss());
+
+        TextView githubLink = dialogView.findViewById(R.id.github_link);
+        githubLink.setOnClickListener(v -> {
+            String url = getString(R.string.github_url);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            startActivity(intent);
+        });
+
+        builder.create().show();
+    }
+
+    private void showUserAgreementDialog() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_user_agreement, null);
+        builder.setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                .setCancelable(false); // 用户必须阅读协议才能继续
+
+        TextView tvUserAgreement = dialogView.findViewById(R.id.tv_user_agreement);
+        tvUserAgreement.setMovementMethod(new ScrollingMovementMethod()); // 使TextView可滚动
+        tvUserAgreement.setText(FileUtils.readAssetTextFile(this, "user_rule.txt"));
+        builder.create().show();
+    }
+
+
 
     /**
      * 处理按钮返回事件，这段方法写的比较难以理解，可能存在未知的bug
@@ -519,6 +560,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             }
             if (id == R.id.donate) {
                 showDonateDialog();
+            }
+            if (id == R.id.about) {
+                showAboutDialog();
+            }
+            if (id == R.id.userRule) {
+                showUserAgreementDialog();
+
             }
             drawerLayout.closeDrawer(navigationView);
             return true;

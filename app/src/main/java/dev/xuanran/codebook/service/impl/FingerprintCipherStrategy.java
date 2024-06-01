@@ -29,6 +29,7 @@ public class FingerprintCipherStrategy implements CipherStrategy {
 
     /**
      * 加密数据
+     *
      * @param data 待加密数据
      * @return 加密后的数据
      * @throws Exception 加密异常
@@ -59,6 +60,7 @@ public class FingerprintCipherStrategy implements CipherStrategy {
 
     /**
      * 解密数据
+     *
      * @param encryptedData 待解密数据
      * @return 解密后的数据
      * @throws Exception 解密异常
@@ -71,6 +73,7 @@ public class FingerprintCipherStrategy implements CipherStrategy {
             throw new RuntimeException(e);
         }
     }
+
     @Override
     public void validate(String encryptedData) throws Exception {
         decryptingData(encryptedData);
