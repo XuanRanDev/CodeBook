@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Objects;
 
@@ -70,30 +71,30 @@ public class AccountViewModel extends AndroidViewModel {
         return Transformations.map(repository.searchAccounts(query), this::decryptAccounts);
     }
 
-    public void exportData(String password, ExportCallback callback) {
+    public void exportData(String password, Uri uri, ExportCallback callback) {
         new Thread(() -> {
             try {
                 List<AccountEntity> accounts = allAccounts.getValue();
                 StringBuilder data = new StringBuilder();
                 for (AccountEntity account : accounts) {
-                    account.setUsername(MainActivity.cipherStrategy.decryptData(account.getUsername()));
-                    account.setPassword(MainActivity.cipherStrategy.decryptData(account.getPassword()));
                     data.append(account.toString()).append("\n");
                 }
                 String encryptedData = CryptoUtils.encrypt(data.toString(), password);
 
-                File file = new File(getApplication().getExternalFilesDir(null), "accounts_backup.txt");
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    fos.write(encryptedData.getBytes());
+                try (OutputStream outputStream = getApplication().getContentResolver().openOutputStream(uri)) {
+                    if (outputStream != null) {
+                        outputStream.write(encryptedData.getBytes());
+                    }
                 }
 
-                callback.onSuccess(file);
+                callback.onSuccess(new File(uri.getPath()));
             } catch (Exception e) {
                 e.printStackTrace();
                 callback.onError(e);
             }
         }).start();
     }
+
 
     public void importData(String password, Uri uri, ImportCallback callback) {
         new Thread(() -> {

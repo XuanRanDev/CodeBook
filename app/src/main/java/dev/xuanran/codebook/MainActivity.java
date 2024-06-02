@@ -2,6 +2,7 @@ package dev.xuanran.codebook;
 
 import static dev.xuanran.codebook.bean.Constants.FINGERPRINT_AUTH_EXPIRED;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -89,6 +90,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private long firstTime;
 
     private boolean initialized = false;
+    /**
+     * 导出数据时配置的密码
+     */
+    private String exportDataPassword;
     private static final String PREFS_NAME = "pass_config";
     private static final String KEY_ENCRYPTION_TYPE = "encryption_type";
     public static final String KEY_VALIDATE = "validate_key";
@@ -278,20 +283,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         builder.setTitle(R.string.export_data);
         builder.setView(dialogView);
         builder.setPositiveButton(R.string.export, (dialog, which) -> {
-            String password = passwordInput.getText().toString();
-            accountViewModel.exportData(password, new ExportCallback() {
-                @Override
-                public void onSuccess(File file) {
-                    runOnUiThread(() ->
-                            Toast.makeText(MainActivity.this, R.string.export_success, Toast.LENGTH_SHORT).show());
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.export_error, Toast.LENGTH_SHORT).show());
-                }
-            });
+            exportDataPassword = passwordInput.getText().toString();
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TITLE, "accounts_backup.txt");
+            startActivityForResult(intent, 2); // 创建常量 CREATE_FILE
         });
+
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
@@ -309,6 +308,27 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
             Uri uri = data.getData();
             showImportDialog(uri);
+        }
+
+        if (requestCode == 2 && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                Uri uri = data.getData();
+                if (uri != null) {
+                    accountViewModel.exportData(exportDataPassword, uri, new ExportCallback() {
+                        @Override
+                        public void onSuccess(File file) {
+                            runOnUiThread(() ->
+                                    Toast.makeText(MainActivity.this, R.string.export_success, Toast.LENGTH_SHORT).show());
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            runOnUiThread(() ->
+                                    Toast.makeText(MainActivity.this, R.string.export_error, Toast.LENGTH_SHORT).show());
+                        }
+                    });
+                }
+            }
         }
     }
 
