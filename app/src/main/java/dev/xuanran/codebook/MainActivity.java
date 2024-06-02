@@ -1,12 +1,17 @@
 package dev.xuanran.codebook;
 
+import static dev.xuanran.codebook.bean.Constants.FINGERPRINT_AUTH_EXPIRED;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.method.ScrollingMovementMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -20,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -29,8 +33,6 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.biometric.BiometricManager;
-import androidx.biometric.BiometricPrompt;
-import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -59,7 +61,6 @@ import dev.xuanran.codebook.callback.ImportCallback;
 import dev.xuanran.codebook.service.CipherStrategy;
 import dev.xuanran.codebook.service.impl.FingerprintCipherStrategy;
 import dev.xuanran.codebook.service.impl.PasswordCipherStrategy;
-import dev.xuanran.codebook.util.CipherHelper;
 import dev.xuanran.codebook.util.FileUtils;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private boolean appBarStatus = true;
 
     private long firstTime;
+
+    private boolean initialized = false;
     private static final String PREFS_NAME = "pass_config";
     private static final String KEY_ENCRYPTION_TYPE = "encryption_type";
     public static final String KEY_VALIDATE = "validate_key";
@@ -124,7 +127,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         verifyDialogBuild.setCancelable(false);
         verifyDialogBuild.setView(dialogView);
         AlertDialog verifyDialog = verifyDialogBuild.create();
+        if (verifyDialog.isShowing()) return;
         verifyDialog.show();
+        startAppropriateFlow();
     }
 
     /**
@@ -163,52 +168,28 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
      * 启动指纹验证流程
      */
     private void startFingerprintFlow() {
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            Toast.makeText(this, R.string.fingerprint_require_R, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         BiometricManager biometricManager = BiometricManager.from(this);
         if (biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
-            authenticateWithFingerprint();
+            boolean needGenKey = this.encryptionType.isEmpty();
+            cipherStrategy = new FingerprintCipherStrategy(this, needGenKey, (success, code, msg) -> {
+                if (success) {
+                    scheduleReauthentication(this);
+                    onCipherStrategyCreated(cipherStrategy, ENCRYPTION_TYPE_FINGERPRINT);
+                } else {
+                    showTips(msg);
+                    startAppropriateFlow();
+                }
+            });
             return;
         }
         Toast.makeText(this, R.string.fingerprint_not_supported, Toast.LENGTH_SHORT).show();
         showEncryptionTypeDialog();
-    }
-
-    /**
-     * 使用指纹验证进行身份验证
-     */
-    private void authenticateWithFingerprint() {
-        BiometricPrompt biometricPrompt = new BiometricPrompt(this,
-                ContextCompat.getMainExecutor(this),
-                new BiometricPrompt.AuthenticationCallback() {
-                    @Override
-                    public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                        super.onAuthenticationError(errorCode, errString);
-                        Toast.makeText(getApplicationContext(), "指纹认证错误: " + errString, Toast.LENGTH_SHORT).show();
-                        startAppropriateFlow();
-                    }
-
-                    @Override
-                    public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-                        super.onAuthenticationSucceeded(result);
-                        CipherHelper.generateSecretKey();
-                        Toast.makeText(getApplicationContext(), "指纹认证成功", Toast.LENGTH_SHORT).show();
-                        onCipherStrategyCreated(new FingerprintCipherStrategy(), ENCRYPTION_TYPE_FINGERPRINT);
-                    }
-
-                    @Override
-                    public void onAuthenticationFailed() {
-                        super.onAuthenticationFailed();
-                        Toast.makeText(getApplicationContext(), "指纹认证失败", Toast.LENGTH_SHORT).show();
-                        startAppropriateFlow();
-                    }
-                });
-
-        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.fingerprint_title))
-                .setSubtitle(getString(R.string.fingerprint_subtitle))
-                .setNegativeButtonText(getString(R.string.cancel))
-                .build();
-
-        biometricPrompt.authenticate(promptInfo);
     }
 
 
@@ -382,19 +363,37 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             accountViewModel.insert(accountEntity);
             dialog.cancel();
         });
-        more.setOnClickListener(view ->{
+        more.setOnClickListener(view -> {
             PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
             popupMenu.getMenuInflater().inflate(R.menu.add_popup_menu, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(item -> {
 
-               if (item.getItemId() == R.id.dialog_popup_menu_remark) {
-                   showRemarkDialog(view, accountEntity);
-               }
+                if (item.getItemId() == R.id.dialog_popup_menu_remark) {
+                    showRemarkDialog(view, accountEntity);
+                }
                 return false;
             });
             popupMenu.show();
         });
         dialog.show();
+    }
+
+    private void showReauthenticationDialog(Context context) {
+        new MaterialAlertDialogBuilder(context)
+                .setTitle(R.string.re_auth)
+                .setMessage(R.string.re_auth_tips)
+                .setCancelable(false)
+                .setPositiveButton(R.string.re_auth, (dialog, which) -> startFingerprintFlow())
+                .setNegativeButton(R.string.exit, (dialog, which) -> {
+                    finish();
+                })
+                .create()
+                .show();
+    }
+
+    private void scheduleReauthentication(Context context) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(() -> showReauthenticationDialog(context), (FINGERPRINT_AUTH_EXPIRED - 3) * 1000); // 5 minutes before expiration
     }
 
     private void showRemarkDialog(View view, AccountEntity account) {
@@ -453,27 +452,38 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public void onCipherStrategyCreated(CipherStrategy cipherStrategy, String encryption) {
 
-        MainActivity.cipherStrategy = cipherStrategy;
+        if (MainActivity.cipherStrategy == null) {
+            MainActivity.cipherStrategy = cipherStrategy;
+        }
+
+        // 如果encryptionType的值是空的代表第一次启动
         if (encryptionType.isEmpty()) {
+            // 保存选择的配置
+            String value = cipherStrategy.encryptData("123456");
             sharedPreferences.edit()
-                    .putString(KEY_VALIDATE, cipherStrategy.encryptData("123456"))
+                    .putString(KEY_VALIDATE, value)
                     .putString(KEY_ENCRYPTION_TYPE, encryption)
                     .apply();
+            validateData = value;
+            encryptionType = encryption;
         }
-        boolean completeVerification = encryptionType.isEmpty();
-        // 测试解密数据
-        if (!encryptionType.isEmpty()) {
-            try {
-                cipherStrategy.validate(validateData);
-                completeVerification = true;
-            } catch (Exception e) {
-                startAppropriateFlow();
-                showTips(getString(R.string.password_error));
-            }
+
+        // 如果还已完全初始化
+        if (initialized) {
+            return;
         }
-        if (completeVerification) {
-            initData();
+
+        // 验证密码
+        try {
+            cipherStrategy.validate(validateData);
+        } catch (Exception e) {
+            startAppropriateFlow();
+            showTips(getString(R.string.password_error));
         }
+        // 如果密码已验证，将值改变为已初始化一次
+        initialized = true;
+        // 加载数据
+        initData();
     }
 
     public void showTips(String message) {
@@ -511,7 +521,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         tvUserAgreement.setText(FileUtils.readAssetTextFile(this, "user_rule.txt"));
         builder.create().show();
     }
-
 
 
     /**

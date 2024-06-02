@@ -45,7 +45,7 @@
     <string name="choose_encryption_method_tips">CodeBook 必须要求您指定一种加密方式。\n\n指纹方式：您需要授权您的指纹，CodeBook会使用操作系统底层的硬件加密生成高强度的加密算法来对您的数据进行加/解密，您需要在每次启动时授权您的指纹。(仅在设置支持指纹的情况下)\n\n密码方式：CodeBook会要求您提供一个密码，然后使用此密码做为随机种子生成高强度加密密钥，来对您的数据加/解密，您需要在每次启动时输入此密码，若此密码忘记，您的数据将无法找回。</string>
     <string name="fingerprint">指纹</string>
     <string name="password">密码</string>
-    <string name="fingerprint_not_supported">指纹识别不可用或您的设备不支持指纹</string>
+    <string name="fingerprint_not_supported">您的设备不支持指纹或指纹识别暂不可用</string>
     <string name="fingerprint_title">验证指纹</string>
     <string name="fingerprint_subtitle">请使用指纹验证进行身份验证</string>
     <string name="password_title">密码验证</string>
@@ -71,4 +71,7 @@
     <string name="input_remark_tips">备注信息不加密存储，且创建完成后不支持编辑，敬请谅解。</string>
     <string name="exit_tips">再按一次退出</string>
     <string name="user_rule">用户协议</string>
+    <string name="re_auth">重新认证</string>
+    <string name="re_auth_tips">您的生物认证已过期，请重新认证。</string>
+    <string name="fingerprint_require_R">为保证安全，指纹方式暂只支持安卓11以上系统</string>
 </resources>

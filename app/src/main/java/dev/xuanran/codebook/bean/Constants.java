@@ -7,6 +7,11 @@ public class Constants {
     public static final String CIPHER_KEYSTORE_ALIAS = "codebook-aes";
 
     /**
+     * 指纹验证方式过期时间
+     */
+    public static final int FINGERPRINT_AUTH_EXPIRED = 30;
+
+    /**
      * 加密算法/模式/填充方式
      */
     public static final String TRANSFORMATION = "AES/GCM/NoPadding";
