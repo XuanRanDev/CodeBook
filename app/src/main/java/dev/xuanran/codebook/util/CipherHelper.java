@@ -2,8 +2,11 @@ package dev.xuanran.codebook.util;
 
 import static dev.xuanran.codebook.bean.Constants.CIPHER_KEYSTORE_ALIAS;
 
+import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+
+import androidx.annotation.RequiresApi;
 
 import java.security.KeyStore;
 
@@ -19,6 +22,7 @@ public class CipherHelper {
      * 这个密钥可以用于加密和解密数据，并且该密钥受设备的生物识别（如指纹）保护。
      * 这意味着每次要使用这个密钥时，都需要通过生物识别。
      */
+    @RequiresApi(api = Build.VERSION_CODES.R)
     public static void generateSecretKey() {
         try {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
@@ -31,11 +35,13 @@ public class CipherHelper {
                     .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                     .setUserAuthenticationRequired(true)
+                    .setInvalidatedByBiometricEnrollment(false)
+                    .setUserAuthenticationParameters(60, KeyProperties.AUTH_BIOMETRIC_STRONG)
                     .build());
 
-            keyGenerator.generateKey();
+            cachedSecretKey = keyGenerator.generateKey();
         } catch (Exception e) {
-            throw new RuntimeException("无法生成在安全硬件中生成加密数据");
+            throw new RuntimeException("无法生成密钥。");
         }
     }
 
@@ -47,7 +53,7 @@ public class CipherHelper {
                 keyStore.load(null);
                 cachedSecretKey = (SecretKey) keyStore.getKey(CIPHER_KEYSTORE_ALIAS, null);
             } catch (Exception e) {
-                throw new RuntimeException("无法获取安全硬件中的加密数据", e);
+                throw new RuntimeException("授权已过期或无法获取密钥", e);
             }
         }
         return cachedSecretKey;

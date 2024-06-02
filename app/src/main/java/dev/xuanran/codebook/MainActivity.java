@@ -189,9 +189,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     @Override
                     public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                         super.onAuthenticationSucceeded(result);
-                        if (encryptionType.isEmpty()) {
-                            CipherHelper.generateSecretKey();
-                        }
+                        CipherHelper.generateSecretKey();
                         Toast.makeText(getApplicationContext(), "指纹认证成功", Toast.LENGTH_SHORT).show();
                         onCipherStrategyCreated(new FingerprintCipherStrategy(), ENCRYPTION_TYPE_FINGERPRINT);
                     }
