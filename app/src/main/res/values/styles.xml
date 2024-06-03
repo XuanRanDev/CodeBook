@@ -18,4 +18,9 @@
         <item name="android:textColor">#B39DDB</item>
     </style>
 
+    <!--自定义泡泡菜单样式-->
+    <style name="Widget.App.PopupMenu" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupBackground">@drawable/custom_popup_background</item>
+    </style>
+
 </resources>

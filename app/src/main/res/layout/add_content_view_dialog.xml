@@ -122,8 +122,7 @@
                 android:layout_marginTop="40dp"
                 android:layout_marginEnd="10dp"
                 android:text="@string/cancel"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurface" />
+                android:textAppearance="?attr/textAppearanceBodySmall" />
 
             <Button
                 android:id="@+id/add_content_view_dialog_save"
@@ -131,8 +130,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
                 android:text="@string/save"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurface" />
+                android:textAppearance="?attr/textAppearanceBodySmall" />
 
         </LinearLayout>
 
