@@ -38,8 +38,6 @@ public class AccountViewModel extends AndroidViewModel {
             for (AccountEntity account : accounts) {
                 String username = account.getUsername();
                 String decryptData = MainActivity.cipherStrategy.decryptData(username);
-                Log.e("XuanRan", "原始数据：" + username);
-                Log.e("XuanRan", "解密数据：" + decryptData);
                 account.setUsername(decryptData);
                 account.setPassword(MainActivity.cipherStrategy.decryptData(account.getPassword()));
             }
