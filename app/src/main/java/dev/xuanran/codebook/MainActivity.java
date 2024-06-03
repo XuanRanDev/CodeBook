@@ -32,6 +32,9 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import dev.xuanran.codebook.bean.account.adapter.AccountAdapter;
 import dev.xuanran.codebook.bean.account.model.AccountViewModel;
@@ -295,7 +298,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TITLE, "accounts_backup.txt");
+                    // 获取本地化的日期和时间格式
+                    DateFormat dateTimeFormatter = DateFormat.getDateTimeInstance();
+                    intent.putExtra(Intent.EXTRA_TITLE, String.format("codebook_backup_%s.txt", dateTimeFormatter.format(new Date())));
                     startActivityForResult(intent, REQUEST_CODE_EXPORT);
                 });
             } else if (itemId == R.id.menu_data_import) {

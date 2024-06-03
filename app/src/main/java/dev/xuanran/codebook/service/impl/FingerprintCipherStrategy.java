@@ -2,40 +2,26 @@ package dev.xuanran.codebook.service.impl;
 
 import static dev.xuanran.codebook.bean.Constants.CIPHER_KEYSTORE_ALIAS;
 import static dev.xuanran.codebook.bean.Constants.FINGERPRINT_AUTH_EXPIRED;
-import static dev.xuanran.codebook.bean.Constants.IV_SIZE;
-import static dev.xuanran.codebook.bean.Constants.TAG_SIZE;
-import static dev.xuanran.codebook.bean.Constants.TRANSFORMATION;
 
 import android.app.Activity;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import android.security.keystore.UserNotAuthenticatedException;
-import android.util.Base64;
 
 import androidx.annotation.NonNull;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.CountDownLatch;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
 
 import dev.xuanran.codebook.R;
 import dev.xuanran.codebook.callback.FingerprintCallback;
 import dev.xuanran.codebook.service.CipherStrategy;
-import dev.xuanran.codebook.util.CipherHelper;
+import dev.xuanran.codebook.util.AESUtils;
 
 /**
  * 指纹认证加解密实现类
@@ -70,25 +56,7 @@ public class FingerprintCipherStrategy implements CipherStrategy {
      */
     @Override
     public String encryptData(String data) {
-        try {
-            SecretKey secretKey = CipherHelper.getSecretKey();
-            if (secretKey == null) {
-                throw new RuntimeException("SecretKey is null");
-            }
-            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-
-            byte[] iv = cipher.getIV();
-            byte[] encryption = cipher.doFinal(data.getBytes());
-
-            byte[] combined = new byte[IV_SIZE + encryption.length];
-            System.arraycopy(iv, 0, combined, 0, IV_SIZE);
-            System.arraycopy(encryption, 0, combined, IV_SIZE, encryption.length);
-
-            return Base64.encodeToString(combined, Base64.DEFAULT);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return AESUtils.encrypt(getSecretKey(), data);
     }
 
 
@@ -114,25 +82,8 @@ public class FingerprintCipherStrategy implements CipherStrategy {
     }
 
     @NonNull
-    private static String decryptingData(String encryptedData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        SecretKey secretKey = CipherHelper.getSecretKey();
-        if (secretKey == null) {
-            throw new RuntimeException("SecretKey is null");
-        }
-        byte[] decoded = Base64.decode(encryptedData, Base64.DEFAULT);
-
-        byte[] iv = new byte[IV_SIZE];
-        System.arraycopy(decoded, 0, iv, 0, IV_SIZE);
-
-        byte[] encryption = new byte[decoded.length - IV_SIZE];
-        System.arraycopy(decoded, IV_SIZE, encryption, 0, encryption.length);
-
-        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-        GCMParameterSpec spec = new GCMParameterSpec(TAG_SIZE, iv);
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
-
-        byte[] decrypted = cipher.doFinal(encryption);
-        return new String(decrypted);
+    private static String decryptingData(String encryptedData) throws Exception {
+        return AESUtils.decrypt(getSecretKey(), encryptedData);
     }
 
 

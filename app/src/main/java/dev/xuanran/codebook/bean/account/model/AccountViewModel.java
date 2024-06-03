@@ -17,12 +17,17 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Objects;
 
+import javax.crypto.SecretKey;
+
 import dev.xuanran.codebook.MainActivity;
 import dev.xuanran.codebook.bean.account.AccountEntity;
 import dev.xuanran.codebook.bean.account.AccountRepository;
 import dev.xuanran.codebook.callback.ExportCallback;
 import dev.xuanran.codebook.callback.ImportCallback;
+import dev.xuanran.codebook.util.AESUtils;
 import dev.xuanran.codebook.util.CryptoUtils;
+import dev.xuanran.codebook.util.PasswordUtils;
+
 public class AccountViewModel extends AndroidViewModel {
     private AccountRepository repository;
     private LiveData<List<AccountEntity>> allAccounts;
@@ -77,7 +82,8 @@ public class AccountViewModel extends AndroidViewModel {
                 for (AccountEntity account : accounts) {
                     data.append(account.toString()).append("\n");
                 }
-                String encryptedData = CryptoUtils.encrypt(data.toString(), password);
+                SecretKey secretKey = PasswordUtils.generateKeyFromPassword(password);
+                String encryptedData = AESUtils.encrypt(secretKey, data.toString());
 
                 try (OutputStream outputStream = getApplication().getContentResolver().openOutputStream(uri)) {
                     if (outputStream != null) {
@@ -102,7 +108,9 @@ public class AccountViewModel extends AndroidViewModel {
                 while ((line = reader.readLine()) != null) {
                     data.append(line);
                 }
-                String decryptedData = CryptoUtils.decrypt(data.toString(), password);
+
+                SecretKey secretKey = PasswordUtils.generateKeyFromPassword(password);
+                String decryptedData = AESUtils.decrypt(secretKey, data.toString());
                 String[] accounts = decryptedData.split("\n");
 
                 for (String accountData : accounts) {
