@@ -19,7 +19,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -97,12 +96,13 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
                         .putString(KEY_USER_RULE_AGREE_DATE, DateFormat.getDateTimeInstance().toString())
                         .apply();
             }, false, "");
+        }else {
+            init();
         }
 
-        progress();
     }
 
-    private void progress() {
+    private void init() {
         // 如果存储的加密类型是空的代表第一次启动
         if (encryptionType.isEmpty()) {
             showEncryptionTypeDialog();
