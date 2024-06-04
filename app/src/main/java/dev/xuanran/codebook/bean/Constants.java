@@ -25,4 +25,34 @@ public class Constants {
      * GCM Tag 大小 对于 GCM 模式，推荐使用 128 位的认证标签。
      */
     public static final int TAG_SIZE = 128; // GCM recommended tag size
+
+    /**
+     * Shared 配置名称
+     */
+    public static final String PREFS_NAME = "codebook-config";
+
+    /**
+     * 加密类型Key
+     */
+    public static final String KEY_ENCRYPTION_TYPE = "encryption_type";
+
+    /**
+     * 验证密码Key
+     */
+    public static final String KEY_VALIDATE = "validate";
+
+    /**
+     * 加密类型值-指纹
+     */
+    public static final String ENCRYPTION_TYPE_FINGERPRINT = "fingerprint";
+
+    /**
+     * 加密类型值-密码
+     */
+    public static final String ENCRYPTION_TYPE_PASSWORD = "password";
+
+    public static final String KEY_USER_RULE_AGREE_STATUS = "user_rule_agree_status";
+
+    public static final String KEY_USER_RULE_AGREE_DATE = "user_rule_agree_date";
+
 }

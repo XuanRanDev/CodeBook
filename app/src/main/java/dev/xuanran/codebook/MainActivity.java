@@ -1,6 +1,13 @@
 package dev.xuanran.codebook;
 
+import static dev.xuanran.codebook.bean.Constants.ENCRYPTION_TYPE_FINGERPRINT;
+import static dev.xuanran.codebook.bean.Constants.ENCRYPTION_TYPE_PASSWORD;
 import static dev.xuanran.codebook.bean.Constants.FINGERPRINT_AUTH_EXPIRED;
+import static dev.xuanran.codebook.bean.Constants.KEY_ENCRYPTION_TYPE;
+import static dev.xuanran.codebook.bean.Constants.KEY_USER_RULE_AGREE_DATE;
+import static dev.xuanran.codebook.bean.Constants.KEY_USER_RULE_AGREE_STATUS;
+import static dev.xuanran.codebook.bean.Constants.KEY_VALIDATE;
+import static dev.xuanran.codebook.bean.Constants.PREFS_NAME;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +19,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -64,11 +72,6 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
 
     public static CipherStrategy cipherStrategy;
 
-    private static final String PREFS_NAME = "pass_config";
-    private static final String KEY_ENCRYPTION_TYPE = "encryption_type";
-    public static final String KEY_VALIDATE = "validate_key";
-    private static final String ENCRYPTION_TYPE_FINGERPRINT = "fingerprint";
-    private static final String ENCRYPTION_TYPE_PASSWORD = "password";
     private static final int REQUEST_CODE_IMPORT = 1;
     private static final int REQUEST_CODE_EXPORT = 2;
 
@@ -85,7 +88,21 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         encryptionType = sharedPreferences.getString(KEY_ENCRYPTION_TYPE, "");
         validateData = sharedPreferences.getString(KEY_VALIDATE, "");
+        boolean userRuleStatus = sharedPreferences.getBoolean(KEY_USER_RULE_AGREE_STATUS, false);
 
+        if (!userRuleStatus) {
+            dialogHelper.showUserAgreementDialog(view -> {
+                sharedPreferences.edit()
+                        .putBoolean(KEY_USER_RULE_AGREE_STATUS, true)
+                        .putString(KEY_USER_RULE_AGREE_DATE, DateFormat.getDateTimeInstance().toString())
+                        .apply();
+            }, false, "");
+        }
+
+        progress();
+    }
+
+    private void progress() {
         // 如果存储的加密类型是空的代表第一次启动
         if (encryptionType.isEmpty()) {
             showEncryptionTypeDialog();
@@ -339,7 +356,7 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
             } else if (itemId == R.id.about) {
                 dialogHelper.showAboutDialog();
             } else if (itemId == R.id.userRule) {
-                dialogHelper.showUserAgreementDialog();
+                dialogHelper.showUserAgreementDialog(null, true, "");
             }
 
             drawerLayout.closeDrawer(navigationView);

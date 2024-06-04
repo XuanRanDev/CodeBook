@@ -9,6 +9,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -23,13 +24,10 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.io.InputStream;
 import java.util.Date;
 
-import dev.xuanran.codebook.MainActivity;
 import dev.xuanran.codebook.R;
 import dev.xuanran.codebook.bean.account.AccountEntity;
 import dev.xuanran.codebook.bean.account.model.AccountViewModel;
 import dev.xuanran.codebook.callback.DialogEditTextCallback;
-import dev.xuanran.codebook.callback.ImportCallback;
-import dev.xuanran.codebook.service.impl.PasswordCipherStrategy;
 
 public class DialogHelper {
     private final Context context;
@@ -43,11 +41,11 @@ public class DialogHelper {
     public void showEncryptionTypeDialog(DialogInterface.OnClickListener onFingerprintSelected, DialogInterface.OnClickListener onPasswordSelected) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setTitle(R.string.choose_encryption_method)
-               .setMessage(R.string.choose_encryption_method_tips)
-               .setCancelable(false)
-               .setPositiveButton(R.string.fingerprint, onFingerprintSelected)
-               .setNegativeButton(R.string.password, onPasswordSelected)
-               .show();
+                .setMessage(R.string.choose_encryption_method_tips)
+                .setCancelable(false)
+                .setPositiveButton(R.string.fingerprint, onFingerprintSelected)
+                .setNegativeButton(R.string.password, onPasswordSelected)
+                .show();
     }
 
     public void showImportDialog(Uri uri, DialogEditTextCallback callback) {
@@ -65,8 +63,8 @@ public class DialogHelper {
         View dialogView = inflater.inflate(R.layout.dialog_verfiy, null);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setCancelable(false)
-               .setView(dialogView)
-               .show();
+                .setView(dialogView)
+                .show();
     }
 
 
@@ -74,9 +72,9 @@ public class DialogHelper {
         View dialogView = inflater.inflate(R.layout.dialog_donate, null);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setView(dialogView)
-               .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
-               .setPositiveButton("打开支付宝", (dialog, which) -> openAlipay())
-               .show();
+                .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton("打开支付宝", (dialog, which) -> openAlipay())
+                .show();
 
         ImageView imageView = dialogView.findViewById(R.id.iv_donate_image);
         try {
@@ -190,8 +188,8 @@ public class DialogHelper {
         View dialogView = inflater.inflate(R.layout.dialog_about, null);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setView(dialogView)
-               .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
-               .show();
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                .show();
 
         TextView githubLink = dialogView.findViewById(R.id.github_link);
         githubLink.setOnClickListener(v -> {
@@ -202,17 +200,53 @@ public class DialogHelper {
         });
     }
 
-    public void showUserAgreementDialog() {
+    /**
+     * 显示隐私协议
+     *
+     * @param okClick     同意回调
+     * @param agreeStatus 是否已同意，已同意状态下CheckBox选中不可更改，弹窗禁用
+     */
+    public void showUserAgreementDialog(View.OnClickListener okClick, boolean agreeStatus, String agreeDate) {
         View dialogView = inflater.inflate(R.layout.dialog_user_agreement, null);
+
+        CheckBox checkBox = dialogView.findViewById(R.id.dialog_user_agreement_cb);
+
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        builder.setView(dialogView)
-               .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
-               .setCancelable(false)
-               .show();
+        AlertDialog alertDialog = builder.setView(dialogView)
+                .setPositiveButton(android.R.string.ok, null)
+                .setCancelable(agreeStatus)
+                .create();
+        alertDialog.show();
 
         TextView tvUserAgreement = dialogView.findViewById(R.id.tv_user_agreement);
         tvUserAgreement.setMovementMethod(new ScrollingMovementMethod());
-        tvUserAgreement.setText(FileUtils.readAssetTextFile(context, "user_rule.txt"));
+        String text = FileUtils.readAssetTextFile(context, "user_rule.txt");
+
+        if (agreeStatus) {
+            text += context.getString(R.string.agree_date) + agreeDate;
+        }
+
+        tvUserAgreement.setText(text);
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setEnabled(false);
+
+        checkBox.setOnCheckedChangeListener((compoundButton, b) ->
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setEnabled(b));
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(okClick);
+
+
+        if (agreeStatus) {
+            checkBox.setChecked(true);
+            checkBox.setEnabled(false);
+            Button button = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setText(R.string.you_already_agree);
+            button.setEnabled(false);
+        }
+
     }
 
     public void showReAuthenticationDialog(Context context, DialogInterface.OnClickListener onReAuthClicked, DialogInterface.OnClickListener onExitClicked) {
