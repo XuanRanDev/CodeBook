@@ -33,7 +33,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import dev.xuanran.codebook.bean.account.adapter.AccountAdapter;
@@ -46,7 +45,7 @@ import dev.xuanran.codebook.service.impl.FingerprintCipherStrategy;
 import dev.xuanran.codebook.service.impl.PasswordCipherStrategy;
 import dev.xuanran.codebook.util.DialogHelper;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, CipherStrategyCallback {
+public class MainActivity extends AppCompatActivity implements CipherStrategyCallback {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -61,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private String validateData;
     private String exportDataPassword;
     private DialogHelper dialogHelper;
-    private long firstTime;
     private boolean initialized = false;
 
     public static CipherStrategy cipherStrategy;
@@ -73,16 +71,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private static final String ENCRYPTION_TYPE_PASSWORD = "password";
     private static final int REQUEST_CODE_IMPORT = 1;
     private static final int REQUEST_CODE_EXPORT = 2;
-    private static final long DOUBLE_CLICK_INTERVAL = 3000;
-
-    public MainActivity() {
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // DialogHelper中包含了很多使用到的弹窗
         dialogHelper = new DialogHelper(this);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
@@ -91,15 +86,20 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         encryptionType = sharedPreferences.getString(KEY_ENCRYPTION_TYPE, "");
         validateData = sharedPreferences.getString(KEY_VALIDATE, "");
 
+        // 如果存储的加密类型是空的代表第一次启动
         if (encryptionType.isEmpty()) {
             showEncryptionTypeDialog();
         } else {
+            // 根据选择的加密类型启动不同的处理流程
             startAppropriateFlow();
         }
-
+        // View init
         initView();
     }
 
+    /**
+     * 显示选择加密类型的弹窗
+     */
     private void showEncryptionTypeDialog() {
         dialogHelper.showEncryptionTypeDialog(
                 (dialogInterface, i) -> startFingerprintFlow(),
@@ -107,6 +107,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         );
     }
 
+    /**
+     * 开始App流程
+     */
     private void startAppropriateFlow() {
         if (ENCRYPTION_TYPE_FINGERPRINT.equals(encryptionType)) {
             startFingerprintFlow();
@@ -115,6 +118,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     }
 
+    /**
+     * 开始指纹认证流程
+     */
     private void startFingerprintFlow() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             showTips(R.string.fingerprint_require_R);
@@ -132,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     }
 
+
     private void handleCipherStrategyCreation(boolean success, int code, String msg) {
         if (success) {
             scheduleReAuthentication(this);
@@ -142,10 +149,16 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     }
 
+    /**
+     * 开始密码验证流程
+     */
     private void startPasswordFlow() {
         dialogHelper.startPasswordFlow(text -> onCipherStrategyCreated(new PasswordCipherStrategy(text), ENCRYPTION_TYPE_PASSWORD), (dialogInterface, i) -> finish());
     }
 
+    /**
+     * View init
+     */
     private void initView() {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
@@ -159,10 +172,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
         setupFabBehavior();
     }
 
+    /**
+     * 设置Fab事件与AppBarLayout在展开和折叠时Fab的状态处理
+     */
     private void setupFabBehavior() {
         fab.setOnClickListener(view -> dialogHelper.showAddAccountDialog(accountViewModel));
         appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
@@ -214,46 +229,58 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     }
 
+    /**
+     * 在指纹方式下由于SecretKey会过期，如果App仍在运行当中则启动定时任务在到时间之后请求重新认证
+     * @param context Activity
+     */
     private void scheduleReAuthentication(Context context) {
         new Handler(Looper.getMainLooper()).postDelayed(() -> dialogHelper.showReAuthenticationDialog(
                         context,
                         (dialogInterface, i) -> startFingerprintFlow(),
                         (dialogInterface, i) -> finish()),
-                (FINGERPRINT_AUTH_EXPIRED - 3) * 1000); // 5 minutes before expiration
+                (FINGERPRINT_AUTH_EXPIRED - 3) * 1000);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
+
         searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setOnSearchClickListener(view -> appBarLayout.setExpanded(false));
-        searchView.setOnQueryTextListener(this);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                clearSearchFocus();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                appBarLayout.setExpanded(false);
+                accountViewModel.searchAccounts(newText).observe(MainActivity.this, accounts -> adapter.setAccounts(accounts));
+                return false;
+            }
+        });
         return true;
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        clearSearchFocus();
-        return false;
-    }
 
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        appBarLayout.setExpanded(false);
-        accountViewModel.searchAccounts(newText).observe(this, accounts -> adapter.setAccounts(accounts));
-        return false;
-    }
-
+    /**
+     * 加密策略处理以及数据解密尝试
+     * @param cipherStrategy 加密策略实例
+     * @param encryption 选择的加密方式
+     */
     @Override
     public void onCipherStrategyCreated(CipherStrategy cipherStrategy, String encryption) {
         // 条件二主要解决第一次密码错误第二次密码正确的场景
         if (MainActivity.cipherStrategy == null || encryption.equalsIgnoreCase(ENCRYPTION_TYPE_PASSWORD)) {
             MainActivity.cipherStrategy = cipherStrategy;
         }
-
+        // 如果条件成立代表App首次启动
         if (encryptionType.isEmpty()) {
+            // 加密一个测试数据，方便后续测试密码是否能够正常解密数据
             String encryptedValue = cipherStrategy.encryptData("123456");
             sharedPreferences.edit()
                     .putString(KEY_VALIDATE, encryptedValue)
@@ -263,6 +290,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             encryptionType = encryption;
         }
 
+        // 此方法可能会频繁调用(指纹场景)，如果已初始化的情况下后续的方法不再调用
         if (!initialized) {
             try {
                 cipherStrategy.validate(validateData);
@@ -287,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private void clearSearchFocus() {
         searchView.clearFocus();
         searchView.onActionViewCollapsed();
+        appBarLayout.setExpanded(true, true);
     }
 
     private void initData() {
