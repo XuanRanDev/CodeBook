@@ -55,7 +55,6 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
         holder.title.setText(currentAccount.getAppName());
         holder.id.setText("# " + currentAccount.getId());
         holder.createDate.setText(simpleDateFormat.format(currentAccount.getCreateTime()));
-        holder.tagText.setText(currentAccount.getTags());
 
         holder.viewButton.setOnClickListener(v -> {
             showAccountDetailsDialog(v, currentAccount);

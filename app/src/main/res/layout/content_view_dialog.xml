@@ -71,7 +71,6 @@
             android:layout_marginRight="20dp"
             android:focusable="false"
             android:focusableInTouchMode="false"
-
             app:layout_constraintTop_toBottomOf="@id/content_view_dialog_accountID"
             app:passwordToggleEnabled="true">
 
@@ -82,6 +81,7 @@
                 android:drawablePadding="8dp"
                 android:enabled="false"
                 android:inputType="textPassword"
+                android:drawableStart="@drawable/baseline_password_24"
                 android:maxLines="1" />
 
         </com.google.android.material.textfield.TextInputLayout>

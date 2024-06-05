@@ -20,7 +20,6 @@ public class AccountEntity {
     private String password;
 
     private String remark;
-    private String tags;
 
     @ColumnInfo(name = "create_time")
     private Date createTime;
@@ -49,14 +48,6 @@ public class AccountEntity {
         this.password = password;
     }
 
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
-
     public String getAppName() {
         return appName;
     }
@@ -83,7 +74,7 @@ public class AccountEntity {
 
     @Override
     public String toString() {
-        return appName + "," + username + "," + password + "," + remark + "," + tags + "," + createTime.getTime();
+        return appName + "," + username + "," + password + "," + remark + "," + createTime.getTime();
     }
 
     public static AccountEntity fromString(String data) {
@@ -93,7 +84,6 @@ public class AccountEntity {
         account.setUsername(fields[1]);
         account.setPassword(fields[2]);
         account.setRemark(fields[3]);
-        account.setTags(fields[4]);
         account.setCreateTime(new Date(Long.parseLong(fields[5])));
         return account;
     }

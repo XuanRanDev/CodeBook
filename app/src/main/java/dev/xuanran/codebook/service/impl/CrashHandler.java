@@ -9,7 +9,9 @@ import android.os.Build;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import dev.xuanran.codebook.BuildConfig;
 import dev.xuanran.codebook.activity.ExceptionActivity;
+
 public class CrashHandler {
 
     private static final String FORMAT = "%1$s (%2$d)";
@@ -46,6 +48,8 @@ public class CrashHandler {
         if (packageInfo != null) {
             sb.append("\nVersion=").append(String.format(FORMAT, packageInfo.versionName, packageInfo.versionCode));
         }
+        sb.append("\nBUILD TIME=" + BuildConfig.BUILD_TIME);
+        sb.append("\nGIT HASH=" + BuildConfig.GIT_HASH);
 
         sb.append("\n\n").append(getStackTrace(throwable));
         return sb.toString();

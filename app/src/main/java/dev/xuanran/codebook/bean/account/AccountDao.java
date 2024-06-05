@@ -25,7 +25,4 @@ public interface AccountDao {
 
     @Query("SELECT * FROM account_table WHERE app_name LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%'")
     LiveData<List<AccountEntity>> selectAccountByNameOrAccount(String query);
-
-    @Query("SELECT * FROM account_table WHERE tags LIKE :tag")
-    LiveData<List<AccountEntity>> getAccountsByTag(String tag);
 }
