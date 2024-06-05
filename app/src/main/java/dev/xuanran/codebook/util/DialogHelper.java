@@ -1,5 +1,6 @@
 package dev.xuanran.codebook.util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +25,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.io.InputStream;
 import java.util.Date;
 
+import dev.xuanran.codebook.BuildConfig;
 import dev.xuanran.codebook.R;
 import dev.xuanran.codebook.bean.Constants;
 import dev.xuanran.codebook.bean.account.AccountEntity;
@@ -185,6 +187,7 @@ public class DialogHelper {
                 .show();
     }
 
+    @SuppressLint("SetTextI18n")
     public void showAboutDialog() {
         View dialogView = inflater.inflate(R.layout.dialog_about, null);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
@@ -199,6 +202,11 @@ public class DialogHelper {
             intent.setData(Uri.parse(url));
             context.startActivity(intent);
         });
+
+        TextView buildInfo = dialogView.findViewById(R.id.build_info);
+
+        buildInfo.setText(context.getString(R.string.build_time) + BuildConfig.BUILD_TIME + "\n" +
+                context.getString(R.string.git_hash)+ BuildConfig.GIT_HASH);
     }
 
     /**

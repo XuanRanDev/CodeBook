@@ -2,6 +2,15 @@ plugins {
     id 'com.android.application'
 }
 
+def getGitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
 android {
     namespace 'dev.xuanran.codebook'
     compileSdk 34
@@ -23,11 +32,30 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField "String", "BUILD_TIME", "\"${new Date().getDateTimeString()}\""
+            // 启用自定义 BuildConfig 字段
+            buildConfigField "boolean", "ENABLE_CUSTOM_FIELDS", "true"
+            // 在 debug 构建类型中将 Git 构建哈希作为 BuildConfig 字段
+            buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
+
+
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "BUILD_TIME", "\"${new Date().getTime()}\""
+            // 启用自定义 BuildConfig 字段
+            buildConfigField "boolean", "ENABLE_CUSTOM_FIELDS", "true"
+            // 在 release 构建类型中执行获取 Git 构建哈希的命令
+            buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
         }
     }
+
+    buildFeatures {
+        buildConfig true
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -53,3 +81,4 @@ dependencies {
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }
+

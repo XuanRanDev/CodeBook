@@ -84,4 +84,6 @@
     <string name="log_saved_path">日志已保存到：</string>
     <string name="log_deleted">日志已删除</string>
     <string name="save_failed">保存失败</string>
+    <string name="build_time">构建时间：</string>
+    <string name="git_hash">Git Hash：</string>
 </resources>
