@@ -13,6 +13,7 @@
         android:textAppearance="?attr/textAppearanceLabelMedium"
         android:textColor="?attr/colorOnSurface"
         android:text="@string/donate_tips" />
+
     <ImageView
         android:id="@+id/iv_donate_image"
         android:layout_width="wrap_content"

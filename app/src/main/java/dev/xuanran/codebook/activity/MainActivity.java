@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
             onCipherStrategyCreated(cipherStrategy, ENCRYPTION_TYPE_FINGERPRINT);
         } else {
             showTips(msg);
-            startAppropriateFlow();
+            startFingerprintFlow();
         }
     }
 
