@@ -55,4 +55,11 @@ public class Constants {
 
     public static final String KEY_USER_RULE_AGREE_DATE = "user_rule_agree_date";
 
+
+    /**
+     * 盐值 Key
+     */
+    public static final String KEY_SALT = "salt";
+
+
 }

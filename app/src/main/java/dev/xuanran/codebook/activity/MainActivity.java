@@ -4,6 +4,7 @@ import static dev.xuanran.codebook.bean.Constants.ENCRYPTION_TYPE_FINGERPRINT;
 import static dev.xuanran.codebook.bean.Constants.ENCRYPTION_TYPE_PASSWORD;
 import static dev.xuanran.codebook.bean.Constants.FINGERPRINT_AUTH_EXPIRED;
 import static dev.xuanran.codebook.bean.Constants.KEY_ENCRYPTION_TYPE;
+import static dev.xuanran.codebook.bean.Constants.KEY_SALT;
 import static dev.xuanran.codebook.bean.Constants.KEY_USER_RULE_AGREE_DATE;
 import static dev.xuanran.codebook.bean.Constants.KEY_USER_RULE_AGREE_STATUS;
 import static dev.xuanran.codebook.bean.Constants.KEY_VALIDATE;
@@ -53,8 +54,12 @@ import dev.xuanran.codebook.service.impl.FingerprintCipherStrategy;
 import dev.xuanran.codebook.service.impl.PasswordCipherStrategy;
 import dev.xuanran.codebook.util.DateUtils;
 import dev.xuanran.codebook.util.DialogHelper;
+import dev.xuanran.codebook.util.HexUtils;
+import dev.xuanran.codebook.util.PasswordUtils;
 
 public class MainActivity extends AppCompatActivity implements CipherStrategyCallback {
+
+    public static byte[] salt;
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -70,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
     private String exportDataPassword;
     private DialogHelper dialogHelper;
     private boolean initialized = false;
-
     public static CipherStrategy cipherStrategy;
 
     private static final int REQUEST_CODE_IMPORT = 1;
@@ -89,11 +93,15 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         encryptionType = sharedPreferences.getString(KEY_ENCRYPTION_TYPE, "");
         validateData = sharedPreferences.getString(KEY_VALIDATE, "");
+        String saltHex = sharedPreferences.getString(KEY_SALT, "");
+        salt = HexUtils.hexToBytes(saltHex);
         boolean userRuleStatus = sharedPreferences.getBoolean(KEY_USER_RULE_AGREE_STATUS, false);
 
         if (!userRuleStatus) {
             dialogHelper.showUserAgreementDialog(view -> {
+                salt = PasswordUtils.generateSalt();
                 sharedPreferences.edit()
+                        .putString(KEY_SALT, HexUtils.bytesToHex(salt))
                         .putBoolean(KEY_USER_RULE_AGREE_STATUS, true)
                         .putString(KEY_USER_RULE_AGREE_DATE, DateUtils.getNowTime())
                         .apply();
@@ -349,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
                     intent.setType("text/plain");
                     // 获取本地化的日期和时间格式
                     DateFormat dateTimeFormatter = DateFormat.getDateTimeInstance();
-                    intent.putExtra(Intent.EXTRA_TITLE, String.format("codebook_backup_%s.txt", dateTimeFormatter.format(new Date())));
+                    intent.putExtra(Intent.EXTRA_TITLE, String.format("codebook_backup_%s.txt", DateUtils.getNowTime()));
                     startActivityForResult(intent, REQUEST_CODE_EXPORT);
                 });
             } else if (itemId == R.id.menu_data_import) {
