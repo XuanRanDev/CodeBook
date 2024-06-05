@@ -86,4 +86,6 @@
     <string name="save_failed">保存失败</string>
     <string name="build_time">构建时间：</string>
     <string name="git_hash">Git Hash：</string>
+    <string name="auth_fail">认证失败</string>
+    <string name="user_cancel">用户取消</string>
 </resources>

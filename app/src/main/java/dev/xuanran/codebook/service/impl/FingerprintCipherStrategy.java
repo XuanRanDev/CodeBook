@@ -7,11 +7,18 @@ import android.app.Activity;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.security.KeyStore;
 
@@ -91,18 +98,38 @@ public class FingerprintCipherStrategy implements CipherStrategy {
      * 使用指纹验证进行身份验证
      */
     private void authenticateWithFingerprint() {
+        // 创建 BottomSheetDialog 并加载自定义布局
+        View bottomSheetView = LayoutInflater.from(context).inflate(R.layout.fingerprint_bottom_sheet, null);
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
+        bottomSheetDialog.setContentView(bottomSheetView);
+
+        // 设置自定义布局中的视图
+        TextView titleTextView = bottomSheetView.findViewById(R.id.fingerprint_title);
+        TextView subtitleTextView = bottomSheetView.findViewById(R.id.fingerprint_subtitle);
+        ImageView fingerprintIcon = bottomSheetView.findViewById(R.id.fingerprint_icon);
+        Button cancelButton = bottomSheetView.findViewById(R.id.cancel_button);
+
+        // 取消按钮点击事件
+        cancelButton.setOnClickListener(v -> {
+            fingerprintCallback.onFingerprint(false, -1, context.getString(R.string.user_cancel));
+            bottomSheetDialog.dismiss();
+        });
+
+        // 创建 BiometricPrompt 实例
         BiometricPrompt biometricPrompt = new BiometricPrompt((FragmentActivity) context,
                 ContextCompat.getMainExecutor(context),
                 new BiometricPrompt.AuthenticationCallback() {
                     @Override
                     public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                         super.onAuthenticationError(errorCode, errString);
+                        bottomSheetDialog.dismiss();
                         fingerprintCallback.onFingerprint(false, -1, String.valueOf(errString));
                     }
 
                     @Override
                     public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                         super.onAuthenticationSucceeded(result);
+                        bottomSheetDialog.dismiss();
                         if (needGenKey) {
                             generateSecretKey();
                             needGenKey = false;
@@ -113,18 +140,25 @@ public class FingerprintCipherStrategy implements CipherStrategy {
                     @Override
                     public void onAuthenticationFailed() {
                         super.onAuthenticationFailed();
-                        fingerprintCallback.onFingerprint(false, -1, "认证失败");
+                        fingerprintCallback.onFingerprint(false, -1, context.getString(R.string.auth_fail));
                     }
                 });
 
+        // 创建指纹验证提示信息
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setConfirmationRequired(false)
                 .setTitle(context.getString(R.string.fingerprint_title))
                 .setSubtitle(context.getString(R.string.fingerprint_subtitle))
                 .setNegativeButtonText(context.getString(R.string.cancel))
                 .build();
 
-        biometricPrompt.authenticate(promptInfo);
+        // 在 BottomSheetDialog 显示时启动指纹认证
+        bottomSheetDialog.setOnShowListener(dialog -> biometricPrompt.authenticate(promptInfo));
+
+        // 显示 BottomSheetDialog
+        bottomSheetDialog.show();
     }
+
 
 
     public static void generateSecretKey() {

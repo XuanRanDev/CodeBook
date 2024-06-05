@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    tools:ignore="UselessParent">
+
+    <ImageView
+        android:id="@+id/fingerprint_icon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:src="@drawable/baseline_fingerprint_24" />
+
+    <TextView
+        android:id="@+id/fingerprint_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/fingerprint_title"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/fingerprint_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/fingerprint_subtitle"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/cancel_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/cancel" />
+
+</LinearLayout>
