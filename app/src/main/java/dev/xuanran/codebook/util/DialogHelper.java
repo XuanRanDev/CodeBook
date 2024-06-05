@@ -51,6 +51,17 @@ public class DialogHelper {
                 .show();
     }
 
+    public void showCancelFingerprintDialog(DialogInterface.OnClickListener reAuthClick,
+                                            DialogInterface.OnClickListener exitClick) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        builder.setTitle(R.string.fingerprint_title)
+                .setMessage(R.string.fingerprint_auth_cancel)
+                .setCancelable(false)
+                .setPositiveButton(R.string.re_auth, reAuthClick)
+                .setNegativeButton(R.string.exit, exitClick)
+                .show();
+    }
+
     public void showImportDialog(Uri uri, DialogEditTextCallback callback) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         View dialogView = inflater.inflate(R.layout.dialog_password, null);

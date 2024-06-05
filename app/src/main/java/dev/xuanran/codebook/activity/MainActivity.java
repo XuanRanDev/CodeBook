@@ -41,7 +41,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.text.DateFormat;
-import java.util.Date;
 
 import dev.xuanran.codebook.R;
 import dev.xuanran.codebook.bean.account.adapter.AccountAdapter;
@@ -107,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
                         .apply();
                 init();
             }, false);
-        }else {
+        } else {
             init();
         }
 
@@ -171,6 +170,13 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
         if (success) {
             scheduleReAuthentication(this);
             onCipherStrategyCreated(cipherStrategy, ENCRYPTION_TYPE_FINGERPRINT);
+        } else if (code == -1) {
+            // -1 是用户取消认证
+            dialogHelper.showCancelFingerprintDialog((m ,k) -> {
+                startFingerprintFlow();
+            }, (m, k) -> {
+                finish();
+            });
         } else {
             showTips(msg);
             startFingerprintFlow();
@@ -259,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
 
     /**
      * 在指纹方式下由于SecretKey会过期，如果App仍在运行当中则启动定时任务在到时间之后请求重新认证
+     *
      * @param context Activity
      */
     private void scheduleReAuthentication(Context context) {
@@ -297,8 +304,9 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
 
     /**
      * 加密策略处理以及数据解密尝试
+     *
      * @param cipherStrategy 加密策略实例
-     * @param encryption 选择的加密方式
+     * @param encryption     选择的加密方式
      */
     @Override
     public void onCipherStrategyCreated(CipherStrategy cipherStrategy, String encryption) {
@@ -344,6 +352,15 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
         searchView.clearFocus();
         searchView.onActionViewCollapsed();
         appBarLayout.setExpanded(true, true);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (cipherStrategy instanceof FingerprintCipherStrategy) {
+            FingerprintCipherStrategy cancelFingerprint = (FingerprintCipherStrategy) cipherStrategy;
+            cancelFingerprint.cancelFingerprintAuthentication();
+        }
     }
 
     private void initData() {

@@ -44,7 +44,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "BUILD_TIME", "\"${new Date().getTime()}\""
+            buildConfigField "String", "BUILD_TIME", "\"${new Date().getDateTimeString()}\""
             // 启用自定义 BuildConfig 字段
             buildConfigField "boolean", "ENABLE_CUSTOM_FIELDS", "true"
             // 在 release 构建类型中执行获取 Git 构建哈希的命令

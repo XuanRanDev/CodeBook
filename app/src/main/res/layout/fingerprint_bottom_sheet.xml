@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/fingerprint_icon"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_gravity="center"
         android:src="@drawable/baseline_fingerprint_24" />
 

@@ -9,7 +9,7 @@ public class Constants {
     /**
      * 指纹验证方式过期时间
      */
-    public static final int FINGERPRINT_AUTH_EXPIRED = 30;
+    public static final int FINGERPRINT_AUTH_EXPIRED = 90;
 
     /**
      * 加密算法/模式/填充方式

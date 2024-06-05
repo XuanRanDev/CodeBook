@@ -88,4 +88,5 @@
     <string name="git_hash">Git Hash：</string>
     <string name="auth_fail">认证失败</string>
     <string name="user_cancel">用户取消</string>
+    <string name="fingerprint_auth_cancel">指纹认证已被取消，未通过认证无法加载数据。</string>
 </resources>
