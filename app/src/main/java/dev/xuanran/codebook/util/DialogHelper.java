@@ -119,12 +119,10 @@ public class DialogHelper {
     }
 
     private void openAlipay() {
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage("com.eg.android.AlipayGphone");
-        if (intent != null) {
-            context.startActivity(intent);
-        } else {
-            Toast.makeText(context, "未安装支付宝应用", Toast.LENGTH_SHORT).show();
-        }
+        String uri = "alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx19506bgcutjrzzq9ud44";
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        context.startActivity(intent);
+
     }
 
     public void showExportDialog(DialogEditTextCallback callback) {
