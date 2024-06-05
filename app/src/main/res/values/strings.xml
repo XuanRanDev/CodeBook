@@ -77,4 +77,11 @@
     <string name="read_and_agree">我已认真阅读并同意CodeBook用户协议，且了解CodeBook的加密算法实现以及同意CodeBook任何情况下出现数据丢失泄露均与开发者无关。</string>
     <string name="you_already_agree">您已阅读并同意</string>
     <string name="agree_date">\n\n\n同意时间：</string>
+    <string name="program_exception">程序异常</string>
+    <string name="save_log">保存日志</string>
+    <string name="restart">重新启动</string>
+    <string name="log_saved">日志已保存</string>
+    <string name="log_saved_path">日志已保存到：</string>
+    <string name="log_deleted">日志已删除</string>
+    <string name="save_failed">保存失败</string>
 </resources>

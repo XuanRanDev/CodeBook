@@ -2,7 +2,6 @@ package dev.xuanran.codebook.bean.account.model;
 
 import android.app.Application;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -11,21 +10,18 @@ import androidx.lifecycle.Transformations;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Objects;
 
 import javax.crypto.SecretKey;
 
-import dev.xuanran.codebook.MainActivity;
+import dev.xuanran.codebook.activity.MainActivity;
 import dev.xuanran.codebook.bean.account.AccountEntity;
 import dev.xuanran.codebook.bean.account.AccountRepository;
 import dev.xuanran.codebook.callback.ExportCallback;
 import dev.xuanran.codebook.callback.ImportCallback;
 import dev.xuanran.codebook.util.AESUtils;
-import dev.xuanran.codebook.util.CryptoUtils;
 import dev.xuanran.codebook.util.PasswordUtils;
 
 public class AccountViewModel extends AndroidViewModel {

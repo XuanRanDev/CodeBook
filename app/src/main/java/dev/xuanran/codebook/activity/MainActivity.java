@@ -1,4 +1,4 @@
-package dev.xuanran.codebook;
+package dev.xuanran.codebook.activity;
 
 import static dev.xuanran.codebook.bean.Constants.ENCRYPTION_TYPE_FINGERPRINT;
 import static dev.xuanran.codebook.bean.Constants.ENCRYPTION_TYPE_PASSWORD;
@@ -42,6 +42,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.util.Date;
 
+import dev.xuanran.codebook.R;
 import dev.xuanran.codebook.bean.account.adapter.AccountAdapter;
 import dev.xuanran.codebook.bean.account.model.AccountViewModel;
 import dev.xuanran.codebook.callback.CipherStrategyCallback;
@@ -50,6 +51,7 @@ import dev.xuanran.codebook.callback.ImportCallback;
 import dev.xuanran.codebook.service.CipherStrategy;
 import dev.xuanran.codebook.service.impl.FingerprintCipherStrategy;
 import dev.xuanran.codebook.service.impl.PasswordCipherStrategy;
+import dev.xuanran.codebook.util.DateUtils;
 import dev.xuanran.codebook.util.DialogHelper;
 
 public class MainActivity extends AppCompatActivity implements CipherStrategyCallback {
@@ -93,9 +95,10 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
             dialogHelper.showUserAgreementDialog(view -> {
                 sharedPreferences.edit()
                         .putBoolean(KEY_USER_RULE_AGREE_STATUS, true)
-                        .putString(KEY_USER_RULE_AGREE_DATE, DateFormat.getDateTimeInstance().toString())
+                        .putString(KEY_USER_RULE_AGREE_DATE, DateUtils.getNowTime())
                         .apply();
-            }, false, "");
+                init();
+            }, false);
         }else {
             init();
         }
@@ -356,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
             } else if (itemId == R.id.about) {
                 dialogHelper.showAboutDialog();
             } else if (itemId == R.id.userRule) {
-                dialogHelper.showUserAgreementDialog(null, true, "");
+                dialogHelper.showUserAgreementDialog(null, true);
             }
 
             drawerLayout.closeDrawer(navigationView);

@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.Date;
 
 import dev.xuanran.codebook.R;
+import dev.xuanran.codebook.bean.Constants;
 import dev.xuanran.codebook.bean.account.AccountEntity;
 import dev.xuanran.codebook.bean.account.model.AccountViewModel;
 import dev.xuanran.codebook.callback.DialogEditTextCallback;
@@ -206,7 +207,8 @@ public class DialogHelper {
      * @param okClick     同意回调
      * @param agreeStatus 是否已同意，已同意状态下CheckBox选中不可更改，弹窗禁用
      */
-    public void showUserAgreementDialog(View.OnClickListener okClick, boolean agreeStatus, String agreeDate) {
+    public void showUserAgreementDialog(View.OnClickListener okClick, boolean agreeStatus) {
+        LayoutInflater inflater = LayoutInflater.from(context);
         View dialogView = inflater.inflate(R.layout.dialog_user_agreement, null);
 
         CheckBox checkBox = dialogView.findViewById(R.id.dialog_user_agreement_cb);
@@ -219,14 +221,18 @@ public class DialogHelper {
         alertDialog.show();
 
         TextView tvUserAgreement = dialogView.findViewById(R.id.tv_user_agreement);
-        tvUserAgreement.setMovementMethod(new ScrollingMovementMethod());
         String text = FileUtils.readAssetTextFile(context, "user_rule.txt");
 
         if (agreeStatus) {
-            text += context.getString(R.string.agree_date) + agreeDate;
+            String date = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
+                    .getString(Constants.KEY_USER_RULE_AGREE_DATE, "");
+            text += context.getString(R.string.agree_date) + date;
         }
 
         tvUserAgreement.setText(text);
+
+        // 延迟设置滚动方法
+        tvUserAgreement.post(() -> tvUserAgreement.setMovementMethod(new ScrollingMovementMethod()));
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 .setEnabled(false);
@@ -236,7 +242,10 @@ public class DialogHelper {
                         .setEnabled(b));
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setOnClickListener(okClick);
+                .setOnClickListener(view -> {
+                    okClick.onClick(view);
+                    alertDialog.dismiss(); // 关闭弹窗
+                });
 
 
         if (agreeStatus) {
@@ -246,8 +255,8 @@ public class DialogHelper {
             button.setText(R.string.you_already_agree);
             button.setEnabled(false);
         }
-
     }
+
 
     public void showReAuthenticationDialog(Context context, DialogInterface.OnClickListener onReAuthClicked, DialogInterface.OnClickListener onExitClicked) {
         new MaterialAlertDialogBuilder(context)
