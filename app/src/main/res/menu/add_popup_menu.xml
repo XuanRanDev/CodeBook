@@ -4,4 +4,9 @@
         android:id="@+id/dialog_popup_menu_remark"
         android:icon="@drawable/baseline_bookmark_24"
         android:title="@string/remark" />
+
+    <item
+        android:id="@+id/dialog_popup_menu_password_generator"
+        android:icon="@drawable/baseline_pattern_24"
+        android:title="@string/generate_password" />
 </menu>

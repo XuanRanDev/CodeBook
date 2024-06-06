@@ -14,16 +14,19 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Random;
 
 import dev.xuanran.codebook.BuildConfig;
 import dev.xuanran.codebook.R;
@@ -175,6 +178,10 @@ public class DialogHelper {
                 if (item.getItemId() == R.id.dialog_popup_menu_remark) {
                     showRemarkDialog(view, accountEntity);
                 }
+                if (item.getItemId() == R.id.dialog_popup_menu_password_generator) {
+                    showPasswordGeneratorDialog(text -> passwordInputLayout.getEditText()
+                            .setText(text));
+                }
                 return false;
             });
             popupMenu.show();
@@ -284,4 +291,62 @@ public class DialogHelper {
                 .setNegativeButton(R.string.exit, onExitClicked)
                 .show();
     }
+
+    public void showPasswordGeneratorDialog(DialogEditTextCallback callback) {
+        BottomSheetDialog builder = new BottomSheetDialog(context);
+        View dialogView = inflater.inflate(R.layout.dialog_password_generator, null);
+        CheckBox includeUppercase = dialogView.findViewById(R.id.include_uppercase);
+        CheckBox includeLowercase = dialogView.findViewById(R.id.include_lowercase);
+        CheckBox includeNumbers = dialogView.findViewById(R.id.include_numbers);
+        CheckBox includeSpecialChars = dialogView.findViewById(R.id.include_special_chars);
+        SeekBar passwordLengthSeekBar = dialogView.findViewById(R.id.password_length_seekbar);
+        TextView passwordLengthValue = dialogView.findViewById(R.id.password_length_value);
+        Button generatePasswordButton = dialogView.findViewById(R.id.generate_password_button);
+        passwordLengthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                passwordLengthValue.setText(String.valueOf(progress));
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        generatePasswordButton.setOnClickListener(v -> {
+            boolean upper = includeUppercase.isChecked();
+            boolean lower = includeLowercase.isChecked();
+            boolean numbers = includeNumbers.isChecked();
+            boolean special = includeSpecialChars.isChecked();
+            int length = passwordLengthSeekBar.getProgress();
+            String password = generatePassword(upper, lower, numbers, special, length);
+            callback.onEditTextEntered(password);
+            builder.dismiss();
+        });
+        builder.setContentView(dialogView);
+        builder.show();
+    }
+
+    private String generatePassword(boolean upper, boolean lower, boolean numbers, boolean special, int length) {
+        String upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowerChars = "abcdefghijklmnopqrstuvwxyz";
+        String numberChars = "0123456789";
+        String specialChars = "!@#.%^*()-_=+?";
+
+        StringBuilder passwordChars = new StringBuilder();
+        if (upper) passwordChars.append(upperChars);
+        if (lower) passwordChars.append(lowerChars);
+        if (numbers) passwordChars.append(numberChars);
+        if (special) passwordChars.append(specialChars);
+
+        StringBuilder password = new StringBuilder(length);
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            password.append(passwordChars.charAt(random.nextInt(passwordChars.length())));
+        }
+        return password.toString();
+    }
+
 }
