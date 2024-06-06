@@ -89,6 +89,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="20dp"
             android:focusable="false"
+            app:counterEnabled="true"
             android:focusableInTouchMode="false"
             app:layout_constraintTop_toBottomOf="@id/add_content_view_dialog_accountID"
             app:passwordToggleEnabled="true">
