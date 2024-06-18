@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Random;
 
@@ -69,9 +72,12 @@ public class DialogHelper {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         View dialogView = inflater.inflate(R.layout.dialog_password, null);
         EditText passwordInput = dialogView.findViewById(R.id.password_input);
+        EditText saltInput = dialogView.findViewById(R.id.salt_input);
         builder.setTitle(R.string.import_data);
         builder.setView(dialogView);
-        builder.setPositiveButton(R.string.importStr, (dialogInterface, i) -> callback.onEditTextEntered(passwordInput.getText().toString()));
+        builder.setPositiveButton(R.string.importStr, (dialogInterface, i) -> callback.onEditTextEntered(saltInput.getText().toString() +
+                Constants.EXPORT_IMPORT_PASS_SPILT
+                + passwordInput.getText().toString()));
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
@@ -132,14 +138,29 @@ public class DialogHelper {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         View dialogView = inflater.inflate(R.layout.dialog_password, null);
         EditText passwordInput = dialogView.findViewById(R.id.password_input);
+        EditText saltInput = dialogView.findViewById(R.id.salt_input);
+        byte[] saltByte = PasswordUtils.generateSalt();
+        String salt = Base64.getEncoder().encodeToString(saltByte);
+        saltInput.setText(salt);
+        saltInput.setEnabled(false);
         builder.setTitle(R.string.export_data);
         builder.setView(dialogView);
         builder.setPositiveButton(R.string.export, (dialog, which) -> {
-            String exportDataPassword = passwordInput.getText().toString();
+            String exportDataPassword = saltInput.getText().toString()
+                    + Constants.EXPORT_IMPORT_PASS_SPILT
+                    + passwordInput.getText().toString();
             callback.onEditTextEntered(exportDataPassword);
         });
         builder.setNegativeButton(R.string.cancel, null);
-        builder.show();
+        builder.setNeutralButton(R.string.copy_salt, (dialogInterface, i) -> {
+            ClipboardUtils.copyToClipboard(context, "text", salt);
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(view -> {
+            ClipboardUtils.copyToClipboard(context, "text", salt);
+            Toast.makeText(context, R.string.copy_success, Toast.LENGTH_SHORT).show();
+        });
     }
 
 
@@ -222,7 +243,7 @@ public class DialogHelper {
         TextView buildInfo = dialogView.findViewById(R.id.build_info);
 
         buildInfo.setText(context.getString(R.string.build_time) + BuildConfig.BUILD_TIME + "\n" +
-                context.getString(R.string.git_hash)+ BuildConfig.GIT_HASH);
+                context.getString(R.string.git_hash) + BuildConfig.GIT_HASH);
     }
 
     /**
@@ -307,9 +328,11 @@ public class DialogHelper {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 passwordLengthValue.setText(String.valueOf(progress));
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
+
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }

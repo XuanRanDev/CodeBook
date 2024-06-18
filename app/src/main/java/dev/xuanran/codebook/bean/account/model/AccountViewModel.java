@@ -2,6 +2,7 @@ package dev.xuanran.codebook.bean.account.model;
 
 import android.app.Application;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -70,7 +71,7 @@ public class AccountViewModel extends AndroidViewModel {
         return Transformations.map(repository.searchAccounts(query), this::decryptAccounts);
     }
 
-    public void exportData(String password, Uri uri, ExportCallback callback) {
+    public void exportData(SecretKey secretKey, Uri uri, ExportCallback callback) {
         new Thread(() -> {
             try {
                 List<AccountEntity> accounts = allAccounts.getValue();
@@ -78,7 +79,6 @@ public class AccountViewModel extends AndroidViewModel {
                 for (AccountEntity account : accounts) {
                     data.append(account.toString()).append("\n");
                 }
-                SecretKey secretKey = PasswordUtils.generateKeyFromPassword(password);
                 String encryptedData = AESUtils.encrypt(secretKey, data.toString());
 
                 try (OutputStream outputStream = getApplication().getContentResolver().openOutputStream(uri)) {
@@ -96,7 +96,7 @@ public class AccountViewModel extends AndroidViewModel {
     }
 
 
-    public void importData(String password, Uri uri, ImportCallback callback) {
+    public void importData(SecretKey secretKey, Uri uri, ImportCallback callback) {
         new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(getApplication().getContentResolver().openInputStream(uri)))) {
                 StringBuilder data = new StringBuilder();
@@ -105,7 +105,6 @@ public class AccountViewModel extends AndroidViewModel {
                     data.append(line);
                 }
 
-                SecretKey secretKey = PasswordUtils.generateKeyFromPassword(password);
                 String decryptedData = AESUtils.decrypt(secretKey, data.toString());
                 String[] accounts = decryptedData.split("\n");
 

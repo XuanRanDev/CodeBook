@@ -84,7 +84,7 @@ public class AccountEntity {
         account.setUsername(fields[1]);
         account.setPassword(fields[2]);
         account.setRemark(fields[3]);
-        account.setCreateTime(new Date(Long.parseLong(fields[5])));
+        account.setCreateTime(new Date(Long.parseLong(fields[4])));
         return account;
     }
 }

@@ -43,6 +43,7 @@ import java.io.File;
 import java.text.DateFormat;
 
 import dev.xuanran.codebook.R;
+import dev.xuanran.codebook.bean.Constants;
 import dev.xuanran.codebook.bean.account.adapter.AccountAdapter;
 import dev.xuanran.codebook.bean.account.model.AccountViewModel;
 import dev.xuanran.codebook.callback.CipherStrategyCallback;
@@ -237,19 +238,27 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
         if (data == null || data.getData() == null) return;
         Uri uri = data.getData();
         if (requestCode == REQUEST_CODE_IMPORT && resultCode == RESULT_OK) {
-            dialogHelper.showImportDialog(uri, password -> accountViewModel.importData(password, uri, new ImportCallback() {
-                @Override
-                public void onSuccess() {
-                    showToast(R.string.import_success);
-                }
 
-                @Override
-                public void onError(Exception e) {
-                    showToast(R.string.import_error);
-                }
-            }));
+
+            dialogHelper.showImportDialog(uri, password -> {
+                String pass = password.split(Constants.EXPORT_IMPORT_PASS_SPILT)[1];
+                String salt = password.split(Constants.EXPORT_IMPORT_PASS_SPILT)[0];
+                accountViewModel.importData(PasswordUtils.generateKeyFromPassword(pass, salt), uri, new ImportCallback() {
+                    @Override
+                    public void onSuccess() {
+                        showToast(R.string.import_success);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        showToast(R.string.import_error);
+                    }
+                });
+            });
         } else if (requestCode == REQUEST_CODE_EXPORT && resultCode == RESULT_OK) {
-            accountViewModel.exportData(exportDataPassword, uri, new ExportCallback() {
+            String pass = exportDataPassword.split(Constants.EXPORT_IMPORT_PASS_SPILT)[1];
+            String salt = exportDataPassword.split(Constants.EXPORT_IMPORT_PASS_SPILT)[0];
+            accountViewModel.exportData(PasswordUtils.generateKeyFromPassword(pass, salt), uri, new ExportCallback() {
                 @Override
                 public void onSuccess(File file) {
                     showToast(R.string.export_success);

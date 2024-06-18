@@ -61,5 +61,10 @@ public class Constants {
      */
     public static final String KEY_SALT = "salt";
 
+    /**
+     * 导入导出时，密码与盐值的分割
+     */
+    public static final String EXPORT_IMPORT_PASS_SPILT = "-&&-";
+
 
 }

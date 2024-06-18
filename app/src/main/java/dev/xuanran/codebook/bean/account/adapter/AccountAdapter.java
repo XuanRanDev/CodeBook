@@ -1,5 +1,7 @@
 package dev.xuanran.codebook.bean.account.adapter;
 
+import static dev.xuanran.codebook.util.ClipboardUtils.copyToClipboard;
+
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -28,6 +30,7 @@ import java.util.Objects;
 import dev.xuanran.codebook.R;
 import dev.xuanran.codebook.bean.account.AccountEntity;
 import dev.xuanran.codebook.bean.account.model.AccountViewModel;
+import dev.xuanran.codebook.util.ClipboardUtils;
 
 public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
     @SuppressLint("SimpleDateFormat")
@@ -103,12 +106,6 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
 
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-
-    private void copyToClipboard(Context context, String label, String text) {
-        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText(label, text);
-        clipboard.setPrimaryClip(clip);
     }
 
     /**

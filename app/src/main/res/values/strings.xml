@@ -29,8 +29,10 @@
     <string name="please_enter_the_application_name">请输入应用名称</string>
     <string name="please_enter_the_user_name">请输入用户名/账号</string>
     <string name="please_enter_the_password">请输入密码</string>
-    <string name="export_import_data_tips">导出数据时，程序会将您在数据库中储存的所有数据进行AES-128加密后导出为TXT文件。
+    <string name="export_import_data_tips">导出数据时，程序会将您在数据库中储存的所有数据进行AES256加密后导出为TXT文件。
         \n\n导入数据时，您需要输入数据的导入密码，仅在密码验证成功后数据才能完成导入。
+
+        \n\n* 您可将盐值看作数据的额外加密密码，请务必在导出数据时保存您的盐值，盐值为每次导出随机生成，在导出后不可见，在导入时需要输入生成时的盐值，相同密码在不同盐值下产生的加密结果不同，若盐值丢失则数据无法找回。
     </string>
     <string name="enter_password">输入密码</string>
     <string name="export">导出</string>
@@ -54,7 +56,7 @@
     <string name="ok">确定</string>
     <string name="exit">退出</string>
     <string name="set_password">请输入要设置的密码</string>
-    <string name="set_password_tips">密码若忘记，将无法找回您的数据。</string>
+    <string name="set_password_tips">若忘记密码，您将丢失全部数据。</string>
     <string name="search_hint">搜索...</string>
     <string name="verify_title">完成验证</string>
     <string name="finish_verfig">完成身份验证后继续</string>
@@ -96,4 +98,6 @@
     <string name="contains_special_characters">特殊字符</string>
     <string name="password_length_selection">生成密码长度</string>
     <string name="generate_password">生成密码</string>
+    <string name="salt">盐值</string>
+    <string name="copy_salt">复制盐值</string>
 </resources>
