@@ -24,6 +24,17 @@ public class AccountEntity {
     @ColumnInfo(name = "create_time")
     private Date createTime;
 
+    public AccountEntity() {
+    }
+
+    public AccountEntity(String appName, String username, String password, String remark, Date createTime) {
+        this.appName = appName;
+        this.username = username;
+        this.password = password;
+        this.remark = remark;
+        this.createTime = createTime;
+    }
+
     public Long getId() {
         return id;
     }

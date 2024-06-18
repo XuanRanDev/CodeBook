@@ -9,6 +9,9 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -23,6 +26,7 @@ import dev.xuanran.codebook.bean.account.AccountRepository;
 import dev.xuanran.codebook.callback.ExportCallback;
 import dev.xuanran.codebook.callback.ImportCallback;
 import dev.xuanran.codebook.util.AESUtils;
+import dev.xuanran.codebook.util.JsonUtil;
 import dev.xuanran.codebook.util.PasswordUtils;
 
 public class AccountViewModel extends AndroidViewModel {
@@ -75,11 +79,8 @@ public class AccountViewModel extends AndroidViewModel {
         new Thread(() -> {
             try {
                 List<AccountEntity> accounts = allAccounts.getValue();
-                StringBuilder data = new StringBuilder();
-                for (AccountEntity account : accounts) {
-                    data.append(account.toString()).append("\n");
-                }
-                String encryptedData = AESUtils.encrypt(secretKey, data.toString());
+                String data = JsonUtil.convertListToJson(accounts);
+                String encryptedData = AESUtils.encrypt(secretKey, data);
 
                 try (OutputStream outputStream = getApplication().getContentResolver().openOutputStream(uri)) {
                     if (outputStream != null) {
@@ -106,15 +107,14 @@ public class AccountViewModel extends AndroidViewModel {
                 }
 
                 String decryptedData = AESUtils.decrypt(secretKey, data.toString());
-                String[] accounts = decryptedData.split("\n");
 
-                for (String accountData : accounts) {
-                    AccountEntity account = AccountEntity.fromString(accountData);
-                    account.setUsername(MainActivity.cipherStrategy.encryptData(account.getUsername()));
-                    account.setPassword(MainActivity.cipherStrategy.encryptData(account.getPassword()));
-                    repository.insert(account);
+                List<AccountEntity> accountEntities = JsonUtil.convertJsonToList(decryptedData);
+
+                for (AccountEntity accountEntity : accountEntities) {
+                    accountEntity.setUsername(MainActivity.cipherStrategy.encryptData(accountEntity.getUsername()));
+                    accountEntity.setPassword(MainActivity.cipherStrategy.encryptData(accountEntity.getPassword()));
+                    repository.insert(accountEntity);
                 }
-
                 callback.onSuccess();
             } catch (Exception e) {
                 e.printStackTrace();
