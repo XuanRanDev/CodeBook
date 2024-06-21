@@ -19,6 +19,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.security.KeyStore;
@@ -110,6 +111,7 @@ public class FingerprintCipherStrategy implements CipherStrategy {
         View bottomSheetView = LayoutInflater.from(context).inflate(R.layout.fingerprint_bottom_sheet, null);
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
         bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.setCancelable(false);
 
         // 设置自定义布局中的视图
         TextView titleTextView = bottomSheetView.findViewById(R.id.fingerprint_title);
