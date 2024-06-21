@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -26,9 +25,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 import dev.xuanran.codebook.BuildConfig;
@@ -265,8 +264,17 @@ public class DialogHelper {
                 .create();
         alertDialog.show();
 
+        // 获取当前语言
+        String language = Locale.getDefault().getLanguage();
+        String assetPath = "en/user_rule.txt"; // 默认英文版本
+
+        // 根据语言设置选择相应的路径
+        if ("zh".equals(language)) {
+            assetPath = "zh/user_rule.txt";
+        }
+
         TextView tvUserAgreement = dialogView.findViewById(R.id.tv_user_agreement);
-        String text = FileUtils.readAssetTextFile(context, "user_rule.txt");
+        String text = FileUtils.readAssetTextFile(context, "zh/user_rule.txt");
 
         if (agreeStatus) {
             String date = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
