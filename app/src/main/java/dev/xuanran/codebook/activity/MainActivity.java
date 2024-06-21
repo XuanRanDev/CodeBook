@@ -52,6 +52,7 @@ import dev.xuanran.codebook.callback.ImportCallback;
 import dev.xuanran.codebook.service.CipherStrategy;
 import dev.xuanran.codebook.service.impl.FingerprintCipherStrategy;
 import dev.xuanran.codebook.service.impl.PasswordCipherStrategy;
+import dev.xuanran.codebook.util.AppExitUtil;
 import dev.xuanran.codebook.util.DateUtils;
 import dev.xuanran.codebook.util.DialogHelper;
 import dev.xuanran.codebook.util.HexUtils;
@@ -176,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
             dialogHelper.showCancelFingerprintDialog((m ,k) -> {
                 startFingerprintFlow();
             }, (m, k) -> {
-                finish();
+                AppExitUtil.exitApp();
             });
         } else {
             showTips(msg);
@@ -188,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
      * 开始密码验证流程
      */
     private void startPasswordFlow() {
-        dialogHelper.startPasswordFlow(text -> onCipherStrategyCreated(new PasswordCipherStrategy(text), ENCRYPTION_TYPE_PASSWORD), (dialogInterface, i) -> finish());
+        dialogHelper.startPasswordFlow(text -> onCipherStrategyCreated(new PasswordCipherStrategy(text), ENCRYPTION_TYPE_PASSWORD), (dialogInterface, i) -> AppExitUtil.exitApp());
     }
 
     /**
@@ -281,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
         new Handler(Looper.getMainLooper()).postDelayed(() -> dialogHelper.showReAuthenticationDialog(
                         context,
                         (dialogInterface, i) -> startFingerprintFlow(),
-                        (dialogInterface, i) -> finish()),
+                        (dialogInterface, i) -> AppExitUtil.exitApp()),
                 (FINGERPRINT_AUTH_EXPIRED - 3) * 1000);
     }
 

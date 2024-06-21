@@ -40,6 +40,9 @@ public class FingerprintCipherStrategy implements CipherStrategy {
     private CancellationSignal cancellationSignal;
     private boolean isCallbackCalled;
 
+    private static boolean isAuthenticating = false;
+
+
     /**
      * 指纹认证处理器
      *
@@ -97,6 +100,12 @@ public class FingerprintCipherStrategy implements CipherStrategy {
      * 使用指纹验证进行身份验证
      */
     private void authenticateWithFingerprint() {
+
+        // 检查是否已经在进行指纹认证
+        if (isAuthenticating) {
+            return;
+        }
+
         // 创建 BottomSheetDialog 并加载自定义布局
         View bottomSheetView = LayoutInflater.from(context).inflate(R.layout.fingerprint_bottom_sheet, null);
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
@@ -115,6 +124,8 @@ public class FingerprintCipherStrategy implements CipherStrategy {
             if (isCallbackCalled) return;
             isCallbackCalled = true;
             fingerprintCallback.onFingerprint(false, -1, context.getString(R.string.user_cancel));
+            // 更新认证状态
+            isAuthenticating = false;
         });
 
         // 设置指纹管理器和回调
@@ -125,6 +136,8 @@ public class FingerprintCipherStrategy implements CipherStrategy {
             public void onAuthenticationError(int errorCode, CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
                 bottomSheetDialog.dismiss();
+                // 更新认证状态
+                isAuthenticating = false;
                 if (isCallbackCalled) return;
                 isCallbackCalled = true;
                 fingerprintCallback.onFingerprint(false, -1, String.valueOf(errString));
@@ -134,6 +147,8 @@ public class FingerprintCipherStrategy implements CipherStrategy {
             public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
                 bottomSheetDialog.dismiss();
+                // 更新认证状态
+                isAuthenticating = false;
                 if (needGenKey) {
                     generateSecretKey();
                     needGenKey = false;
@@ -144,6 +159,8 @@ public class FingerprintCipherStrategy implements CipherStrategy {
             @Override
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();
+                // 更新认证状态
+                isAuthenticating = false;
                 if (isCallbackCalled) return;
                 isCallbackCalled = true;
                 fingerprintCallback.onFingerprint(false, -2, context.getString(R.string.auth_fail));
