@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements CipherStrategyCal
         if (success) {
             scheduleReAuthentication(this);
             onCipherStrategyCreated(cipherStrategy, ENCRYPTION_TYPE_FINGERPRINT);
-        } else if (code == -1) {
+        } else if (code == -1 || code == -2) {
             // -1 是用户取消认证
             dialogHelper.showCancelFingerprintDialog((m ,k) -> {
                 startFingerprintFlow();
