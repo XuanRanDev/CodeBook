@@ -90,7 +90,7 @@
     <string name="git_hash">Git Hash：</string>
     <string name="auth_fail">认证失败</string>
     <string name="user_cancel">用户取消</string>
-    <string name="fingerprint_auth_cancel">指纹认证已被取消，未通过认证无法加载数据。</string>
+    <string name="fingerprint_auth_cancel">生物认证已被取消或未通过，无法加载数据。</string>
     <string name="select_password_criteria">选择密码标准</string>
     <string name="contains_uppercase_letters">大写字母</string>
     <string name="contains_lowercase_letters">小写字母</string>
