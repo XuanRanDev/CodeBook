@@ -36,10 +36,10 @@ public class JsonUtil {
             JSONArray jsonArray = new JSONArray(jsonString);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String appName = jsonObject.getString("appName");
-                String username = jsonObject.getString("username");
-                String password = jsonObject.getString("password");
-                String remark = jsonObject.getString("remark");
+                String appName = jsonObject.optString("appName", "");
+                String username = jsonObject.optString("username", "");
+                String password = jsonObject.optString("password", "");
+                String remark = jsonObject.optString("remark", "");
                 long createTimeLong = jsonObject.getLong("createTime");
                 AccountEntity account = new AccountEntity(appName, username, password, remark, new Date(createTimeLong));
                 accounts.add(account);
