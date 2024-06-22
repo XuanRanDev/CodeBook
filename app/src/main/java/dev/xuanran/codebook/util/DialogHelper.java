@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -274,7 +275,7 @@ public class DialogHelper {
         }
 
         TextView tvUserAgreement = dialogView.findViewById(R.id.tv_user_agreement);
-        String text = FileUtils.readAssetTextFile(context, "zh/user_rule.txt");
+        String text = FileUtils.readAssetTextFile(context, assetPath);
 
         if (agreeStatus) {
             String date = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)

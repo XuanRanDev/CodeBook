@@ -74,7 +74,7 @@
     <string name="re_auth">Re-authenticate</string>
     <string name="re_auth_tips">Your biometric authentication has expired, please re-authenticate.</string>
     <string name="fingerprint_require_R">For security reasons, the fingerprint method currently only supports Android 11 and above</string>
-    <string name="read_and_agree">I have carefully read and agree to the CodeBook User Agreement, understand the implementation of CodeBook's encryption algorithm, and agree that any data loss or leakage under any circumstances is not related to the developer.</string>
+    <string name="read_and_agree">I have carefully read and agree to the CodeBook User Agreement, understand the implementation of CodeBook encryption algorithm, and agree that any data loss or leakage under any circumstances is not related to the developer.</string>
     <string name="you_already_agree">You have read and agreed</string>
     <string name="agree_date">\n\n\nAgreement Date:</string>
     <string name="program_exception">Program Exception</string>

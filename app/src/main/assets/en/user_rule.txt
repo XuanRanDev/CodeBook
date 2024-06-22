@@ -6,11 +6,11 @@ Welcome to CodeBook! We highly value your privacy and are committed to protectin
 
 Information We Collect
 
-1. **Information You Provide**
+1. Information You Provide
    When you use CodeBook, you may provide us with the following information:
    - Your usernames and passwords for other apps.
 
-2. **Automatically Collected Information**
+2. Automatically Collected Information
    We do not automatically collect any user-related personal information. All data is stored locally on your device unless you choose to export or share it.
 
 Use of Information
@@ -28,10 +28,10 @@ Protection of Information
 
 We take the security of your information very seriously. When you first use CodeBook, you will be required to select an encryption method to encrypt and decrypt the data you provide:
 
-- **Password Method**
+- Password Method
   You need to provide a password (hereinafter referred to as the password seed). CodeBook uses this password seed to generate a high-strength AES256 encryption key. This key is generated using the PBKDF2 encryption algorithm, iterating 10,000 times, ensuring that the encryption key generated from the password seed better protects your data. The key generated from the same password seed will be the same, so please ensure the complexity of the password when choosing this method.
 
-- **Fingerprint Method**
+- Fingerprint Method
   * We strongly recommend using the password method.
   If you choose the fingerprint method for encryption, your Android system must be Android 11 or above, with a screen lock password set and a fingerprint added. The fingerprint method may be disabled due to hardware damage or the deletion of the password/fingerprint in the system, causing data loss.
 
@@ -51,9 +51,9 @@ Data Storage and Retention
 
 All user data is stored on your local device. We do not store any personal information on our servers. Users can choose to export or delete their data.
 
-- **Export Data**: You need to provide an encryption key. CodeBook will also provide you with the salt value used for this encryption. CodeBook will use this salt value and your given password to encrypt the data before exporting it to a TXT file. This file is also protected by AES256 encryption.
+- Export Data: You need to provide an encryption key. CodeBook will also provide you with the salt value used for this encryption. CodeBook will use this salt value and your given password to encrypt the data before exporting it to a TXT file. This file is also protected by AES256 encryption.
 
-- **Import Data**: You need to provide the decryption password and salt value. CodeBook will attempt to decrypt the data before importing it. Incorrect passwords or salt values will result in import failure. Please ensure that you do not delete the original data in CodeBook until after a successful import.
+- Import Data: You need to provide the decryption password and salt value. CodeBook will attempt to decrypt the data before importing it. Incorrect passwords or salt values will result in import failure. Please ensure that you do not delete the original data in CodeBook until after a successful import.
 
 Changes and Revisions
 
