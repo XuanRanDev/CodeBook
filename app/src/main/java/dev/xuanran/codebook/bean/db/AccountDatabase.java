@@ -11,7 +11,7 @@ import dev.xuanran.codebook.bean.account.AccountDao;
 import dev.xuanran.codebook.bean.account.AccountEntity;
 import dev.xuanran.codebook.util.Converters;
 
-@Database(entities = {AccountEntity.class}, version = 1)
+@Database(entities = {AccountEntity.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AccountDatabase extends RoomDatabase {
     private static AccountDatabase instance;
