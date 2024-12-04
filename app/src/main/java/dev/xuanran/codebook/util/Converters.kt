@@ -1,18 +1,18 @@
-package dev.xuanran.codebook.util;
+package dev.xuanran.codebook.util
 
-import androidx.room.TypeConverter;
+import androidx.room.TypeConverter
+import java.util.Date
 
-import java.util.Date;
-
-public class Converters {
-
+object Converters {
+    @JvmStatic
     @TypeConverter
-    public static Date fromTimestamp(Long value) {
-        return value == null ? null : new Date(value);
+    fun fromTimestamp(value: Long?): Date? {
+        return if (value == null) null else Date(value)
     }
 
+    @JvmStatic
     @TypeConverter
-    public static Long dateToTimestamp(Date date) {
-        return date == null ? null : date.getTime();
+    fun dateToTimestamp(date: Date?): Long? {
+        return if (date == null) null else date.getTime()
     }
 }

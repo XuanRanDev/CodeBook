@@ -1,38 +1,33 @@
-package dev.xuanran.codebook.util;
+package dev.xuanran.codebook.util
+
+import dev.xuanran.codebook.activity.MainActivity
+import java.lang.RuntimeException
+import java.security.NoSuchAlgorithmException
+import java.security.SecureRandom
+import java.security.spec.InvalidKeySpecException
+import java.util.Base64
+import javax.crypto.SecretKey
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
+import javax.crypto.spec.SecretKeySpec
 
 
-import android.util.Log;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.Base64;
-
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
-
-import dev.xuanran.codebook.activity.MainActivity;
-
-
-public class PasswordUtils {
-
-    private static final int ITERATION_COUNT = 10000;
-    private static final int KEY_LENGTH = 256;
-    private static final int SALT_LENGTH = 16;
+object PasswordUtils {
+    private const val ITERATION_COUNT = 10000
+    private const val KEY_LENGTH = 256
+    private const val SALT_LENGTH = 16
 
     /**
      * 生成随机盐值。
      *
      * @return 随机盐值
      */
-    public static byte[] generateSalt() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[SALT_LENGTH];
-        random.nextBytes(salt);
-        return salt;
+    @JvmStatic
+    fun generateSalt(): ByteArray {
+        val random = SecureRandom()
+        val salt = ByteArray(PasswordUtils.SALT_LENGTH)
+        random.nextBytes(salt)
+        return salt
     }
 
     /**
@@ -42,16 +37,24 @@ public class PasswordUtils {
      * @param salt 盐值
      * @return 密钥
      */
-    public static SecretKey generateKeyFromPassword(String password, String salt) {
-        byte[] salt2 = Base64.getDecoder().decode(salt.getBytes());
+    @JvmStatic
+    fun generateKeyFromPassword(password: String, salt: String): SecretKey {
+        val salt2 = Base64.getDecoder().decode(salt.toByteArray())
         try {
-            char[] passwordChars = password.toCharArray();
-            PBEKeySpec spec = new PBEKeySpec(passwordChars, salt2, ITERATION_COUNT, KEY_LENGTH);
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            byte[] keyBytes = factory.generateSecret(spec).getEncoded();
-            return new SecretKeySpec(keyBytes, "AES");
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new RuntimeException("Failed to generate key from password", e);
+            val passwordChars = password.toCharArray()
+            val spec = PBEKeySpec(
+                passwordChars,
+                salt2,
+                PasswordUtils.ITERATION_COUNT,
+                PasswordUtils.KEY_LENGTH
+            )
+            val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+            val keyBytes = factory.generateSecret(spec).getEncoded()
+            return SecretKeySpec(keyBytes, "AES")
+        } catch (e: NoSuchAlgorithmException) {
+            throw RuntimeException("Failed to generate key from password", e)
+        } catch (e: InvalidKeySpecException) {
+            throw RuntimeException("Failed to generate key from password", e)
         }
     }
 
@@ -62,17 +65,23 @@ public class PasswordUtils {
      * @param password 密码
      * @return 密钥
      */
-    public static SecretKey generateKeyFromPassword(String password) {
+    @JvmStatic
+    fun generateKeyFromPassword(password: String): SecretKey {
         try {
-            char[] passwordChars = password.toCharArray();
-            PBEKeySpec spec = new PBEKeySpec(passwordChars, MainActivity.salt, ITERATION_COUNT, KEY_LENGTH);
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            byte[] keyBytes = factory.generateSecret(spec).getEncoded();
-            return new SecretKeySpec(keyBytes, "AES");
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new RuntimeException("Failed to generate key from password", e);
+            val passwordChars = password.toCharArray()
+            val spec = PBEKeySpec(
+                passwordChars,
+                MainActivity.salt,
+                PasswordUtils.ITERATION_COUNT,
+                PasswordUtils.KEY_LENGTH
+            )
+            val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+            val keyBytes = factory.generateSecret(spec).getEncoded()
+            return SecretKeySpec(keyBytes, "AES")
+        } catch (e: NoSuchAlgorithmException) {
+            throw RuntimeException("Failed to generate key from password", e)
+        } catch (e: InvalidKeySpecException) {
+            throw RuntimeException("Failed to generate key from password", e)
         }
     }
-
-
 }

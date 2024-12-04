@@ -1,40 +1,41 @@
-package dev.xuanran.codebook.util;
+package dev.xuanran.codebook.util
 
-import java.security.SecureRandom;
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import android.util.Base64
+import java.lang.Exception
+import java.security.SecureRandom
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.spec.SecretKeySpec
 
-import android.util.Base64;
+object CryptoUtils {
+    private const val ALGORITHM = "AES"
+    private const val KEY_SIZE = 128
 
-public class CryptoUtils {
-
-    private static final String ALGORITHM = "AES";
-    private static final int KEY_SIZE = 128;
-
-    public static String encrypt(String data, String password) throws Exception {
-        SecretKeySpec key = generateKey(password);
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        byte[] encryptedData = cipher.doFinal(data.getBytes("UTF-8"));
-        return Base64.encodeToString(encryptedData, Base64.DEFAULT);
+    @Throws(Exception::class)
+    fun encrypt(data: String, password: String): String? {
+        val key = CryptoUtils.generateKey(password)
+        val cipher = Cipher.getInstance(CryptoUtils.ALGORITHM)
+        cipher.init(Cipher.ENCRYPT_MODE, key)
+        val encryptedData = cipher.doFinal(data.toByteArray(charset("UTF-8")))
+        return Base64.encodeToString(encryptedData, Base64.DEFAULT)
     }
 
-    public static String decrypt(String data, String password) throws Exception {
-        SecretKeySpec key = generateKey(password);
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        byte[] decodedData = Base64.decode(data, Base64.DEFAULT);
-        byte[] decryptedData = cipher.doFinal(decodedData);
-        return new String(decryptedData, "UTF-8");
+    @Throws(Exception::class)
+    fun decrypt(data: String?, password: String): String {
+        val key = CryptoUtils.generateKey(password)
+        val cipher = Cipher.getInstance(CryptoUtils.ALGORITHM)
+        cipher.init(Cipher.DECRYPT_MODE, key)
+        val decodedData = Base64.decode(data, Base64.DEFAULT)
+        val decryptedData = cipher.doFinal(decodedData)
+        return kotlin.text.String(decryptedData!!, charset("UTF-8"))
     }
 
-    private static SecretKeySpec generateKey(String password) throws Exception {
-        KeyGenerator keyGen = KeyGenerator.getInstance(ALGORITHM);
-        SecureRandom secureRandom = new SecureRandom(password.getBytes());
-        keyGen.init(KEY_SIZE, secureRandom);
-        SecretKey secretKey = keyGen.generateKey();
-        return new SecretKeySpec(secretKey.getEncoded(), ALGORITHM);
+    @Throws(Exception::class)
+    private fun generateKey(password: String): SecretKeySpec {
+        val keyGen = KeyGenerator.getInstance(CryptoUtils.ALGORITHM)
+        val secureRandom = SecureRandom(password.toByteArray())
+        keyGen.init(CryptoUtils.KEY_SIZE, secureRandom)
+        val secretKey = keyGen.generateKey()
+        return SecretKeySpec(secretKey.getEncoded(), CryptoUtils.ALGORITHM)
     }
 }

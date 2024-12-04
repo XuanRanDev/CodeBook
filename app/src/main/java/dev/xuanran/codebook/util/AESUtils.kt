@@ -1,48 +1,49 @@
-package dev.xuanran.codebook.util;
+package dev.xuanran.codebook.util
 
-import static dev.xuanran.codebook.bean.Constants.IV_SIZE;
-import static dev.xuanran.codebook.bean.Constants.TAG_SIZE;
-import static dev.xuanran.codebook.bean.Constants.TRANSFORMATION;
+import android.util.Base64
+import dev.xuanran.codebook.bean.Constants
+import java.lang.Exception
+import java.lang.RuntimeException
+import javax.crypto.Cipher
+import javax.crypto.SecretKey
+import javax.crypto.spec.GCMParameterSpec
 
-import android.util.Base64;
-
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
-
-public class AESUtils {
-    public static String encrypt(SecretKey secretKey, String data) {
+object AESUtils {
+    @JvmStatic
+    fun encrypt(secretKey: SecretKey?, data: String): String? {
         try {
-            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            val cipher = Cipher.getInstance(Constants.TRANSFORMATION)
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
 
-            byte[] iv = cipher.getIV();
-            byte[] encryption = cipher.doFinal(data.getBytes());
-            byte[] combined = new byte[IV_SIZE + encryption.length];
+            val iv = cipher.getIV()
+            val encryption = cipher.doFinal(data.toByteArray())
+            val combined = ByteArray(Constants.IV_SIZE + encryption.size)
 
-            System.arraycopy(iv, 0, combined, 0, IV_SIZE);
-            System.arraycopy(encryption, 0, combined, IV_SIZE, encryption.length);
-            return Base64.encodeToString(combined, Base64.DEFAULT);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.arraycopy(iv, 0, combined, 0, Constants.IV_SIZE)
+            System.arraycopy(encryption, 0, combined, Constants.IV_SIZE, encryption.size)
+            return Base64.encodeToString(combined, Base64.DEFAULT)
+        } catch (e: Exception) {
+            throw RuntimeException(e)
         }
     }
 
-    public static String decrypt(SecretKey secretKey, String data) throws Exception {
-        byte[] decoded = Base64.decode(data, Base64.DEFAULT);
+    @JvmStatic
+    @Throws(Exception::class)
+    fun decrypt(secretKey: SecretKey?, data: String?): String {
+        val decoded = Base64.decode(data, Base64.DEFAULT)
 
-        byte[] iv = new byte[IV_SIZE];
-        System.arraycopy(decoded, 0, iv, 0, IV_SIZE);
+        val iv = ByteArray(Constants.IV_SIZE)
+        System.arraycopy(decoded, 0, iv, 0, Constants.IV_SIZE)
 
-        byte[] encryption = new byte[decoded.length - IV_SIZE];
-        System.arraycopy(decoded, IV_SIZE, encryption, 0, encryption.length);
+        val encryption = ByteArray(decoded.size - Constants.IV_SIZE)
+        System.arraycopy(decoded, Constants.IV_SIZE, encryption, 0, encryption.size)
 
-        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-        GCMParameterSpec spec = new GCMParameterSpec(TAG_SIZE, iv);
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+        val cipher = Cipher.getInstance(Constants.TRANSFORMATION)
+        val spec = GCMParameterSpec(Constants.TAG_SIZE, iv)
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
 
-        byte[] decrypted = cipher.doFinal(encryption);
-        return new String(decrypted);
+        val decrypted = cipher.doFinal(encryption)
+        return String(decrypted)
     }
 }
 

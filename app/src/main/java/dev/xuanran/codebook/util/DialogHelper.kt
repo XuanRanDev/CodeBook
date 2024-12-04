@@ -1,249 +1,284 @@
-package dev.xuanran.codebook.util;
+package dev.xuanran.codebook.util
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.text.method.ScrollingMovementMethod
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.PopupMenu
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputLayout
+import dev.xuanran.codebook.BuildConfig
+import dev.xuanran.codebook.R
+import dev.xuanran.codebook.bean.Constants
+import dev.xuanran.codebook.bean.account.AccountEntity
+import dev.xuanran.codebook.bean.account.model.AccountViewModel
+import dev.xuanran.codebook.callback.DialogEditTextCallback
+import java.lang.Exception
+import java.lang.StringBuilder
+import java.util.Base64
+import java.util.Date
+import java.util.Locale
+import java.util.Random
 
-import androidx.appcompat.app.AlertDialog;
+class DialogHelper(context: Context) {
+    private val context: Context
+    private val inflater: LayoutInflater
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputLayout;
-
-import java.io.InputStream;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Random;
-
-import dev.xuanran.codebook.BuildConfig;
-import dev.xuanran.codebook.R;
-import dev.xuanran.codebook.bean.Constants;
-import dev.xuanran.codebook.bean.account.AccountEntity;
-import dev.xuanran.codebook.bean.account.model.AccountViewModel;
-import dev.xuanran.codebook.callback.DialogEditTextCallback;
-
-public class DialogHelper {
-    private final Context context;
-    private final LayoutInflater inflater;
-
-    public DialogHelper(Context context) {
-        this.context = context;
-        this.inflater = LayoutInflater.from(context);
+    init {
+        this.context = context
+        this.inflater = LayoutInflater.from(context)
     }
 
-    public void showEncryptionTypeDialog(DialogInterface.OnClickListener onFingerprintSelected, DialogInterface.OnClickListener onPasswordSelected) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+    fun showEncryptionTypeDialog(
+        onFingerprintSelected: DialogInterface.OnClickListener?,
+        onPasswordSelected: DialogInterface.OnClickListener?
+    ) {
+        val builder = MaterialAlertDialogBuilder(context)
         builder.setTitle(R.string.choose_encryption_method)
-                .setMessage(R.string.choose_encryption_method_tips)
-                .setCancelable(false)
-                .setPositiveButton(R.string.fingerprint, onFingerprintSelected)
-                .setNegativeButton(R.string.password, onPasswordSelected)
-                .show();
+            .setMessage(R.string.choose_encryption_method_tips)
+            .setCancelable(false)
+            .setPositiveButton(R.string.fingerprint, onFingerprintSelected)
+            .setNegativeButton(R.string.password, onPasswordSelected)
+            .show()
     }
 
-    public void showCancelFingerprintDialog(DialogInterface.OnClickListener reAuthClick,
-                                            DialogInterface.OnClickListener exitClick) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+    fun showCancelFingerprintDialog(
+        reAuthClick: DialogInterface.OnClickListener?,
+        exitClick: DialogInterface.OnClickListener?
+    ) {
+        val builder = MaterialAlertDialogBuilder(context)
         builder.setTitle(R.string.fingerprint_title)
-                .setMessage(R.string.fingerprint_auth_cancel)
-                .setCancelable(false)
-                .setPositiveButton(R.string.re_auth, reAuthClick)
-                .setNegativeButton(R.string.exit, exitClick)
-                .show();
+            .setMessage(R.string.fingerprint_auth_cancel)
+            .setCancelable(false)
+            .setPositiveButton(R.string.re_auth, reAuthClick)
+            .setNegativeButton(R.string.exit, exitClick)
+            .show()
     }
 
-    public void showImportDialog(Uri uri, DialogEditTextCallback callback) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        View dialogView = inflater.inflate(R.layout.dialog_password, null);
-        EditText passwordInput = dialogView.findViewById(R.id.password_input);
-        EditText saltInput = dialogView.findViewById(R.id.salt_input);
-        builder.setTitle(R.string.import_data);
-        builder.setView(dialogView);
-        builder.setPositiveButton(R.string.importStr, (dialogInterface, i) -> callback.onEditTextEntered(saltInput.getText().toString() +
-                Constants.EXPORT_IMPORT_PASS_SPILT
-                + passwordInput.getText().toString()));
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.show();
-    }
-
-    public void showVerifyDialog() {
-        View dialogView = inflater.inflate(R.layout.dialog_verfiy, null);
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        builder.setCancelable(false)
-                .setView(dialogView)
-                .show();
-    }
-
-
-    public void showDonateDialog() {
-        View dialogView = inflater.inflate(R.layout.dialog_donate, null);
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+    fun showImportDialog(uri: Uri?, callback: DialogEditTextCallback) {
+        val builder = MaterialAlertDialogBuilder(context)
+        val dialogView = inflater.inflate(R.layout.dialog_password, null)
+        val passwordInput = dialogView.findViewById<EditText>(R.id.password_input)
+        val saltInput = dialogView.findViewById<EditText>(R.id.salt_input)
+        builder.setTitle(R.string.import_data)
         builder.setView(dialogView)
-                .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
-                .setPositiveButton("打开支付宝", (dialog, which) -> openAlipay())
-                .show();
+        builder.setPositiveButton(
+            R.string.importStr,
+            DialogInterface.OnClickListener { dialogInterface: DialogInterface?, i: Int ->
+                callback.onEditTextEntered(
+                    (saltInput.getText().toString() +
+                            Constants.EXPORT_IMPORT_PASS_SPILT
+                            + passwordInput.getText().toString())
+                )
+            })
+        builder.setNegativeButton(R.string.cancel, null)
+        builder.show()
+    }
 
-        ImageView imageView = dialogView.findViewById(R.id.iv_donate_image);
+    fun showVerifyDialog() {
+        val dialogView = inflater.inflate(R.layout.dialog_verfiy, null)
+        val builder = MaterialAlertDialogBuilder(context)
+        builder.setCancelable(false)
+            .setView(dialogView)
+            .show()
+    }
+
+
+    fun showDonateDialog() {
+        val dialogView = inflater.inflate(R.layout.dialog_donate, null)
+        val builder = MaterialAlertDialogBuilder(context)
+        builder.setView(dialogView)
+            .setNegativeButton(
+                "取消",
+                DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int -> dialog!!.dismiss() })
+            .setPositiveButton(
+                "打开支付宝",
+                DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int -> openAlipay() })
+            .show()
+
+        val imageView = dialogView.findViewById<ImageView>(R.id.iv_donate_image)
         try {
-            InputStream inputStream = context.getAssets().open("donate_image.png");
-            Drawable drawable = Drawable.createFromStream(inputStream, null);
-            imageView.setImageDrawable(drawable);
-        } catch (Exception e) {
-            e.printStackTrace();
+            val inputStream = context.getAssets().open("donate_image.png")
+            val drawable = Drawable.createFromStream(inputStream, null)
+            imageView.setImageDrawable(drawable)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    public void startPasswordFlow(DialogEditTextCallback callback, DialogInterface.OnClickListener exit) {
+    fun startPasswordFlow(
+        callback: DialogEditTextCallback,
+        exit: DialogInterface.OnClickListener?
+    ) {
         // 弹出密码验证对话框，让用户输入密码
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        View dialogView = inflater.inflate(R.layout.dialog_password_enter, null);
-        EditText passwordInput = dialogView.findViewById(R.id.password_input);
-        TextView passwordInputTips = dialogView.findViewById(R.id.password_input_tips);
-        passwordInputTips.setText(R.string.set_password_tips);
-        builder.setTitle(R.string.enter_password);
-        builder.setView(dialogView);
-        builder.setCancelable(false);
-        builder.setPositiveButton(R.string.ok, (dialog, which) -> {
-            String password = passwordInput.getText().toString();
-            callback.onEditTextEntered(password);
-        });
-        builder.setNegativeButton(R.string.exit, exit);
-        builder.show();
+        val builder = MaterialAlertDialogBuilder(context)
+        val dialogView = inflater.inflate(R.layout.dialog_password_enter, null)
+        val passwordInput = dialogView.findViewById<EditText>(R.id.password_input)
+        val passwordInputTips = dialogView.findViewById<TextView>(R.id.password_input_tips)
+        passwordInputTips.setText(R.string.set_password_tips)
+        builder.setTitle(R.string.enter_password)
+        builder.setView(dialogView)
+        builder.setCancelable(false)
+        builder.setPositiveButton(
+            R.string.ok,
+            DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
+                val password = passwordInput.getText().toString()
+                callback.onEditTextEntered(password)
+            })
+        builder.setNegativeButton(R.string.exit, exit)
+        builder.show()
     }
 
-    private void openAlipay() {
-        String uri = "alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx19506bgcutjrzzq9ud44";
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-        context.startActivity(intent);
-
+    private fun openAlipay() {
+        val uri =
+            "alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx19506bgcutjrzzq9ud44"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+        context.startActivity(intent)
     }
 
-    public void showExportDialog(DialogEditTextCallback callback) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        View dialogView = inflater.inflate(R.layout.dialog_password, null);
-        EditText passwordInput = dialogView.findViewById(R.id.password_input);
-        EditText saltInput = dialogView.findViewById(R.id.salt_input);
-        byte[] saltByte = PasswordUtils.generateSalt();
-        String salt = Base64.getEncoder().encodeToString(saltByte);
-        saltInput.setText(salt);
-        saltInput.setEnabled(false);
-        builder.setTitle(R.string.export_data);
-        builder.setView(dialogView);
-        builder.setPositiveButton(R.string.export, (dialog, which) -> {
-            String exportDataPassword = saltInput.getText().toString()
-                    + Constants.EXPORT_IMPORT_PASS_SPILT
-                    + passwordInput.getText().toString();
-            callback.onEditTextEntered(exportDataPassword);
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.setNeutralButton(R.string.copy_salt, (dialogInterface, i) -> {
-            ClipboardUtils.copyToClipboard(context, "text", salt);
-        });
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(view -> {
-            ClipboardUtils.copyToClipboard(context, "text", salt);
-            Toast.makeText(context, R.string.copy_success, Toast.LENGTH_SHORT).show();
-        });
+    fun showExportDialog(callback: DialogEditTextCallback) {
+        val builder = MaterialAlertDialogBuilder(context)
+        val dialogView = inflater.inflate(R.layout.dialog_password, null)
+        val passwordInput = dialogView.findViewById<EditText>(R.id.password_input)
+        val saltInput = dialogView.findViewById<EditText>(R.id.salt_input)
+        val saltByte = PasswordUtils.generateSalt()
+        val salt = Base64.getEncoder().encodeToString(saltByte)
+        saltInput.setText(salt)
+        saltInput.setEnabled(false)
+        builder.setTitle(R.string.export_data)
+        builder.setView(dialogView)
+        builder.setPositiveButton(
+            R.string.export,
+            DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
+                val exportDataPassword = (saltInput.getText().toString()
+                        + Constants.EXPORT_IMPORT_PASS_SPILT
+                        + passwordInput.getText().toString())
+                callback.onEditTextEntered(exportDataPassword)
+            })
+        builder.setNegativeButton(R.string.cancel, null)
+        builder.setNeutralButton(
+            R.string.copy_salt,
+            DialogInterface.OnClickListener { dialogInterface: DialogInterface?, i: Int ->
+                ClipboardUtils.copyToClipboard(context, "text", salt)
+            })
+        val alertDialog = builder.create()
+        alertDialog.show()
+        alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+            .setOnClickListener(View.OnClickListener { view: View? ->
+                ClipboardUtils.copyToClipboard(context, "text", salt)
+                Toast.makeText(context, R.string.copy_success, Toast.LENGTH_SHORT).show()
+            })
     }
 
 
-    public void showAddAccountDialog(AccountViewModel accountViewModel) {
-        AccountEntity accountEntity = new AccountEntity();
-        View dialogView = inflater.inflate(R.layout.add_content_view_dialog, null);
+    fun showAddAccountDialog(accountViewModel: AccountViewModel) {
+        val accountEntity = AccountEntity()
+        val dialogView = inflater.inflate(R.layout.add_content_view_dialog, null)
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        builder.setView(dialogView);
+        val builder = MaterialAlertDialogBuilder(context)
+        builder.setView(dialogView)
 
-        TextInputLayout appNameInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_appName);
-        TextInputLayout accountIDInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_accountID);
-        TextInputLayout passwordInputLayout = dialogView.findViewById(R.id.add_content_view_dialog_password);
-        ImageView more = dialogView.findViewById(R.id.add_content_view_dialog_more);
-        Button cancel = dialogView.findViewById(R.id.add_content_view_dialog_cancel);
-        Button save = dialogView.findViewById(R.id.add_content_view_dialog_save);
-        AlertDialog dialog = builder.create();
+        val appNameInputLayout =
+            dialogView.findViewById<TextInputLayout>(R.id.add_content_view_dialog_appName)
+        val accountIDInputLayout =
+            dialogView.findViewById<TextInputLayout>(R.id.add_content_view_dialog_accountID)
+        val passwordInputLayout =
+            dialogView.findViewById<TextInputLayout>(R.id.add_content_view_dialog_password)
+        val more = dialogView.findViewById<ImageView>(R.id.add_content_view_dialog_more)
+        val cancel = dialogView.findViewById<Button>(R.id.add_content_view_dialog_cancel)
+        val save = dialogView.findViewById<Button>(R.id.add_content_view_dialog_save)
+        val dialog = builder.create()
 
-        cancel.setOnClickListener(view -> dialog.cancel());
-        save.setOnClickListener(view -> {
-            String appName = appNameInputLayout.getEditText().getText().toString();
-            String accountID = accountIDInputLayout.getEditText().getText().toString();
-            String password = passwordInputLayout.getEditText().getText().toString();
-            accountEntity.setAppName(appName);
-            accountEntity.setUsername(accountID);
-            accountEntity.setPassword(password);
-            accountEntity.setCreateTime(new Date());
-            accountViewModel.insert(accountEntity);
-            dialog.cancel();
-        });
+        cancel.setOnClickListener(View.OnClickListener { view: View? -> dialog.cancel() })
+        save.setOnClickListener(View.OnClickListener { view: View? ->
+            val appName = appNameInputLayout.getEditText()!!.getText().toString()
+            val accountID = accountIDInputLayout.getEditText()!!.getText().toString()
+            val password = passwordInputLayout.getEditText()!!.getText().toString()
+            accountEntity.setAppName(appName)
+            accountEntity.setUsername(accountID)
+            accountEntity.setPassword(password)
+            accountEntity.setCreateTime(Date())
+            accountViewModel.insert(accountEntity)
+            dialog.cancel()
+        })
 
-        more.setOnClickListener(view -> {
-            PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
-            popupMenu.getMenuInflater().inflate(R.menu.add_popup_menu, popupMenu.getMenu());
-            popupMenu.setOnMenuItemClickListener(item -> {
-                if (item.getItemId() == R.id.dialog_popup_menu_remark) {
-                    showRemarkDialog(view, accountEntity);
+        more.setOnClickListener(View.OnClickListener { view: View? ->
+            val popupMenu = PopupMenu(view!!.getContext(), view)
+            popupMenu.getMenuInflater().inflate(R.menu.add_popup_menu, popupMenu.getMenu())
+            popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
+                if (item!!.getItemId() == R.id.dialog_popup_menu_remark) {
+                    showRemarkDialog(view, accountEntity)
                 }
                 if (item.getItemId() == R.id.dialog_popup_menu_password_generator) {
-                    showPasswordGeneratorDialog(text -> passwordInputLayout.getEditText()
-                            .setText(text));
+                    showPasswordGeneratorDialog(DialogEditTextCallback { text: String? ->
+                        passwordInputLayout.getEditText()!!
+                            .setText(text)
+                    })
                 }
-                return false;
-            });
-            popupMenu.show();
-        });
+                false
+            })
+            popupMenu.show()
+        })
 
-        dialog.show();
+        dialog.show()
     }
 
-    private void showRemarkDialog(View view, AccountEntity account) {
-        View dialogView = inflater.inflate(R.layout.dialog_create_remark, null);
-        TextInputLayout edittext = dialogView.findViewById(R.id.dialog_create_remark_edittext);
+    private fun showRemarkDialog(view: View, account: AccountEntity) {
+        val dialogView = inflater.inflate(R.layout.dialog_create_remark, null)
+        val edittext = dialogView.findViewById<TextInputLayout>(R.id.dialog_create_remark_edittext)
 
-        new MaterialAlertDialogBuilder(view.getContext())
-                .setView(dialogView)
-                .setPositiveButton(R.string.ok, (dialog, which) -> {
-                    account.setRemark(edittext.getEditText().getText().toString());
+        MaterialAlertDialogBuilder(view.getContext())
+            .setView(dialogView)
+            .setPositiveButton(
+                R.string.ok,
+                DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
+                    account.setRemark(edittext.getEditText()!!.getText().toString())
                 })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     @SuppressLint("SetTextI18n")
-    public void showAboutDialog() {
-        View dialogView = inflater.inflate(R.layout.dialog_about, null);
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+    fun showAboutDialog() {
+        val dialogView = inflater.inflate(R.layout.dialog_about, null)
+        val builder = MaterialAlertDialogBuilder(context)
         builder.setView(dialogView)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
-                .show();
+            .setPositiveButton(
+                android.R.string.ok,
+                DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int -> dialog!!.dismiss() })
+            .show()
 
-        TextView githubLink = dialogView.findViewById(R.id.github_link);
-        githubLink.setOnClickListener(v -> {
-            String url = context.getString(R.string.github_url);
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            context.startActivity(intent);
-        });
+        val githubLink = dialogView.findViewById<TextView>(R.id.github_link)
+        githubLink.setOnClickListener(View.OnClickListener { v: View? ->
+            val url = context.getString(R.string.github_url)
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setData(Uri.parse(url))
+            context.startActivity(intent)
+        })
 
-        TextView buildInfo = dialogView.findViewById(R.id.build_info);
+        val buildInfo = dialogView.findViewById<TextView>(R.id.build_info)
 
-        buildInfo.setText(context.getString(R.string.build_time) + BuildConfig.BUILD_TIME + "\n" +
-                context.getString(R.string.git_hash) + BuildConfig.GIT_HASH);
+        buildInfo.setText(
+            context.getString(R.string.build_time) + BuildConfig.BUILD_TIME + "\n" +
+                    context.getString(R.string.git_hash) + BuildConfig.GIT_HASH
+        )
     }
 
     /**
@@ -252,133 +287,143 @@ public class DialogHelper {
      * @param okClick     同意回调
      * @param agreeStatus 是否已同意，已同意状态下CheckBox选中不可更改，弹窗禁用
      */
-    public void showUserAgreementDialog(View.OnClickListener okClick, boolean agreeStatus) {
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View dialogView = inflater.inflate(R.layout.dialog_user_agreement, null);
+    fun showUserAgreementDialog(okClick: View.OnClickListener, agreeStatus: Boolean) {
+        val inflater = LayoutInflater.from(context)
+        val dialogView = inflater.inflate(R.layout.dialog_user_agreement, null)
 
-        CheckBox checkBox = dialogView.findViewById(R.id.dialog_user_agreement_cb);
+        val checkBox = dialogView.findViewById<CheckBox>(R.id.dialog_user_agreement_cb)
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        AlertDialog alertDialog = builder.setView(dialogView)
-                .setPositiveButton(android.R.string.ok, null)
-                .setCancelable(agreeStatus)
-                .create();
-        alertDialog.show();
+        val builder = MaterialAlertDialogBuilder(context)
+        val alertDialog = builder.setView(dialogView)
+            .setPositiveButton(android.R.string.ok, null)
+            .setCancelable(agreeStatus)
+            .create()
+        alertDialog.show()
 
         // 获取当前语言
-        String language = Locale.getDefault().getLanguage();
-        String assetPath = "en/user_rule.txt"; // 默认英文版本
+        val language = Locale.getDefault().getLanguage()
+        var assetPath = "en/user_rule.txt" // 默认英文版本
 
         // 根据语言设置选择相应的路径
-        if ("zh".equals(language)) {
-            assetPath = "zh/user_rule.txt";
+        if ("zh" == language) {
+            assetPath = "zh/user_rule.txt"
         }
 
-        TextView tvUserAgreement = dialogView.findViewById(R.id.tv_user_agreement);
-        String text = FileUtils.readAssetTextFile(context, assetPath);
+        val tvUserAgreement = dialogView.findViewById<TextView>(R.id.tv_user_agreement)
+        var text = FileUtils.readAssetTextFile(context, assetPath)
 
         if (agreeStatus) {
-            String date = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
-                    .getString(Constants.KEY_USER_RULE_AGREE_DATE, "");
-            text += context.getString(R.string.agree_date) + date;
+            val date: String = context.getSharedPreferences(
+                dev.xuanran.codebook.bean.Constants.PREFS_NAME,
+                android.content.Context.MODE_PRIVATE
+            )
+                .getString(dev.xuanran.codebook.bean.Constants.KEY_USER_RULE_AGREE_DATE, "")!!
+            text += context.getString(R.string.agree_date) + date
         }
 
-        tvUserAgreement.setText(text);
+        tvUserAgreement.setText(text)
 
         // 延迟设置滚动方法
-        tvUserAgreement.post(() -> tvUserAgreement.setMovementMethod(new ScrollingMovementMethod()));
+        tvUserAgreement.post(Runnable { tvUserAgreement.setMovementMethod(ScrollingMovementMethod()) })
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setEnabled(false);
+            .setEnabled(false)
 
-        checkBox.setOnCheckedChangeListener((compoundButton, b) ->
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setEnabled(b));
+        checkBox.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { compoundButton: CompoundButton?, b: Boolean ->
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setEnabled(b)
+        })
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setOnClickListener(view -> {
-                    okClick.onClick(view);
-                    alertDialog.dismiss(); // 关闭弹窗
-                });
+            .setOnClickListener(View.OnClickListener { view: View? ->
+                okClick.onClick(view)
+                alertDialog.dismiss() // 关闭弹窗
+            })
 
 
         if (agreeStatus) {
-            checkBox.setChecked(true);
-            checkBox.setEnabled(false);
-            Button button = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            button.setText(R.string.you_already_agree);
-            button.setEnabled(false);
+            checkBox.setChecked(true)
+            checkBox.setEnabled(false)
+            val button = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            button.setText(R.string.you_already_agree)
+            button.setEnabled(false)
         }
     }
 
 
-    public void showReAuthenticationDialog(Context context, DialogInterface.OnClickListener onReAuthClicked, DialogInterface.OnClickListener onExitClicked) {
-        new MaterialAlertDialogBuilder(context)
-                .setTitle(R.string.re_auth)
-                .setMessage(R.string.re_auth_tips)
-                .setCancelable(false)
-                .setPositiveButton(R.string.re_auth, onReAuthClicked)
-                .setNegativeButton(R.string.exit, onExitClicked)
-                .show();
+    fun showReAuthenticationDialog(
+        context: Context,
+        onReAuthClicked: DialogInterface.OnClickListener?,
+        onExitClicked: DialogInterface.OnClickListener?
+    ) {
+        MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.re_auth)
+            .setMessage(R.string.re_auth_tips)
+            .setCancelable(false)
+            .setPositiveButton(R.string.re_auth, onReAuthClicked)
+            .setNegativeButton(R.string.exit, onExitClicked)
+            .show()
     }
 
-    public void showPasswordGeneratorDialog(DialogEditTextCallback callback) {
-        BottomSheetDialog builder = new BottomSheetDialog(context);
-        View dialogView = inflater.inflate(R.layout.dialog_password_generator, null);
-        CheckBox includeUppercase = dialogView.findViewById(R.id.include_uppercase);
-        CheckBox includeLowercase = dialogView.findViewById(R.id.include_lowercase);
-        CheckBox includeNumbers = dialogView.findViewById(R.id.include_numbers);
-        CheckBox includeSpecialChars = dialogView.findViewById(R.id.include_special_chars);
-        SeekBar passwordLengthSeekBar = dialogView.findViewById(R.id.password_length_seekbar);
-        TextView passwordLengthValue = dialogView.findViewById(R.id.password_length_value);
-        Button generatePasswordButton = dialogView.findViewById(R.id.generate_password_button);
-        passwordLengthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                passwordLengthValue.setText(String.valueOf(progress));
+    fun showPasswordGeneratorDialog(callback: DialogEditTextCallback) {
+        val builder = BottomSheetDialog(context)
+        val dialogView = inflater.inflate(R.layout.dialog_password_generator, null)
+        val includeUppercase = dialogView.findViewById<CheckBox>(R.id.include_uppercase)
+        val includeLowercase = dialogView.findViewById<CheckBox>(R.id.include_lowercase)
+        val includeNumbers = dialogView.findViewById<CheckBox>(R.id.include_numbers)
+        val includeSpecialChars = dialogView.findViewById<CheckBox>(R.id.include_special_chars)
+        val passwordLengthSeekBar = dialogView.findViewById<SeekBar>(R.id.password_length_seekbar)
+        val passwordLengthValue = dialogView.findViewById<TextView>(R.id.password_length_value)
+        val generatePasswordButton = dialogView.findViewById<Button>(R.id.generate_password_button)
+        passwordLengthSeekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                passwordLengthValue.setText(progress.toString())
             }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
-        });
+        })
 
-        generatePasswordButton.setOnClickListener(v -> {
-            boolean upper = includeUppercase.isChecked();
-            boolean lower = includeLowercase.isChecked();
-            boolean numbers = includeNumbers.isChecked();
-            boolean special = includeSpecialChars.isChecked();
-            int length = passwordLengthSeekBar.getProgress();
-            String password = generatePassword(upper, lower, numbers, special, length);
-            callback.onEditTextEntered(password);
-            builder.dismiss();
-        });
-        builder.setContentView(dialogView);
-        builder.show();
+        generatePasswordButton.setOnClickListener(View.OnClickListener { v: View? ->
+            val upper = includeUppercase.isChecked()
+            val lower = includeLowercase.isChecked()
+            val numbers = includeNumbers.isChecked()
+            val special = includeSpecialChars.isChecked()
+            val length = passwordLengthSeekBar.getProgress()
+            val password = generatePassword(upper, lower, numbers, special, length)
+            callback.onEditTextEntered(password)
+            builder.dismiss()
+        })
+        builder.setContentView(dialogView)
+        builder.show()
     }
 
-    private String generatePassword(boolean upper, boolean lower, boolean numbers, boolean special, int length) {
-        String upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String lowerChars = "abcdefghijklmnopqrstuvwxyz";
-        String numberChars = "0123456789";
-        String specialChars = "!@#.%^*()-_=+?";
+    private fun generatePassword(
+        upper: Boolean,
+        lower: Boolean,
+        numbers: Boolean,
+        special: Boolean,
+        length: Int
+    ): String {
+        val upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        val lowerChars = "abcdefghijklmnopqrstuvwxyz"
+        val numberChars = "0123456789"
+        val specialChars = "!@#.%^*()-_=+?"
 
-        StringBuilder passwordChars = new StringBuilder();
-        if (upper) passwordChars.append(upperChars);
-        if (lower) passwordChars.append(lowerChars);
-        if (numbers) passwordChars.append(numberChars);
-        if (special) passwordChars.append(specialChars);
+        val passwordChars = StringBuilder()
+        if (upper) passwordChars.append(upperChars)
+        if (lower) passwordChars.append(lowerChars)
+        if (numbers) passwordChars.append(numberChars)
+        if (special) passwordChars.append(specialChars)
 
-        StringBuilder password = new StringBuilder(length);
-        Random random = new Random();
-        for (int i = 0; i < length; i++) {
-            password.append(passwordChars.charAt(random.nextInt(passwordChars.length())));
+        val password = StringBuilder(length)
+        val random = Random()
+        for (i in 0 until length) {
+            password.append(passwordChars.get(random.nextInt(passwordChars.length)))
         }
-        return password.toString();
+        return password.toString()
     }
-
 }

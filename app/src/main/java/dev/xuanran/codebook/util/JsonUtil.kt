@@ -1,52 +1,50 @@
-package dev.xuanran.codebook.util;
+package dev.xuanran.codebook.util
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import dev.xuanran.codebook.bean.account.AccountEntity
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.ArrayList
+import java.util.Date
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import dev.xuanran.codebook.bean.account.AccountEntity;
-
-public class JsonUtil {
-
-    public static String convertListToJson(List<AccountEntity> accounts) {
-        JSONArray jsonArray = new JSONArray();
-        for (AccountEntity account : accounts) {
-            JSONObject jsonObject = new JSONObject();
+object JsonUtil {
+    fun convertListToJson(accounts: MutableList<AccountEntity>): String {
+        val jsonArray = JSONArray()
+        for (account in accounts) {
+            val jsonObject = JSONObject()
             try {
-                jsonObject.put("appName", account.getAppName());
-                jsonObject.put("username", account.getUsername());
-                jsonObject.put("password", account.getPassword());
-                jsonObject.put("remark", account.getRemark());
-                jsonObject.put("createTime", account.getCreateTime().getTime());
-            } catch (JSONException e) {
-                e.printStackTrace();
+                jsonObject.put("appName", account.getAppName())
+                jsonObject.put("username", account.getUsername())
+                jsonObject.put("password", account.getPassword())
+                jsonObject.put("remark", account.getRemark())
+                jsonObject.put("createTime", account.getCreateTime().getTime())
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-            jsonArray.put(jsonObject);
+            jsonArray.put(jsonObject)
         }
-        return jsonArray.toString();
+        return jsonArray.toString()
     }
 
-    public static List<AccountEntity> convertJsonToList(String jsonString) {
-        List<AccountEntity> accounts = new ArrayList<>();
+    @JvmStatic
+    fun convertJsonToList(jsonString: String?): MutableList<AccountEntity?> {
+        val accounts: MutableList<AccountEntity?> = ArrayList<AccountEntity?>()
         try {
-            JSONArray jsonArray = new JSONArray(jsonString);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String appName = jsonObject.optString("appName", "");
-                String username = jsonObject.optString("username", "");
-                String password = jsonObject.optString("password", "");
-                String remark = jsonObject.optString("remark", "");
-                long createTimeLong = jsonObject.getLong("createTime");
-                AccountEntity account = new AccountEntity(appName, username, password, remark, new Date(createTimeLong));
-                accounts.add(account);
+            val jsonArray = JSONArray(jsonString)
+            for (i in 0 until jsonArray.length()) {
+                val jsonObject = jsonArray.getJSONObject(i)
+                val appName = jsonObject.optString("appName", "")
+                val username = jsonObject.optString("username", "")
+                val password = jsonObject.optString("password", "")
+                val remark = jsonObject.optString("remark", "")
+                val createTimeLong = jsonObject.getLong("createTime")
+                val account =
+                    AccountEntity(appName, username, password, remark, Date(createTimeLong))
+                accounts.add(account)
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (e: JSONException) {
+            e.printStackTrace()
         }
-        return accounts;
+        return accounts
     }
 }
