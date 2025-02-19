@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import dev.xuanran.codebook.databinding.FragmentTotpListBinding
 import dev.xuanran.codebook.model.Totp
 import dev.xuanran.codebook.ui.adapter.TotpAdapter
+import dev.xuanran.codebook.ui.dialog.TotpEditDialog
 import dev.xuanran.codebook.ui.viewmodel.TotpUiState
 import dev.xuanran.codebook.ui.viewmodel.TotpViewModel
 import kotlinx.coroutines.Job
@@ -72,7 +73,7 @@ class TotpListFragment : Fragment() {
     }
 
     private fun showEditDialog(totp: Totp? = null) {
-/*        TotpEditDialog.newInstance(
+        TotpEditDialog.newInstance(
             totp = totp,
             onSave = { appName, accountName, secretKey ->
                 if (totp == null) {
@@ -84,7 +85,7 @@ class TotpListFragment : Fragment() {
                     ), secretKey)
                 }
             }
-        ).show(childFragmentManager, "totp_edit")*/
+        ).show(childFragmentManager, "totp_edit")
     }
 
     private fun observeUiState() {
