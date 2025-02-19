@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 class TotpListFragment : Fragment(), FabClickListener {
     private var _binding: FragmentTotpListBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: TotpViewModel by viewModels()
+    val viewModel: TotpViewModel by viewModels()
     private lateinit var adapter: TotpAdapter
     private var updateJob: Job? = null
 

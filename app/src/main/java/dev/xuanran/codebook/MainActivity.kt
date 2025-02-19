@@ -12,11 +12,14 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.xuanran.codebook.databinding.ActivityMainBinding
+import dev.xuanran.codebook.ui.fragment.AppListFragment
+import dev.xuanran.codebook.ui.fragment.TotpListFragment
 import dev.xuanran.codebook.ui.interfaces.FabClickListener
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private var currentSearchView: SearchView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         // 获取 NavHostFragment
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
 
         // 设置AppBarConfiguration
         val appBarConfiguration = AppBarConfiguration(
@@ -59,6 +62,9 @@ class MainActivity : AppCompatActivity() {
                 else -> View.GONE
             }
         }
+
+        // 添加这行：设置导航监听
+        setupNavigation()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -66,19 +72,65 @@ class MainActivity : AppCompatActivity() {
         
         val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem.actionView as SearchView
+        currentSearchView = searchView
         
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
+        // 配置SearchView
+        searchView.apply {
+            queryHint = "搜索应用或账号"
+            
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    performSearch(query)
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    performSearch(newText)
+                    return true
+                }
+            })
+        }
+
+        // 监听搜索框展开/折叠状态
+        searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                 return true
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                // TODO: 实现搜索逻辑
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                performSearch("") // 清空搜索时恢复原始列表
                 return true
             }
         })
         
         return true
+    }
+
+    private fun performSearch(query: String?) {
+        // 获取当前Fragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
+
+        // 根据当前页面执行对应的搜索
+        when (currentFragment) {
+            is AppListFragment -> {
+                currentFragment.viewModel.searchApps(query ?: "")
+            }
+            is TotpListFragment -> {
+                currentFragment.viewModel.searchTotps(query ?: "")
+            }
+        }
+    }
+
+    // 在导航发生变化时清空搜索
+    private fun setupNavigation() {
+        navController.addOnDestinationChangedListener { _, _, _ ->
+            currentSearchView?.let { searchView ->
+                if (!searchView.isIconified) {
+                    searchView.isIconified = true
+                }
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

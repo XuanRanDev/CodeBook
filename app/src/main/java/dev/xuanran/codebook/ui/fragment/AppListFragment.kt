@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 class AppListFragment : Fragment(), FabClickListener {
     private var _binding: FragmentAppListBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: AppViewModel by viewModels()
+    val viewModel: AppViewModel by viewModels()
     private lateinit var adapter: AppAdapter
 
     override fun onCreateView(
