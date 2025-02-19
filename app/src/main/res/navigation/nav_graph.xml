@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_totp">
+
+    <fragment
+        android:id="@+id/navigation_totp"
+        android:name="dev.xuanran.codebook.ui.fragment.TotpListFragment"
+        android:label="TOTP"
+        tools:layout="@layout/fragment_totp_list" />
+
+    <fragment
+        android:id="@+id/navigation_passwords"
+        android:name="dev.xuanran.codebook.ui.fragment.AppListFragment"
+        android:label="密码"
+        tools:layout="@layout/fragment_app_list" />
+</navigation> 
