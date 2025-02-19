@@ -1,11 +1,13 @@
 package dev.xuanran.codebook
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -15,6 +17,7 @@ import dev.xuanran.codebook.databinding.ActivityMainBinding
 import dev.xuanran.codebook.ui.fragment.AppListFragment
 import dev.xuanran.codebook.ui.fragment.TotpListFragment
 import dev.xuanran.codebook.ui.interfaces.FabClickListener
+import dev.xuanran.codebook.ui.viewmodel.SortOrder
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -70,6 +73,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.top_app_bar, menu)
         
+        // 从SharedPreferences读取当前排序方式并设置选中状态
+        val prefs = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+        val sortOrder = prefs.getString("sort_order", SortOrder.NAME.name)
+        
+        // 设置对应的菜单项选中
+        when (sortOrder) {
+            SortOrder.NAME.name -> menu.findItem(R.id.sort_name).isChecked = true
+            SortOrder.TIME.name -> menu.findItem(R.id.sort_time).isChecked = true
+        }
+
         val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem.actionView as SearchView
         currentSearchView = searchView
@@ -136,12 +149,12 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.sort_name -> {
-                // TODO: 实现按名称排序
+                applySortOrder(SortOrder.NAME)
                 item.isChecked = true
                 true
             }
             R.id.sort_time -> {
-                // TODO: 实现按时间排序
+                applySortOrder(SortOrder.TIME)
                 item.isChecked = true
                 true
             }
@@ -150,6 +163,18 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun getCurrentFragment(): Fragment? {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        return navHostFragment.childFragmentManager.fragments.firstOrNull()
+    }
+
+    private fun applySortOrder(order: SortOrder) {
+        when (val currentFragment = getCurrentFragment()) {
+            is AppListFragment -> currentFragment.viewModel.setSortOrder(order)
+            is TotpListFragment -> currentFragment.viewModel.setSortOrder(order)
         }
     }
 }

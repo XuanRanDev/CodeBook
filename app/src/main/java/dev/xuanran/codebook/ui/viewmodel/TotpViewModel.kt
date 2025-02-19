@@ -1,6 +1,7 @@
 package dev.xuanran.codebook.ui.viewmodel
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dev.xuanran.codebook.data.database.CodeBookDatabase
@@ -17,24 +18,46 @@ class TotpViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow<TotpUiState>(TotpUiState.Loading)
     val uiState: StateFlow<TotpUiState> = _uiState
 
+    private var currentSortOrder = SortOrder.NAME
+    
     init {
         val database = CodeBookDatabase.getDatabase(application)
         repository = TotpRepository(database.totpDao(), application)
+        // 从SharedPreferences加载排序方式
+        val prefs = application.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+        currentSortOrder = SortOrder.valueOf(prefs.getString("sort_order", SortOrder.NAME.name)!!)
         loadTotps()
+    }
+
+    fun setSortOrder(order: SortOrder) {
+        if (currentSortOrder != order) {
+            currentSortOrder = order
+            // 保存排序方式到SharedPreferences
+            getApplication<Application>().getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+                .edit()
+                .putString("sort_order", order.name)
+                .apply()
+            // 重新加载数据
+            loadTotps()
+        }
     }
 
     fun loadTotps(isRefreshing: Boolean = false) {
         _uiState.value = TotpUiState.Loading
         viewModelScope.launch {
             if (isRefreshing) {
-                delay(2000) // 仅在刷新时延时2秒
+                delay(2000)
             }
             repository.allTotps
                 .catch { 
                     _uiState.value = TotpUiState.Error(it.message ?: "未知错误")
                 }
                 .collect { totps ->
-                    _uiState.value = TotpUiState.Success(totps)
+                    val sortedTotps = when (currentSortOrder) {
+                        SortOrder.NAME -> totps.sortedBy { it.appName }
+                        SortOrder.TIME -> totps.sortedByDescending { it.lastUsed }
+                    }
+                    _uiState.value = TotpUiState.Success(sortedTotps)
                 }
         }
     }
@@ -100,4 +123,4 @@ sealed class TotpUiState {
     object Loading : TotpUiState()
     data class Success(val totps: List<Totp>) : TotpUiState()
     data class Error(val message: String) : TotpUiState()
-} 
+}
