@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     // 添加 kapt 插件
-//    kotlin("kapt")
+    kotlin("kapt")
 }
 
 android {
@@ -58,7 +58,7 @@ dependencies {
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-//    kapt("androidx.room:room-compiler:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
     
     // Navigation 组件
     val navVersion = "2.7.7"
