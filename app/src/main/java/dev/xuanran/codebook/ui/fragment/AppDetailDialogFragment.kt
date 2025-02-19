@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dev.xuanran.codebook.R
 import dev.xuanran.codebook.databinding.FragmentAppDetailBinding
@@ -27,6 +28,9 @@ class AppDetailDialogFragment : DialogFragment() {
     private lateinit var linkedAppAdapter: LinkedAppAdapter
 
     private val viewModel: AppViewModel by activityViewModels()
+
+    private var isPasswordVisible = false
+    private var decryptedPassword: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,12 +81,25 @@ class AppDetailDialogFragment : DialogFragment() {
                 ivAppIcon.setImageResource(R.mipmap.ic_launcher)
             }
 
+            // 设置复制账号按钮点击事件
+            btnCopyAccount.setOnClickListener {
+                copyToClipboard(app.accountName)
+                showCopySuccessMessage("账号已复制到剪贴板")
+            }
+
+            // 设置密码显示/隐藏按钮点击事件
+            btnTogglePassword.setOnClickListener {
+                togglePasswordVisibility()
+            }
+
             // 设置复制密码按钮点击事件
             btnCopyPassword.setOnClickListener {
-                // TODO 解密密码
-                val password = "pass"
-                copyToClipboard(password)
-                showCopySuccessMessage()
+                copyPassword()
+            }
+
+            // 设置删除按钮点击事件
+            btnDelete.setOnClickListener {
+                showDeleteConfirmDialog()
             }
         }
     }
@@ -118,12 +135,63 @@ class AppDetailDialogFragment : DialogFragment() {
         clipboard.setPrimaryClip(clip)
     }
 
-    private fun showCopySuccessMessage() {
+    private fun showCopySuccessMessage(message: String) {
         Snackbar.make(
             binding.root,
-            "密码已复制到剪贴板",
+            message,
             Snackbar.LENGTH_SHORT
         ).show()
+    }
+
+    private fun showDeleteConfirmDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("删除确认")
+            .setMessage("确定要删除这条记录吗？此操作不可恢复。")
+            .setNegativeButton("取消", null)
+            .setPositiveButton("删除") { _, _ ->
+                viewModel.deleteApp(app)
+                dismiss()
+            }
+            .show()
+    }
+
+    private fun togglePasswordVisibility() {
+        isPasswordVisible = !isPasswordVisible
+        
+        // 延迟获取密码,仅在需要时解密
+        if (isPasswordVisible && decryptedPassword == null) {
+            // TODO: 实现密码解密
+            decryptedPassword = "decrypted_password"
+        }
+        
+        binding.apply {
+            // 更新密码文本
+            tvPassword.text = if (isPasswordVisible) {
+                decryptedPassword
+            } else {
+                "••••••••"
+            }
+            
+            // 更新图标
+            btnTogglePassword.setIconResource(
+                if (isPasswordVisible) {
+                    R.drawable.ic_visibility_off
+                } else {
+                    R.drawable.ic_visibility
+                }
+            )
+        }
+    }
+
+    private fun copyPassword() {
+        // 延迟获取密码,仅在需要时解密
+        if (decryptedPassword == null) {
+            // TODO: 实现密码解密
+            decryptedPassword = "decrypted_password"
+        }
+        
+        copyToClipboard(decryptedPassword!!)
+        showCopySuccessMessage("密码已复制到剪贴板")
     }
 
     override fun onDestroyView() {
