@@ -119,9 +119,11 @@ class AppListFragment : Fragment(), FabClickListener {
 
     private fun setupSwipeRefresh() {
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.loadApps()
+            binding.emptyView.visibility = View.GONE
+            binding.loadingView.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+            viewModel.loadApps(isRefreshing = true)
         }
-
     }
 
     private fun copyToClipboard(text: String) {

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dev.xuanran.codebook.data.database.CodeBookDatabase
 import dev.xuanran.codebook.data.repository.TotpRepository
 import dev.xuanran.codebook.model.Totp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -22,9 +23,12 @@ class TotpViewModel(application: Application) : AndroidViewModel(application) {
         loadTotps()
     }
 
-    fun loadTotps() {
+    fun loadTotps(isRefreshing: Boolean = false) {
         _uiState.value = TotpUiState.Loading
         viewModelScope.launch {
+            if (isRefreshing) {
+                delay(2000) // 仅在刷新时延时2秒
+            }
             repository.allTotps
                 .catch { 
                     _uiState.value = TotpUiState.Error(it.message ?: "未知错误")

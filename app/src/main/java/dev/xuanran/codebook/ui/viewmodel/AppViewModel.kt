@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dev.xuanran.codebook.data.database.CodeBookDatabase
 import dev.xuanran.codebook.data.repository.AppRepository
 import dev.xuanran.codebook.model.App
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -22,8 +23,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         loadApps()
     }
 
-    fun loadApps() {
+    fun loadApps(isRefreshing: Boolean = false) {
+        _uiState.value = AppUiState.Loading
         viewModelScope.launch {
+            if (isRefreshing) {
+                delay(2000) // 仅在刷新时延时2秒
+            }
             repository.allApps
                 .catch { 
                     _uiState.value = AppUiState.Error(it.message ?: "未知错误")

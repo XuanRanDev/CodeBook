@@ -128,9 +128,11 @@ class TotpListFragment : Fragment(), FabClickListener {
 
     private fun setupSwipeRefresh() {
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.loadTotps()
+            binding.emptyView.visibility = View.GONE
+            binding.loadingView.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+            viewModel.loadTotps(isRefreshing = true)
         }
-
     }
 
     private fun startPeriodicUpdate() {
