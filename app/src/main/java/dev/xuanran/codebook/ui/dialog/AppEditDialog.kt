@@ -34,6 +34,7 @@ class AppEditDialog : BottomSheetDialogFragment() {
         setupViews()
         setupValidation()
         setupButtons()
+        setupToolbar()
         
         // 设置展开/折叠按钮
         binding.btnExpand.setOnClickListener {
@@ -99,6 +100,21 @@ class AppEditDialog : BottomSheetDialogFragment() {
 
         binding.btnCancel.setOnClickListener {
             dismiss()
+        }
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.inflateMenu(R.menu.menu_app_edit)
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_generate_password -> {
+                    PasswordGeneratorDialog.newInstance { password ->
+                        binding.etPassword.setText(password)
+                    }.show(childFragmentManager, "password_generator")
+                    true
+                }
+                else -> false
+            }
         }
     }
 
