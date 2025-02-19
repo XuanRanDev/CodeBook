@@ -39,7 +39,6 @@ class AppListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        setupFab()
         setupSwipeRefresh()
         observeUiState()
     }
@@ -56,12 +55,6 @@ class AppListFragment : Fragment() {
             }
         )
         binding.recyclerView.adapter = adapter
-    }
-
-    private fun setupFab() {
-        binding.fabAdd.setOnClickListener {
-            showEditDialog()
-        }
     }
 
     private fun showEditDialog(app: App? = null) {

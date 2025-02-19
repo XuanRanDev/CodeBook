@@ -42,7 +42,6 @@ class TotpListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        setupFab()
         setupSwipeRefresh()
         observeUiState()
         startPeriodicUpdate()
@@ -65,12 +64,6 @@ class TotpListFragment : Fragment() {
             }
         )
         binding.recyclerView.adapter = adapter
-    }
-
-    private fun setupFab() {
-        binding.fabAdd.setOnClickListener {
-            showEditDialog()
-        }
     }
 
     private fun showEditDialog(totp: Totp? = null) {
