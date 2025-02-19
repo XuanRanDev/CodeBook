@@ -1,16 +1,22 @@
 package dev.xuanran.codebook.ui.fragment
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.google.android.material.snackbar.Snackbar
 import dev.xuanran.codebook.R
 import dev.xuanran.codebook.databinding.FragmentAppDetailBinding
 import dev.xuanran.codebook.model.App
 import dev.xuanran.codebook.ui.adapter.LinkedAppAdapter
+import dev.xuanran.codebook.ui.viewmodel.AppViewModel
 
 class AppDetailDialogFragment : DialogFragment() {
 
@@ -19,6 +25,8 @@ class AppDetailDialogFragment : DialogFragment() {
 
     private lateinit var app: App
     private lateinit var linkedAppAdapter: LinkedAppAdapter
+
+    private val viewModel: AppViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +76,14 @@ class AppDetailDialogFragment : DialogFragment() {
             } else {
                 ivAppIcon.setImageResource(R.mipmap.ic_launcher)
             }
+
+            // 设置复制密码按钮点击事件
+            btnCopyPassword.setOnClickListener {
+                // TODO 解密密码
+                val password = "pass"
+                copyToClipboard(password)
+                showCopySuccessMessage()
+            }
         }
     }
 
@@ -94,6 +110,20 @@ class AppDetailDialogFragment : DialogFragment() {
             etUrl.setText(app.url)
             etRemark.setText(app.remark)
         }
+    }
+
+    private fun copyToClipboard(text: String) {
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("密码", text)
+        clipboard.setPrimaryClip(clip)
+    }
+
+    private fun showCopySuccessMessage() {
+        Snackbar.make(
+            binding.root,
+            "密码已复制到剪贴板",
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
     override fun onDestroyView() {
