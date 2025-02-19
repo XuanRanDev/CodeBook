@@ -17,11 +17,12 @@ import dev.xuanran.codebook.databinding.FragmentAppListBinding
 import dev.xuanran.codebook.model.App
 import dev.xuanran.codebook.ui.adapter.AppAdapter
 import dev.xuanran.codebook.ui.dialog.AppEditDialog
+import dev.xuanran.codebook.ui.interfaces.FabClickListener
 import dev.xuanran.codebook.ui.viewmodel.AppUiState
 import dev.xuanran.codebook.ui.viewmodel.AppViewModel
 import kotlinx.coroutines.launch
 
-class AppListFragment : Fragment() {
+class AppListFragment : Fragment(), FabClickListener {
     private var _binding: FragmentAppListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: AppViewModel by viewModels()
@@ -134,5 +135,9 @@ class AppListFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onFabClick() {
+        showEditDialog()
     }
 } 

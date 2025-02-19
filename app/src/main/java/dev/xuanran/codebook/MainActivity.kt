@@ -3,17 +3,20 @@ package dev.xuanran.codebook
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.navigation.findNavController
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.xuanran.codebook.databinding.ActivityMainBinding
+import dev.xuanran.codebook.ui.interfaces.FabClickListener
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +40,25 @@ class MainActivity : AppCompatActivity() {
         // 设置底部导航
         val navView: BottomNavigationView = binding.navView
         navView.setupWithNavController(navController)
+
+        // 设置FAB点击事件
+        binding.fabAdd.setOnClickListener {
+            // 获取当前Fragment
+            val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+            val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
+            
+            // 如果当前Fragment实现了FabClickListener接口，则调用其onFabClick方法
+            (currentFragment as? FabClickListener)?.onFabClick()
+        }
+
+        // 监听导航变化来更新FAB的显示状态
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            // 根据目的地ID来决定是否显示FAB
+            binding.fabAdd.visibility = when (destination.id) {
+                R.id.navigation_passwords, R.id.navigation_totp -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

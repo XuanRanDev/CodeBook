@@ -17,13 +17,14 @@ import dev.xuanran.codebook.databinding.FragmentTotpListBinding
 import dev.xuanran.codebook.model.Totp
 import dev.xuanran.codebook.ui.adapter.TotpAdapter
 import dev.xuanran.codebook.ui.dialog.TotpEditDialog
+import dev.xuanran.codebook.ui.interfaces.FabClickListener
 import dev.xuanran.codebook.ui.viewmodel.TotpUiState
 import dev.xuanran.codebook.ui.viewmodel.TotpViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class TotpListFragment : Fragment() {
+class TotpListFragment : Fragment(), FabClickListener {
     private var _binding: FragmentTotpListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: TotpViewModel by viewModels()
@@ -153,5 +154,9 @@ class TotpListFragment : Fragment() {
         super.onDestroyView()
         updateJob?.cancel()
         _binding = null
+    }
+
+    override fun onFabClick() {
+        showEditDialog()
     }
 } 
