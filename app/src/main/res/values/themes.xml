@@ -80,4 +80,33 @@
 
     <style name="Theme.CodeBook" parent="Base.Theme.CodeBook" >
     </style>
+
+    <!-- 在现有的 themes.xml 中添加 -->
+    <style name="Theme.CodeBook.FullScreenDialog" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- 继承主题的颜色 -->
+        <item name="colorPrimary">@color/md_theme_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_secondaryContainer</item>
+        <item name="colorSurface">@color/md_theme_surface</item>
+        <item name="colorOnSurface">@color/md_theme_on_surface</item>
+        
+        <!-- 对话框窗口配置 -->
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@color/md_theme_surface</item>
+        <item name="android:windowAnimationStyle">@style/DialogAnimation</item>
+        <item name="android:statusBarColor">@color/status_bar</item>
+        <item name="android:navigationBarColor">@color/navigation_bar</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <!-- 对话框动画 -->
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+    </style>
 </resources>

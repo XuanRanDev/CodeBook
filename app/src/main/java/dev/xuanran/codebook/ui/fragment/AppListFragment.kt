@@ -53,6 +53,10 @@ class AppListFragment : Fragment(), FabClickListener {
             },
             onItemLongClick = { app ->
                 showEditDialog(app)
+            },
+            onItemClick = { app ->
+                AppDetailDialogFragment.newInstance(app)
+                    .show(childFragmentManager, "AppDetail")
             }
         )
         binding.recyclerView.adapter = adapter

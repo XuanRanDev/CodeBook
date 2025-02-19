@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     // 添加 kapt 插件
     kotlin("kapt")
+    id("kotlin-parcelize")
 }
 
 android {

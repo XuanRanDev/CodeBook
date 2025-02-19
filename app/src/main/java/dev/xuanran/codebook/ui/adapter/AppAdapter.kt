@@ -10,7 +10,8 @@ import dev.xuanran.codebook.model.App
 
 class AppAdapter(
     private val onCopyClick: (App) -> Unit,
-    private val onItemLongClick: (App) -> Unit
+    private val onItemLongClick: (App) -> Unit,
+    private val onItemClick: (App) -> Unit
 ) : ListAdapter<App, AppAdapter.ViewHolder>(AppDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,18 +33,25 @@ class AppAdapter(
 
         init {
             binding.btnCopy.setOnClickListener {
-                val position = adapterPosition  // 改为 absoluteAdapterPosition
+                val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     onCopyClick(getItem(position))
                 }
             }
 
             binding.root.setOnLongClickListener {
-                val position = adapterPosition  // 改为 absoluteAdapterPosition
+                val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     onItemLongClick(getItem(position))
                 }
                 true
+            }
+
+            binding.root.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClick(getItem(position))
+                }
             }
         }
 
