@@ -10,6 +10,9 @@ data class App(
     val appName: String,
     val accountName: String,
     val encryptedPassword: String,
+    val packageNames: String? = null,
+    val url: String? = null,
+    val remark: String? = null,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
 )

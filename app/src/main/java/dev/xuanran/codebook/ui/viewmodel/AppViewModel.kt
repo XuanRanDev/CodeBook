@@ -55,17 +55,31 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 .collect { apps ->
                     val sortedApps = when (currentSortOrder) {
                         SortOrder.NAME -> apps.sortedBy { it.appName }
-                        SortOrder.TIME -> apps.sortedByDescending { it.createdAt }
+                        SortOrder.TIME -> apps.sortedByDescending { it.updatedAt }
                     }
                     _uiState.value = AppUiState.Success(sortedApps)
                 }
         }
     }
 
-    fun addApp(appName: String, accountName: String, password: String) {
+    fun addApp(
+        appName: String,
+        accountName: String,
+        password: String,
+        url: String? = null,
+        remark: String? = null,
+        packageNames: String? = null
+    ) {
         viewModelScope.launch {
             try {
-                repository.insert(appName, accountName, password)
+                repository.insert(
+                    appName = appName,
+                    accountName = accountName,
+                    password = password,
+                    url = url,
+                    remark = remark,
+                    packageNames = packageNames
+                )
             } catch (e: Exception) {
                 _uiState.value = AppUiState.Error(e.message ?: "添加失败")
             }
@@ -99,7 +113,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.value = AppUiState.Error(it.message ?: "搜索失败")
                 }
                 .collect { apps ->
-                    _uiState.value = AppUiState.Success(apps)
+                    val sortedApps = when (currentSortOrder) {
+                        SortOrder.NAME -> apps.sortedBy { it.appName }
+                        SortOrder.TIME -> apps.sortedByDescending { it.updatedAt }
+                    }
+                    _uiState.value = AppUiState.Success(sortedApps)
                 }
         }
     }
@@ -113,4 +131,4 @@ sealed class AppUiState {
     object Loading : AppUiState()
     data class Success(val apps: List<App>) : AppUiState()
     data class Error(val message: String) : AppUiState()
-} 
+}

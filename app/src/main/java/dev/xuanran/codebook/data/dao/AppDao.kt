@@ -21,6 +21,13 @@ interface AppDao {
     @Delete
     suspend fun delete(app: App)
 
-    @Query("SELECT * FROM apps WHERE appName LIKE '%' || :query || '%' OR accountName LIKE '%' || :query || '%'")
+    @Query("""
+        SELECT * FROM apps 
+        WHERE appName LIKE '%' || :query || '%' 
+        OR accountName LIKE '%' || :query || '%'
+        OR packageNames LIKE '%' || :query || '%'
+        OR url LIKE '%' || :query || '%'
+        OR remark LIKE '%' || :query || '%'
+    """)
     fun searchApps(query: String): Flow<List<App>>
 } 

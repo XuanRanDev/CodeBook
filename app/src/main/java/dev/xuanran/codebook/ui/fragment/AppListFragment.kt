@@ -61,14 +61,27 @@ class AppListFragment : Fragment(), FabClickListener {
     private fun showEditDialog(app: App? = null) {
         AppEditDialog.newInstance(
             app = app,
-            onSave = { appName, accountName, password ->
+            onSave = { appName, accountName, password, url, remark, packageNames ->
                 if (app == null) {
-                    viewModel.addApp(appName, accountName, password)
-                } else {
-                    viewModel.updateApp(app.copy(
+                    viewModel.addApp(
                         appName = appName,
-                        accountName = accountName
-                    ), password)
+                        accountName = accountName,
+                        password = password,
+                        url = url,
+                        remark = remark,
+                        packageNames = packageNames
+                    )
+                } else {
+                    viewModel.updateApp(
+                        app.copy(
+                            appName = appName,
+                            accountName = accountName,
+                            url = url,
+                            remark = remark,
+                            packageNames = packageNames
+                        ),
+                        password
+                    )
                 }
             }
         ).show(childFragmentManager, "app_edit")
