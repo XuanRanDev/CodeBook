@@ -130,9 +130,7 @@ class TotpListFragment : Fragment(), FabClickListener {
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.loadTotps()
         }
-        binding.swipeRefresh.setColorSchemeResources(
-            com.google.android.material.R.color.design_default_color_primary
-        )
+
     }
 
     private fun startPeriodicUpdate() {

@@ -32,6 +32,7 @@
 
         <!-- Menu 配置 -->
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
+
     </style>
 
     <!-- 自定义 AppBarLayout 样式 -->
@@ -67,7 +68,8 @@
 
     <!-- 自定义 PopupMenu 样式 -->
     <style name="Widget.App.PopupMenu" parent="Widget.Material3.PopupMenu">
-        <item name="android:background">@color/md_theme_surface</item>
+        <item name="android:background">@color/md_theme_surface_container</item>
+        <item name="android:popupBackground">@color/md_theme_surface_container</item>
     </style>
 
     <!-- 自定义标题样式 -->
@@ -76,5 +78,6 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Theme.CodeBook" parent="Base.Theme.CodeBook" />
+    <style name="Theme.CodeBook" parent="Base.Theme.CodeBook" >
+    </style>
 </resources>
