@@ -177,4 +177,10 @@ class MainActivity : AppCompatActivity() {
             is TotpListFragment -> currentFragment.viewModel.setSortOrder(order)
         }
     }
+
+    // 添加这个扩展函数来检查是否是夜间模式
+    private fun android.content.res.Configuration.isNightMode(): Boolean {
+        return uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == 
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
+    }
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material 3 颜色 -->
+    <color name="md_theme_primary">#6CDBAB</color>
+    <color name="md_theme_onPrimary">#003825</color>
+    <color name="md_theme_primaryContainer">#005138</color>
+    <color name="md_theme_onPrimaryContainer">#89F8C7</color>
+    <color name="md_theme_secondary">#B3CCBD</color>
+    <color name="md_theme_onSecondary">#1F352A</color>
+    <color name="md_theme_secondaryContainer">#354B3F</color>
+    <color name="md_theme_surface">#191C1A</color>
+    <color name="md_theme_surface_container">#1D201E</color>
+    <color name="md_theme_on_surface">#E1E3DF</color>
+    <color name="md_theme_outline">#8B938C</color>
+    <color name="md_theme_surface_variant">#404943</color>
+    
+    <!-- 状态栏和导航栏颜色 -->
+    <color name="status_bar">#1D201E</color>
+    <color name="navigation_bar">#1D201E</color>
+</resources> 
