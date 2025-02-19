@@ -40,6 +40,7 @@ class AppListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupFab()
+        setupSwipeRefresh()
         observeUiState()
     }
 
@@ -84,19 +85,51 @@ class AppListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     when (state) {
-                        is AppUiState.Success -> adapter.submitList(state.apps)
-                        is AppUiState.Error -> Toast.makeText(
-                            requireContext(),
-                            state.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        is AppUiState.Success -> {
+                            binding.swipeRefresh.isRefreshing = false
+                            binding.loadingView.visibility = View.GONE
+                            
+                            if (state.apps.isEmpty()) {
+                                binding.emptyView.visibility = View.VISIBLE
+                                binding.recyclerView.visibility = View.GONE
+                            } else {
+                                binding.emptyView.visibility = View.GONE
+                                binding.recyclerView.visibility = View.VISIBLE
+                                adapter.submitList(state.apps)
+                            }
+                        }
+                        is AppUiState.Error -> {
+                            binding.swipeRefresh.isRefreshing = false
+                            binding.loadingView.visibility = View.GONE
+                            binding.emptyView.visibility = View.GONE
+                            binding.recyclerView.visibility = View.VISIBLE
+                            
+                            Toast.makeText(
+                                requireContext(),
+                                state.message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                         AppUiState.Loading -> {
-                            // TODO: 可以添加加载动画
+                            if (!binding.swipeRefresh.isRefreshing) {
+                                binding.loadingView.visibility = View.VISIBLE
+                                binding.emptyView.visibility = View.GONE
+                                binding.recyclerView.visibility = View.GONE
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.loadApps()
+        }
+        binding.swipeRefresh.setColorSchemeResources(
+            com.google.android.material.R.color.design_default_color_primary
+        )
     }
 
     private fun copyToClipboard(text: String) {

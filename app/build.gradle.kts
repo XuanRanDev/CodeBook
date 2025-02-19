@@ -75,4 +75,10 @@ dependencies {
     
     // Security
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    // SwipeRefreshLayout
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    // Lottie 动画
+    implementation("com.airbnb.android:lottie:6.3.0")
 }

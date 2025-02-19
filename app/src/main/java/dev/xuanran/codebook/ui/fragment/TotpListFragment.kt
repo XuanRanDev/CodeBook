@@ -43,6 +43,7 @@ class TotpListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupFab()
+        setupSwipeRefresh()
         observeUiState()
         startPeriodicUpdate()
     }
@@ -93,19 +94,51 @@ class TotpListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     when (state) {
-                        is TotpUiState.Success -> adapter.submitList(state.totps)
-                        is TotpUiState.Error -> Toast.makeText(
-                            requireContext(),
-                            state.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        is TotpUiState.Success -> {
+                            binding.swipeRefresh.isRefreshing = false
+                            binding.loadingView.visibility = View.GONE
+                            
+                            if (state.totps.isEmpty()) {
+                                binding.emptyView.visibility = View.VISIBLE
+                                binding.recyclerView.visibility = View.GONE
+                            } else {
+                                binding.emptyView.visibility = View.GONE
+                                binding.recyclerView.visibility = View.VISIBLE
+                                adapter.submitList(state.totps)
+                            }
+                        }
+                        is TotpUiState.Error -> {
+                            binding.swipeRefresh.isRefreshing = false
+                            binding.loadingView.visibility = View.GONE
+                            binding.emptyView.visibility = View.GONE
+                            binding.recyclerView.visibility = View.VISIBLE
+                            
+                            Toast.makeText(
+                                requireContext(),
+                                state.message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                         TotpUiState.Loading -> {
-                            // TODO: 可以添加加载动画
+                            if (!binding.swipeRefresh.isRefreshing) {
+                                binding.loadingView.visibility = View.VISIBLE
+                                binding.emptyView.visibility = View.GONE
+                                binding.recyclerView.visibility = View.GONE
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.loadTotps()
+        }
+        binding.swipeRefresh.setColorSchemeResources(
+            com.google.android.material.R.color.design_default_color_primary
+        )
     }
 
     private fun startPeriodicUpdate() {

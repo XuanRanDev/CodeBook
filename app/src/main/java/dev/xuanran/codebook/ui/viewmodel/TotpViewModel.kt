@@ -22,7 +22,8 @@ class TotpViewModel(application: Application) : AndroidViewModel(application) {
         loadTotps()
     }
 
-    private fun loadTotps() {
+    fun loadTotps() {
+        _uiState.value = TotpUiState.Loading
         viewModelScope.launch {
             repository.allTotps
                 .catch { 
@@ -54,16 +55,6 @@ class TotpViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateLastUsed(totp: Totp) {
-        viewModelScope.launch {
-            try {
-                repository.updateLastUsed(totp)
-            } catch (e: Exception) {
-                _uiState.value = TotpUiState.Error(e.message ?: "更新使用时间失败")
-            }
-        }
-    }
-
     fun deleteTotp(totp: Totp) {
         viewModelScope.launch {
             try {
@@ -83,6 +74,16 @@ class TotpViewModel(application: Application) : AndroidViewModel(application) {
                 .collect { totps ->
                     _uiState.value = TotpUiState.Success(totps)
                 }
+        }
+    }
+
+    fun updateLastUsed(totp: Totp) {
+        viewModelScope.launch {
+            try {
+                repository.updateLastUsed(totp)
+            } catch (e: Exception) {
+                _uiState.value = TotpUiState.Error(e.message ?: "更新失败")
+            }
         }
     }
 

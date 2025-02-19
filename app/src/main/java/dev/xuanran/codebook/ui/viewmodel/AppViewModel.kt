@@ -22,7 +22,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         loadApps()
     }
 
-    private fun loadApps() {
+    fun loadApps() {
         viewModelScope.launch {
             repository.allApps
                 .catch { 
