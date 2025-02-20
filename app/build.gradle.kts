@@ -82,4 +82,13 @@ dependencies {
 
     // Lottie 动画
     implementation("com.airbnb.android:lottie:6.3.0")
+
+    // Preferences
+    // Java language implementation
+    implementation ("androidx.preference:preference:1.2.0")
+    // Kotlin
+    implementation ("androidx.preference:preference-ktx:1.2.0")
+
+    // Gson
+    implementation("com.google.code.gson:gson:2.10.1")
 }

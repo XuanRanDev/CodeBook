@@ -1,6 +1,7 @@
 package dev.xuanran.codebook
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -14,6 +15,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.xuanran.codebook.databinding.ActivityMainBinding
+import dev.xuanran.codebook.ui.activity.SettingsActivity
 import dev.xuanran.codebook.ui.fragment.AppListFragment
 import dev.xuanran.codebook.ui.fragment.TotpListFragment
 import dev.xuanran.codebook.ui.interfaces.FabClickListener
@@ -159,7 +161,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_settings -> {
-                // TODO: 跳转到设置页面
+                startActivity(Intent(this, SettingsActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
