@@ -65,7 +65,7 @@ class AppListFragment : Fragment(), FabClickListener {
     private fun showEditDialog(app: App? = null) {
         AppEditDialog.newInstance(
             app = app,
-            onSave = { appName, accountName, password, url, remark, packageNames ->
+            onSave = { appName, accountName, password, url, remark, packageName ->
                 if (app == null) {
                     viewModel.addApp(
                         appName = appName,
@@ -73,7 +73,7 @@ class AppListFragment : Fragment(), FabClickListener {
                         password = password,
                         url = url,
                         remark = remark,
-                        packageNames = packageNames
+                        packageName = packageName
                     )
                 } else {
                     viewModel.updateApp(
@@ -82,7 +82,7 @@ class AppListFragment : Fragment(), FabClickListener {
                             accountName = accountName,
                             url = url,
                             remark = remark,
-                            packageNames = packageNames
+                            packageName = packageName
                         ),
                         password
                     )

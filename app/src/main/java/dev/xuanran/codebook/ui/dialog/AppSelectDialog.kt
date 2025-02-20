@@ -16,8 +16,9 @@ class AppSelectDialog : BottomSheetDialogFragment() {
     private var _binding: DialogAppSelectBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: AppSelectAdapter
-    private var selectedPackages = mutableSetOf<String>()
-    private var onConfirm: ((List<String>) -> Unit)? = null
+    private var selectedPackage: String? = null
+    private var onConfirm: ((String?, String?) -> Unit)? = null
+    private var lastCheckedPosition = -1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,7 +45,7 @@ class AppSelectDialog : BottomSheetDialogFragment() {
                     true
                 }
                 R.id.action_confirm -> {
-                    onConfirm?.invoke(selectedPackages.toList())
+                    onConfirm?.invoke(selectedPackage, null)
                     dismiss()
                     true
                 }
@@ -55,12 +56,19 @@ class AppSelectDialog : BottomSheetDialogFragment() {
 
     private fun setupRecyclerView() {
         adapter = AppSelectAdapter(
-            initialSelectedPackages = selectedPackages,
-            onItemSelected = { packageName, isSelected ->
-                if (isSelected) {
-                    selectedPackages.add(packageName)
+            initialSelectedPackage = selectedPackage,
+            onItemSelected = { packageName, appName, position, isChecked ->
+                if (isChecked) {
+                    if (lastCheckedPosition != -1 && lastCheckedPosition != position) {
+                        adapter.notifyItemChanged(lastCheckedPosition)
+                    }
+                    selectedPackage = packageName
+                    lastCheckedPosition = position
                 } else {
-                    selectedPackages.remove(packageName)
+                    if (position == lastCheckedPosition) {
+                        selectedPackage = null
+                        lastCheckedPosition = -1
+                    }
                 }
                 updateConfirmButton()
             }
@@ -87,8 +95,8 @@ class AppSelectDialog : BottomSheetDialogFragment() {
 
     private fun updateConfirmButton() {
         binding.toolbar.menu.findItem(R.id.action_confirm)?.apply {
-            isEnabled = selectedPackages.isNotEmpty()
-            title = "确定 (${selectedPackages.size})"
+            isEnabled = selectedPackage != null
+            title = if (selectedPackage != null) "确定" else "确定"
         }
     }
 
@@ -99,11 +107,11 @@ class AppSelectDialog : BottomSheetDialogFragment() {
 
     companion object {
         fun newInstance(
-            selectedPackages: List<String> = emptyList(),
-            onConfirm: (List<String>) -> Unit
+            selectedPackage: String? = null,
+            onConfirm: (packageName: String?, appName: String?) -> Unit
         ): AppSelectDialog {
             return AppSelectDialog().apply {
-                this.selectedPackages = selectedPackages.toMutableSet()
+                this.selectedPackage = selectedPackage
                 this.onConfirm = onConfirm
             }
         }

@@ -18,7 +18,7 @@ class AppEditDialog : BottomSheetDialogFragment() {
     private var app: App? = null
     private var onSave: ((String, String, String, String?, String?, String?) -> Unit)? = null
 
-    private var selectedPackages = mutableListOf<String>()
+    private var selectedPackage: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,10 +50,13 @@ class AppEditDialog : BottomSheetDialogFragment() {
         // 设置应用选择按钮
         binding.btnSelectApps.setOnClickListener {
             AppSelectDialog.newInstance(
-                selectedPackages = selectedPackages,
-                onConfirm = { packages ->
-                    selectedPackages.clear()
-                    selectedPackages.addAll(packages)
+                selectedPackage = selectedPackage,
+                onConfirm = { packageName, appName ->
+                    selectedPackage = packageName
+                    // 如果选择了应用，自动填充应用名称
+                    if (appName != null) {
+                        binding.etAppName.setText(appName)
+                    }
                     updateSelectedAppsButton()
                 }
             ).show(childFragmentManager, "app_select")
@@ -63,10 +66,8 @@ class AppEditDialog : BottomSheetDialogFragment() {
         app?.let { existingApp ->
             binding.etUrl.setText(existingApp.url)
             binding.etRemark.setText(existingApp.remark)
-            existingApp.packageNames?.split(",")?.let { packages ->
-                selectedPackages.addAll(packages)
-                updateSelectedAppsButton()
-            }
+            selectedPackage = existingApp.packageName
+            updateSelectedAppsButton()
         }
     }
 
@@ -119,10 +120,10 @@ class AppEditDialog : BottomSheetDialogFragment() {
     }
 
     private fun updateSelectedAppsButton() {
-        binding.btnSelectApps.text = if (selectedPackages.isEmpty()) {
+        binding.btnSelectApps.text = if (selectedPackage == null) {
             "选择关联应用"
         } else {
-            "已选择 ${selectedPackages.size} 个应用"
+            "已选择应用"
         }
     }
 
@@ -130,16 +131,10 @@ class AppEditDialog : BottomSheetDialogFragment() {
         val appName = binding.etAppName.text.toString()
         val accountName = binding.etAccountName.text.toString()
         val password = binding.etPassword.text.toString()
-        val urls = binding.etUrl.text.toString()
-            .split(",")
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .joinToString(",")
-            .takeIf { it.isNotEmpty() }
+        val url = binding.etUrl.text.toString().takeIf { it.isNotBlank() }
         val remark = binding.etRemark.text.toString().takeIf { it.isNotBlank() }
-        val packageNames = selectedPackages.takeIf { it.isNotEmpty() }?.joinToString(",")
 
-        onSave?.invoke(appName, accountName, password, urls, remark, packageNames)
+        onSave?.invoke(appName, accountName, password, url, remark, selectedPackage)
         dismiss()
     }
 
@@ -151,7 +146,7 @@ class AppEditDialog : BottomSheetDialogFragment() {
     companion object {
         fun newInstance(
             app: App? = null,
-            onSave: (appName: String, accountName: String, password: String, url: String?, remark: String?, packageNames: String?) -> Unit
+            onSave: (appName: String, accountName: String, password: String, url: String?, remark: String?, packageName: String?) -> Unit
         ): AppEditDialog {
             return AppEditDialog().apply {
                 this.app = app

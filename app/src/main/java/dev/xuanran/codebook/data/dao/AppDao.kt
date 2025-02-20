@@ -25,7 +25,7 @@ interface AppDao {
         SELECT * FROM apps 
         WHERE appName LIKE '%' || :query || '%' 
         OR accountName LIKE '%' || :query || '%'
-        OR packageNames LIKE '%' || :query || '%'
+        OR packageName LIKE '%' || :query || '%'
         OR url LIKE '%' || :query || '%'
         OR remark LIKE '%' || :query || '%'
     """)

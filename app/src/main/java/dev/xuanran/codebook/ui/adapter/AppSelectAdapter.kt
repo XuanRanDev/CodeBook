@@ -15,9 +15,21 @@ data class AppInfo(
 )
 
 class AppSelectAdapter(
-    private val initialSelectedPackages: Set<String>,
-    private val onItemSelected: (String, Boolean) -> Unit
+    private val initialSelectedPackage: String?,
+    private val onItemSelected: (packageName: String, appName: String, position: Int, isChecked: Boolean) -> Unit
 ) : ListAdapter<AppInfo, AppSelectAdapter.ViewHolder>(AppDiffCallback()) {
+
+    private var lastCheckedPosition = -1
+
+    init {
+        // 找到初始选中的位置
+        currentList.forEachIndexed { index, appInfo ->
+            if (appInfo.packageName == initialSelectedPackage) {
+                lastCheckedPosition = index
+                return@forEachIndexed
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -43,12 +55,25 @@ class AppSelectAdapter(
                 tvAppName.text = app.appName
                 tvPackageName.text = app.packageName
                 
-                // 设置初始选中状态
-                checkbox.isChecked = initialSelectedPackages.contains(app.packageName)
+                // 设置选中状态
+                checkbox.isChecked = app.packageName == initialSelectedPackage
                 
-                checkbox.setOnCheckedChangeListener { _, isChecked ->
-                    onItemSelected(app.packageName, isChecked)
+                // 整个项目可点击
+                root.setOnClickListener {
+                    val newCheckedState = !checkbox.isChecked
+                    
+                    // 如果是选中状态，先取消其他选中项
+                    if (newCheckedState && lastCheckedPosition != -1 && lastCheckedPosition != adapterPosition) {
+                        notifyItemChanged(lastCheckedPosition)
+                    }
+                    
+                    checkbox.isChecked = newCheckedState
+                    lastCheckedPosition = if (newCheckedState) adapterPosition else -1
+                    onItemSelected(app.packageName, app.appName, adapterPosition, newCheckedState)
                 }
+                
+                // 禁用 checkbox 的直接点击
+                checkbox.isClickable = false
             }
         }
     }

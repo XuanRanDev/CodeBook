@@ -68,7 +68,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         password: String,
         url: String? = null,
         remark: String? = null,
-        packageNames: String? = null
+        packageName: String? = null
     ) {
         viewModelScope.launch {
             try {
@@ -78,7 +78,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     password = password,
                     url = url,
                     remark = remark,
-                    packageNames = packageNames
+                    packageName = packageName
                 )
             } catch (e: Exception) {
                 _uiState.value = AppUiState.Error(e.message ?: "添加失败")

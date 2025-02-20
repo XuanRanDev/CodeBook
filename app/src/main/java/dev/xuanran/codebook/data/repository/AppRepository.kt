@@ -19,7 +19,7 @@ class AppRepository(
         appName: String, 
         accountName: String, 
         password: String,
-        packageNames: String? = null,
+        packageName: String? = null,
         url: String? = null,
         remark: String? = null
     ): Long {
@@ -29,7 +29,7 @@ class AppRepository(
                 appName = appName,
                 accountName = accountName,
                 encryptedPassword = encryptedPassword,
-                packageNames = packageNames,
+                packageName = packageName,
                 url = url,
                 remark = remark
             )

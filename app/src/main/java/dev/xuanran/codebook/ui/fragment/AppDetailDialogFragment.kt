@@ -69,9 +69,9 @@ class AppDetailDialogFragment : DialogFragment() {
             tvAccountName.text = app.accountName
             
             // 如果有包名，尝试获取应用图标
-            if (!app.packageNames.isNullOrEmpty()) {
+            val packageName = app.packageName // 先保存到本地变量
+            if (packageName != null) {
                 try {
-                    val packageName = app.packageNames!!.split(",")[0]
                     val icon = requireContext().packageManager.getApplicationIcon(packageName)
                     ivAppIcon.setImageDrawable(icon)
                 } catch (e: PackageManager.NameNotFoundException) {
@@ -117,9 +117,9 @@ class AppDetailDialogFragment : DialogFragment() {
             )
         }
 
-        // 获取关联的应用列表
-        val packageNames = app.packageNames?.split(",") ?: emptyList()
-        linkedAppAdapter.submitList(packageNames)
+        // 获取关联的应用
+        val packageName = app.packageName?.let { listOf(it) } ?: emptyList()
+        linkedAppAdapter.submitList(packageName)
     }
 
     private fun setupOtherInfo() {
