@@ -2,4 +2,28 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- Material 3 颜色 -->
+    <color name="md_theme_primary">#006C4C</color>
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primaryContainer">#89F8C7</color>
+    <color name="md_theme_onPrimaryContainer">#002114</color>
+    <color name="md_theme_secondary">#4D6356</color>
+    <color name="md_theme_onSecondary">#FFFFFF</color>
+    <color name="md_theme_secondaryContainer">#CFE9D9</color>
+    <color name="md_theme_surface">#FBFDF9</color>
+    <color name="md_theme_surface_container">#F2F3EF</color>
+    <color name="md_theme_on_surface">#191C1A</color>
+    <color name="md_theme_outline">#717971</color>
+    <color name="md_theme_surface_variant">#DCE5DC</color>
+    
+    <!-- 状态栏和导航栏颜色 -->
+    <color name="status_bar">#F2F3EF</color>
+    <color name="navigation_bar">#F2F3EF</color>
+    
+    <!-- 自定义扫码界面颜色 -->
+    <color name="zxing_custom_viewfinder_mask">#60000000</color>
+    <color name="zxing_custom_possible_result_points">#C0FFFF00</color>
+    <color name="zxing_custom_result_view">#B0000000</color>
+    <color name="zxing_custom_viewfinder_laser">#FFCC0000</color>
 </resources>

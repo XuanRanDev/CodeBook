@@ -14,28 +14,16 @@ class TotpRepository(
 
     val allTotps: Flow<List<Totp>> = totpDao.getAllTotps()
 
-    suspend fun insert(appName: String, accountName: String, secretKey: String): Long {
-        val encryptedSecretKey = encryption.encrypt(secretKey)
-        return totpDao.insert(
-            Totp(
-                appName = appName,
-                accountName = accountName,
-                secretKey = encryptedSecretKey,
-                expiryTime = calculateExpiryTime()
-            )
-        )
+    suspend fun insert(totp: Totp): Long {
+        // TODO 在此处加密密钥
+        // val encryptedSecretKey = encryption.encrypt(secretKey)
+        return totpDao.insert(totp)
     }
 
-    suspend fun update(totp: Totp, newSecretKey: String? = null) {
-        val updatedTotp = if (newSecretKey != null) {
-            totp.copy(
-                secretKey = encryption.encrypt(newSecretKey),
-                updatedAt = System.currentTimeMillis()
-            )
-        } else {
-            totp.copy(updatedAt = System.currentTimeMillis())
-        }
-        totpDao.update(updatedTotp)
+    suspend fun update(totp: Totp) {
+        // TODO 在此处对密钥进行加密
+        var res = totp.copy(updatedAt = System.currentTimeMillis())
+        totpDao.update(res)
     }
 
     suspend fun updateLastUsed(totp: Totp) {

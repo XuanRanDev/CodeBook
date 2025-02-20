@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     // 添加 kapt 插件
     kotlin("kapt")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -75,4 +76,22 @@ dependencies {
     
     // Security
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    // SwipeRefreshLayout
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    // Lottie 动画
+    implementation("com.airbnb.android:lottie:6.3.0")
+
+    // Preferences
+    // Java language implementation
+    implementation ("androidx.preference:preference:1.2.0")
+    // Kotlin
+    implementation ("androidx.preference:preference-ktx:1.2.0")
+
+    // Gson
+    implementation("com.google.code.gson:gson:2.10.1")
+
+
+    implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
 }

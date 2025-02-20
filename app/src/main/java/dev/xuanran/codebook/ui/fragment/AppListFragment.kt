@@ -17,14 +17,15 @@ import dev.xuanran.codebook.databinding.FragmentAppListBinding
 import dev.xuanran.codebook.model.App
 import dev.xuanran.codebook.ui.adapter.AppAdapter
 import dev.xuanran.codebook.ui.dialog.AppEditDialog
+import dev.xuanran.codebook.ui.interfaces.FabClickListener
 import dev.xuanran.codebook.ui.viewmodel.AppUiState
 import dev.xuanran.codebook.ui.viewmodel.AppViewModel
 import kotlinx.coroutines.launch
 
-class AppListFragment : Fragment() {
+class AppListFragment : Fragment(), FabClickListener {
     private var _binding: FragmentAppListBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: AppViewModel by viewModels()
+    val viewModel: AppViewModel by viewModels()
     private lateinit var adapter: AppAdapter
 
     override fun onCreateView(
@@ -39,7 +40,7 @@ class AppListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        setupFab()
+        setupSwipeRefresh()
         observeUiState()
     }
 
@@ -52,28 +53,39 @@ class AppListFragment : Fragment() {
             },
             onItemLongClick = { app ->
                 showEditDialog(app)
+            },
+            onItemClick = { app ->
+                AppDetailDialogFragment.newInstance(app)
+                    .show(childFragmentManager, "AppDetail")
             }
         )
         binding.recyclerView.adapter = adapter
     }
 
-    private fun setupFab() {
-        binding.fabAdd.setOnClickListener {
-            showEditDialog()
-        }
-    }
-
     private fun showEditDialog(app: App? = null) {
         AppEditDialog.newInstance(
             app = app,
-            onSave = { appName, accountName, password ->
+            onSave = { appName, accountName, password, url, remark, packageName ->
                 if (app == null) {
-                    viewModel.addApp(appName, accountName, password)
-                } else {
-                    viewModel.updateApp(app.copy(
+                    viewModel.addApp(
                         appName = appName,
-                        accountName = accountName
-                    ), password)
+                        accountName = accountName,
+                        password = password,
+                        url = url,
+                        remark = remark,
+                        packageName = packageName
+                    )
+                } else {
+                    viewModel.updateApp(
+                        app.copy(
+                            appName = appName,
+                            accountName = accountName,
+                            url = url,
+                            remark = remark,
+                            packageName = packageName
+                        ),
+                        password
+                    )
                 }
             }
         ).show(childFragmentManager, "app_edit")
@@ -84,18 +96,50 @@ class AppListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     when (state) {
-                        is AppUiState.Success -> adapter.submitList(state.apps)
-                        is AppUiState.Error -> Toast.makeText(
-                            requireContext(),
-                            state.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        is AppUiState.Success -> {
+                            binding.swipeRefresh.isRefreshing = false
+                            binding.loadingView.visibility = View.GONE
+                            
+                            if (state.apps.isEmpty()) {
+                                binding.emptyView.visibility = View.VISIBLE
+                                binding.recyclerView.visibility = View.GONE
+                            } else {
+                                binding.emptyView.visibility = View.GONE
+                                binding.recyclerView.visibility = View.VISIBLE
+                                adapter.submitList(state.apps)
+                            }
+                        }
+                        is AppUiState.Error -> {
+                            binding.swipeRefresh.isRefreshing = false
+                            binding.loadingView.visibility = View.GONE
+                            binding.emptyView.visibility = View.GONE
+                            binding.recyclerView.visibility = View.VISIBLE
+                            
+                            Toast.makeText(
+                                requireContext(),
+                                state.message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                         AppUiState.Loading -> {
-                            // TODO: 可以添加加载动画
+                            if (!binding.swipeRefresh.isRefreshing) {
+                                binding.loadingView.visibility = View.VISIBLE
+                                binding.emptyView.visibility = View.GONE
+                                binding.recyclerView.visibility = View.GONE
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            binding.emptyView.visibility = View.GONE
+            binding.loadingView.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+            viewModel.loadApps(isRefreshing = true)
         }
     }
 
@@ -108,5 +152,9 @@ class AppListFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onFabClick() {
+        showEditDialog()
     }
 } 

@@ -15,13 +15,23 @@ class AppRepository(
 
     val allApps: Flow<List<App>> = appDao.getAllApps()
 
-    suspend fun insert(appName: String, accountName: String, password: String): Long {
+    suspend fun insert(
+        appName: String, 
+        accountName: String, 
+        password: String,
+        packageName: String? = null,
+        url: String? = null,
+        remark: String? = null
+    ): Long {
         val encryptedPassword = encryption.encrypt(password)
         return appDao.insert(
             App(
                 appName = appName,
                 accountName = accountName,
-                encryptedPassword = encryptedPassword
+                encryptedPassword = encryptedPassword,
+                packageName = packageName,
+                url = url,
+                remark = remark
             )
         )
     }
