@@ -170,6 +170,8 @@ class TotpEditDialog : BottomSheetDialogFragment() {
             setCameraId(0)
             setBeepEnabled(false)
             setBarcodeImageEnabled(true)
+            // 取消方向锁定
+            setOrientationLocked(false)
             initiateScan()
         }
     }
