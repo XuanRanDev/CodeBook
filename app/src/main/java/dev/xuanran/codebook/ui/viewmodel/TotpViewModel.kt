@@ -62,20 +62,23 @@ class TotpViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun addTotp(appName: String, accountName: String, secretKey: String) {
+    fun addTotp(totp: Totp) {
         viewModelScope.launch {
             try {
-                repository.insert(appName, accountName, secretKey)
+                // 保存到数据库
+                repository.insert(totp)
+                loadTotps()
             } catch (e: Exception) {
                 _uiState.value = TotpUiState.Error(e.message ?: "添加失败")
             }
         }
     }
 
-    fun updateTotp(totp: Totp, newSecretKey: String? = null) {
+    fun updateTotp(totp: Totp) {
         viewModelScope.launch {
             try {
-                repository.update(totp, newSecretKey)
+                repository.update(totp)
+                loadTotps()
             } catch (e: Exception) {
                 _uiState.value = TotpUiState.Error(e.message ?: "更新失败")
             }

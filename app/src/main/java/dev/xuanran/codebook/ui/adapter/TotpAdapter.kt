@@ -43,7 +43,6 @@ class TotpAdapter(
         private val binding: ItemTotpBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        private var progressAnimator: ValueAnimator? = null
         private var updateJob: Job? = null
 
         init {
@@ -84,48 +83,28 @@ class TotpAdapter(
                 )
                 tvTotpCode.text = code.chunked(3).joinToString(" ")
                 
-                // 取消之前的动画和更新
-                progressAnimator?.cancel()
+                // 取消之前的更新
                 updateJob?.cancel()
 
-                // 设置进度条动画
-                setupProgressAnimation(totp)
-            }
-        }
-
-        private fun setupProgressAnimation(totp: Totp) {
-            val period = totp.period * 1000L // 转换为毫秒
-            updateJob = CoroutineScope(Dispatchers.Main).launch {
-                while (isActive) {
-                    val currentTimeMillis = System.currentTimeMillis()
-                    val timeStep = currentTimeMillis / period // 获取当前时间步
-                    val elapsedTime = currentTimeMillis % period
-                    
-                    // 计算进度 - 从0到30000
-                    val progress = (elapsedTime * 30000f / period).toInt()
-
-                    // 如果接近更新时间，更新验证码
-                    if (elapsedTime < 100 || elapsedTime > period - 100) {
-                        notifyItemChanged(adapterPosition)
-                    }
-
-                    // 设置平滑动画
-                    progressAnimator = ValueAnimator.ofInt(progress, 30000).apply {
-                        duration = period - elapsedTime
-                        interpolator = LinearInterpolator()
-                        addUpdateListener { animation ->
-                            binding.progressExpiry.progress = animation.animatedValue as Int
+                // 设置定时更新
+                updateJob = CoroutineScope(Dispatchers.Main).launch {
+                    while (isActive) {
+                        val currentTimeMillis = System.currentTimeMillis()
+                        val period = totp.period * 1000L
+                        val elapsedTime = currentTimeMillis % period
+                        
+                        // 如果接近更新时间，更新验证码
+                        if (elapsedTime < 100 || elapsedTime > period - 100) {
+                            notifyItemChanged(adapterPosition)
                         }
-                        start()
-                    }
 
-                    delay(period - elapsedTime)
+                        delay(period - elapsedTime)
+                    }
                 }
             }
         }
 
         fun cleanup() {
-            progressAnimator?.cancel()
             updateJob?.cancel()
         }
     }

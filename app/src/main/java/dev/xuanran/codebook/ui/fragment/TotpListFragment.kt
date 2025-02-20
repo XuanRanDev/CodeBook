@@ -75,14 +75,11 @@ class TotpListFragment : Fragment(), FabClickListener {
     private fun showEditDialog(totp: Totp? = null) {
         TotpEditDialog.newInstance(
             totp = totp,
-            onSave = { appName, accountName, secretKey ->
+            onSave = { newTotp ->
                 if (totp == null) {
-                    viewModel.addTotp(appName, accountName, secretKey)
+                    viewModel.addTotp(newTotp)
                 } else {
-                    viewModel.updateTotp(totp.copy(
-                        appName = appName,
-                        accountName = accountName
-                    ), secretKey)
+                    viewModel.updateTotp(newTotp)
                 }
             }
         ).show(childFragmentManager, "totp_edit")

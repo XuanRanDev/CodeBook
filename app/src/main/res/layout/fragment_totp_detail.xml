@@ -59,7 +59,14 @@
                         android:id="@+id/progress_expiry"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp" />
+                        android:layout_marginTop="8dp"
+                        app:trackCornerRadius="4dp"
+                        app:trackThickness="4dp"
+                        app:indicatorColor="?attr/colorPrimary"
+                        app:trackColor="?attr/colorSurfaceVariant"
+                        app:indicatorDirectionLinear="startToEnd"
+                        android:max="30000"
+                        android:progress="0" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_copy_code"

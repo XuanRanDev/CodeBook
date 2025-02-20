@@ -17,6 +17,10 @@ import dev.xuanran.codebook.model.Totp
 import dev.xuanran.codebook.ui.viewmodel.TotpViewModel
 import dev.xuanran.codebook.utils.TotpGenerator
 import kotlinx.coroutines.*
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
+import android.view.animation.LinearInterpolator
 
 class TotpDetailDialogFragment : DialogFragment() {
 
@@ -26,6 +30,7 @@ class TotpDetailDialogFragment : DialogFragment() {
     private lateinit var totp: Totp
     private val viewModel: TotpViewModel by activityViewModels()
     private var updateJob: Job? = null
+    private var progressAnimator: ValueAnimator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,12 +107,39 @@ class TotpDetailDialogFragment : DialogFragment() {
                 )
                 binding.tvTotpCode.text = code.chunked(3).joinToString(" ")
                 
-                // 更新进度条
-                val remainingTime = TotpGenerator.getRemainingSeconds(totp.period)
-                val progress = (remainingTime.toFloat() / totp.period * 100).toInt()
-                binding.progressExpiry.progress = progress
+                // 获取当前时间在周期内的位置
+                val currentTimeMillis = System.currentTimeMillis()
+                val period = totp.period * 1000L // 转换为毫秒
+                val elapsedTime = currentTimeMillis % period
                 
-                delay(1000)
+                // 取消之前的动画
+                progressAnimator?.cancel()
+                
+                // 设置进度条动画
+                progressAnimator = ValueAnimator.ofInt((elapsedTime * 30000f / period).toInt(), 30000).apply {
+                    duration = period - elapsedTime
+                    interpolator = LinearInterpolator()
+                    addUpdateListener { animation ->
+                        _binding?.progressExpiry?.progress = animation.animatedValue as Int
+                    }
+                    addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            if (isActive) {
+                                // 重新生成验证码
+                                val newCode = TotpGenerator.generateTOTP(
+                                    secret = viewModel.getDecryptedSecretKey(totp),
+                                    algorithm = totp.algorithm,
+                                    digits = totp.digits,
+                                    period = totp.period
+                                )
+                                _binding?.tvTotpCode?.text = newCode.chunked(3).joinToString(" ")
+                            }
+                        }
+                    })
+                    start()
+                }
+
+                delay(period - elapsedTime)
             }
         }
     }
@@ -137,6 +169,7 @@ class TotpDetailDialogFragment : DialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         updateJob?.cancel()
+        progressAnimator?.cancel()
         _binding = null
     }
 
