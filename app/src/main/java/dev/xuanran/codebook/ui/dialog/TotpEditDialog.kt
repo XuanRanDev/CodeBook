@@ -18,6 +18,7 @@ import android.content.Intent
 import android.widget.ArrayAdapter
 import androidx.core.widget.doAfterTextChanged
 import com.google.zxing.integration.android.IntentIntegrator
+import dev.xuanran.codebook.ui.activity.CustomScanActivity
 
 class TotpEditDialog : BottomSheetDialogFragment() {
     private var _binding: DialogTotpEditBinding? = null
@@ -170,8 +171,8 @@ class TotpEditDialog : BottomSheetDialogFragment() {
             setCameraId(0)
             setBeepEnabled(false)
             setBarcodeImageEnabled(true)
-            // 取消方向锁定
-            setOrientationLocked(false)
+            setOrientationLocked(true)
+            setCaptureActivity(CustomScanActivity::class.java)
             initiateScan()
         }
     }

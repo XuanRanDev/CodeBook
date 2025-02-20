@@ -33,6 +33,11 @@
             android:name=".ui.activity.SettingsActivity"
             android:label="@string/settings"
             android:exported="false" />
+        <activity
+            android:name=".ui.activity.CustomScanActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/CustomScannerTheme"
+            android:windowSoftInputMode="stateAlwaysHidden" />
     </application>
 
 </manifest>

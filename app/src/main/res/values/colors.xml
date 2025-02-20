@@ -20,4 +20,10 @@
     <!-- 状态栏和导航栏颜色 -->
     <color name="status_bar">#F2F3EF</color>
     <color name="navigation_bar">#F2F3EF</color>
+    
+    <!-- 自定义扫码界面颜色 -->
+    <color name="zxing_custom_viewfinder_mask">#60000000</color>
+    <color name="zxing_custom_possible_result_points">#C0FFFF00</color>
+    <color name="zxing_custom_result_view">#B0000000</color>
+    <color name="zxing_custom_viewfinder_laser">#FFCC0000</color>
 </resources>
