@@ -71,8 +71,22 @@ class TotpDetailDialogFragment : DialogFragment() {
             tvDigits.text = "${totp.digits} 位"
             tvPeriod.text = "${totp.period} 秒"
             tvIssuer.text = totp.issuer ?: "未设置"
-            tvUrl.text = totp.url
-            tvRemark.text = totp.remark
+            
+            // 处理 URL 的显示
+            if (!totp.url.isNullOrBlank()) {
+                layoutUrl.visibility = View.VISIBLE
+                tvUrl.text = totp.url
+            } else {
+                layoutUrl.visibility = View.GONE
+            }
+            
+            // 处理备注的显示
+            if (!totp.remark.isNullOrBlank()) {
+                layoutRemark.visibility = View.VISIBLE
+                tvRemark.text = totp.remark
+            } else {
+                layoutRemark.visibility = View.GONE
+            }
         }
     }
 
