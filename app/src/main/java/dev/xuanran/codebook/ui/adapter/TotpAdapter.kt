@@ -13,12 +13,17 @@ import dev.xuanran.codebook.utils.TotpGenerator
 import android.view.animation.LinearInterpolator
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 
 class TotpAdapter(
     private val onCopyClick: (Totp) -> Unit,
     private val onItemLongClick: (Totp) -> Unit,
-    private val onItemClick: (Totp) -> Unit,
-    private val onTotpCodeGenerated: (Totp, String) -> Unit
+    private val onItemClick: (Totp) -> Unit
 ) : ListAdapter<Totp, TotpAdapter.ViewHolder>(TotpDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,7 +43,8 @@ class TotpAdapter(
         private val binding: ItemTotpBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        private var animator: ValueAnimator? = null
+        private var progressAnimator: ValueAnimator? = null
+        private var updateJob: Job? = null
 
         init {
             binding.btnCopy.setOnClickListener {
@@ -78,39 +84,55 @@ class TotpAdapter(
                 )
                 tvTotpCode.text = code.chunked(3).joinToString(" ")
                 
-                // 取消之前的动画
-                animator?.cancel()
-                
-                // 创建新的进度条动画
-                animator = ValueAnimator.ofInt(0, 100).apply {
-                    duration = totp.period * 1000L // 动画持续整个周期
-                    interpolator = LinearInterpolator()
-                    addUpdateListener { animation ->
-                        progressExpiry.progress = animation.animatedValue as Int
-                    }
-                    addListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            // 动画结束时重新开始
-                            if (!animation.isStarted) {
-                                start()
-                            }
-                        }
-                    })
-                    start()
-                }
-                
-                onTotpCodeGenerated(totp, code)
+                // 取消之前的动画和更新
+                progressAnimator?.cancel()
+                updateJob?.cancel()
+
+                // 设置进度条动画
+                setupProgressAnimation(totp)
             }
         }
 
-        fun onViewRecycled() {
-            animator?.cancel()
+        private fun setupProgressAnimation(totp: Totp) {
+            val period = totp.period * 1000L // 转换为毫秒
+            updateJob = CoroutineScope(Dispatchers.Main).launch {
+                while (isActive) {
+                    val currentTimeMillis = System.currentTimeMillis()
+                    val timeStep = currentTimeMillis / period // 获取当前时间步
+                    val elapsedTime = currentTimeMillis % period
+                    
+                    // 计算进度 - 从0到30000
+                    val progress = (elapsedTime * 30000f / period).toInt()
+
+                    // 如果接近更新时间，更新验证码
+                    if (elapsedTime < 100 || elapsedTime > period - 100) {
+                        notifyItemChanged(adapterPosition)
+                    }
+
+                    // 设置平滑动画
+                    progressAnimator = ValueAnimator.ofInt(progress, 30000).apply {
+                        duration = period - elapsedTime
+                        interpolator = LinearInterpolator()
+                        addUpdateListener { animation ->
+                            binding.progressExpiry.progress = animation.animatedValue as Int
+                        }
+                        start()
+                    }
+
+                    delay(period - elapsedTime)
+                }
+            }
+        }
+
+        fun cleanup() {
+            progressAnimator?.cancel()
+            updateJob?.cancel()
         }
     }
 
     override fun onViewRecycled(holder: ViewHolder) {
         super.onViewRecycled(holder)
-        holder.onViewRecycled()
+        holder.cleanup()
     }
 
     private class TotpDiffCallback : DiffUtil.ItemCallback<Totp>() {

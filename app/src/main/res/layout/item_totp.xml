@@ -67,7 +67,7 @@
             app:indicatorColor="?attr/colorPrimary"
             app:trackColor="?attr/colorSurfaceVariant"
             app:indicatorDirectionLinear="startToEnd"
-            android:max="100"
+            android:max="30000"
             android:progress="0"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

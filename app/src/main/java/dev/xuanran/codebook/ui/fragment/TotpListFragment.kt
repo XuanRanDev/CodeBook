@@ -31,7 +31,6 @@ class TotpListFragment : Fragment(), FabClickListener {
     private val binding get() = _binding!!
     val viewModel: TotpViewModel by viewModels()
     private lateinit var adapter: TotpAdapter
-    private var updateJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,7 +46,6 @@ class TotpListFragment : Fragment(), FabClickListener {
         setupRecyclerView()
         setupSwipeRefresh()
         observeUiState()
-        startPeriodicUpdate()
     }
 
     private fun setupRecyclerView() {
@@ -69,9 +67,6 @@ class TotpListFragment : Fragment(), FabClickListener {
             onItemClick = { totp ->
                 TotpDetailDialogFragment.newInstance(totp)
                     .show(childFragmentManager, "TotpDetail")
-            },
-            onTotpCodeGenerated = { totp, code ->
-                // 可以在这里处理新生成的TOTP代码
             }
         )
         binding.recyclerView.adapter = adapter
@@ -145,16 +140,6 @@ class TotpListFragment : Fragment(), FabClickListener {
         }
     }
 
-    private fun startPeriodicUpdate() {
-        updateJob = viewLifecycleOwner.lifecycleScope.launch {
-            while (isActive) {
-                // 每个周期更新一次代码
-                delay(30000) // 30秒更新一次
-                adapter.notifyDataSetChanged()
-            }
-        }
-    }
-
     private fun copyToClipboard(text: String) {
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("验证码", text)
@@ -163,7 +148,6 @@ class TotpListFragment : Fragment(), FabClickListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        updateJob?.cancel()
         _binding = null
     }
 
