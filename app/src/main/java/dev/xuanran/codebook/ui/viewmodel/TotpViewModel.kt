@@ -118,6 +118,7 @@ class TotpViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getDecryptedSecretKey(totp: Totp): String {
+        // TODO 调用Resp对数据进行解密
         // 暂时直接返回原始密钥,不进行解密
         return totp.secretKey
     }
