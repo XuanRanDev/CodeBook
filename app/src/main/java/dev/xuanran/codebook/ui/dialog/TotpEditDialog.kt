@@ -28,7 +28,13 @@ class TotpEditDialog : BottomSheetDialogFragment() {
     private var onSave: ((Totp) -> Unit)? = null
     private var isExpanded = false
 
-    private val algorithms = listOf("SHA1", "SHA256", "SHA512")
+    private val algorithms = listOf(
+        "SHA1",
+        "SHA224",
+        "SHA256",
+        "SHA384",
+        "SHA512"
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
