@@ -199,36 +199,103 @@
                 android:text="@string/other_info"
                 android:textAppearance="?attr/textAppearanceTitleSmall" />
 
-            <com.google.android.material.textfield.TextInputLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="@string/url_hint">
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_url"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:enabled="false"
-                    android:inputType="textUri" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <!-- URL 部分 -->
+                    <LinearLayout
+                        android:id="@+id/layout_url"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="URL"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="?android:textColorSecondary" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="@string/remark_hint">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center_vertical">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_remark"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:enabled="false"
-                    android:inputType="textMultiLine"
-                    android:minLines="2" />
+                            <TextView
+                                android:id="@+id/tv_url"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_copy_url"
+                                style="@style/Widget.Material3.Button.IconButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:icon="@drawable/ic_content_copy" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_open_url"
+                                style="@style/Widget.Material3.Button.IconButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:icon="@drawable/ic_open_in_browser" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- 备注部分 -->
+                    <LinearLayout
+                        android:id="@+id/layout_remark"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="备注"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="?android:textColorSecondary" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:id="@+id/tv_remark"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_copy_remark"
+                                style="@style/Widget.Material3.Button.IconButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:icon="@drawable/ic_content_copy" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 

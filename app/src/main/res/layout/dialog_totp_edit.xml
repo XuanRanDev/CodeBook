@@ -12,243 +12,248 @@
         android:layout_height="wrap_content"
         app:title="添加TOTP验证码" />
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_app_name"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="应用名称"
-            app:startIconDrawable="@drawable/ic_app">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_app_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="1" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_account_name"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="账号"
-            app:startIconDrawable="@drawable/ic_account">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_account_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:maxLines="1" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_secret_key"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="密钥"
-            app:endIconMode="password_toggle"
-            app:startIconDrawable="@drawable/ic_key">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_secret_key"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:maxLines="1" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_expand"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="显示高级选项"
-                    app:icon="@drawable/ic_expand_more"
-                    app:iconGravity="end"/>
-
-                <LinearLayout
-                    android:id="@+id/layout_additional_fields"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:padding="16dp">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_issuer"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="发行方"
-                        app:startIconDrawable="@drawable/ic_business">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_issuer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="text"
-                            android:maxLines="1" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_algorithm"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:hint="算法"
-                        app:startIconDrawable="@drawable/ic_algorithm">
-
-                        <AutoCompleteTextView
-                            android:id="@+id/et_algorithm"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="none"/>
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/til_digits"
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="8dp"
-                            android:hint="位数"
-                            app:startIconDrawable="@drawable/ic_numbers">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/et_digits"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="number"
-                                android:maxLines="1" />
-
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/til_period"
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="8dp"
-                            android:hint="刷新周期(秒)"
-                            app:startIconDrawable="@drawable/ic_timer">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/et_period"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="number"
-                                android:maxLines="1" />
-
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_url"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:hint="URL"
-                        app:startIconDrawable="@drawable/ic_link">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_url"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textUri"
-                            android:maxLines="1" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_remark"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:hint="备注"
-                        app:startIconDrawable="@drawable/ic_note">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_remark"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textMultiLine"
-                            android:minLines="2"
-                            android:gravity="top"/>
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="end">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_scan"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_app_name"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="扫描二维码"
-                app:icon="@drawable/ic_qr_code"/>
+                android:hint="应用名称"
+                app:startIconDrawable="@drawable/ic_app">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_cancel"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_app_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:maxLines="1" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_account_name"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="取消" />
+                android:layout_marginTop="16dp"
+                android:hint="账号"
+                app:startIconDrawable="@drawable/ic_account">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_save"
-                android:layout_width="wrap_content"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_account_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_secret_key"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:enabled="false"
-                android:text="保存" />
+                android:layout_marginTop="16dp"
+                android:hint="密钥"
+                app:endIconMode="password_toggle"
+                app:startIconDrawable="@drawable/ic_key">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_secret_key"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:maxLines="1" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_expand"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="显示高级选项"
+                        app:icon="@drawable/ic_expand_more"
+                        app:iconGravity="end"/>
+
+                    <LinearLayout
+                        android:id="@+id/layout_additional_fields"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:padding="16dp">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/til_issuer"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="发行方"
+                            app:startIconDrawable="@drawable/ic_business">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_issuer"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text"
+                                android:maxLines="1" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/til_algorithm"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:hint="算法"
+                            app:startIconDrawable="@drawable/ic_algorithm">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/et_algorithm"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none"/>
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/til_digits"
+                                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="8dp"
+                                android:hint="位数"
+                                app:startIconDrawable="@drawable/ic_numbers">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/et_digits"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="number"
+                                    android:maxLines="1" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/til_period"
+                                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="8dp"
+                                android:hint="刷新周期(秒)"
+                                app:startIconDrawable="@drawable/ic_timer">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/et_period"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="number"
+                                    android:maxLines="1" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                        </LinearLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/til_url"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:hint="URL"
+                            app:startIconDrawable="@drawable/ic_link">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_url"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textUri"
+                                android:maxLines="1" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/til_remark"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:hint="备注"
+                            app:startIconDrawable="@drawable/ic_note">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_remark"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textMultiLine"
+                                android:minLines="2"
+                                android:gravity="top"/>
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="end">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_scan"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="扫描二维码"
+                    app:icon="@drawable/ic_qr_code"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_cancel"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="取消" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_save"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:enabled="false"
+                    android:text="保存" />
+
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

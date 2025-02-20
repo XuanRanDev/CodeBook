@@ -3,11 +3,14 @@ package dev.xuanran.codebook.ui.fragment
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -55,6 +58,8 @@ class AppDetailDialogFragment : DialogFragment() {
         setupAppInfo()
         setupLinkedApps()
         setupOtherInfo()
+        setupViews()
+        setupButtons()
     }
 
     private fun setupToolbar() {
@@ -124,8 +129,65 @@ class AppDetailDialogFragment : DialogFragment() {
 
     private fun setupOtherInfo() {
         binding.apply {
-            etUrl.setText(app.url)
-            etRemark.setText(app.remark)
+            tvUrl.text = app.url
+            tvRemark.text = app.remark
+        }
+    }
+
+    private fun setupViews() {
+        app?.let { app ->
+            // 设置 URL
+            binding.apply {
+                app.url?.let { url ->
+                    layoutUrl.visibility = View.VISIBLE
+                    tvUrl.text = url
+                } ?: run {
+                    layoutUrl.visibility = View.GONE
+                }
+                
+                // 设置备注
+                app.remark?.let { remark ->
+                    layoutRemark.visibility = View.VISIBLE
+                    tvRemark.text = remark
+                } ?: run {
+                    layoutRemark.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun setupButtons() {
+        binding.apply {
+            // URL 相关按钮
+            btnCopyUrl.setOnClickListener {
+                app?.url?.let { url ->
+                    val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("URL", url)
+                    clipboard.setPrimaryClip(clip)
+                    Toast.makeText(requireContext(), "已复制URL", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            btnOpenUrl.setOnClickListener {
+                app?.url?.let { url ->
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), "无法打开此URL", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            // 备注复制按钮
+            btnCopyRemark.setOnClickListener {
+                app?.remark?.let { remark ->
+                    val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("备注", remark)
+                    clipboard.setPrimaryClip(clip)
+                    Toast.makeText(requireContext(), "已复制备注", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

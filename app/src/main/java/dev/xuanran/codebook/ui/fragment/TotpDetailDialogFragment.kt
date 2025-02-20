@@ -71,8 +71,8 @@ class TotpDetailDialogFragment : DialogFragment() {
             tvDigits.text = "${totp.digits} 位"
             tvPeriod.text = "${totp.period} 秒"
             tvIssuer.text = totp.issuer ?: "未设置"
-            etUrl.setText(totp.url)
-            etRemark.setText(totp.remark)
+            tvUrl.text = totp.url
+            tvRemark.text = totp.remark
         }
     }
 
