@@ -69,108 +69,87 @@
 
                     </LinearLayout>
 
-                    <!-- 账号信息 -->
+                    <!-- 账号信息卡片 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="账号"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="?android:textColorSecondary" />
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="账号"
-                                android:textAppearance="?attr/textAppearanceBodySmall"
-                                android:textColor="?android:textColorSecondary" />
+                            android:layout_marginTop="4dp"
+                            android:gravity="center_vertical">
 
                             <TextView
                                 android:id="@+id/tv_account_name"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
+                                android:layout_weight="1"
                                 android:textAppearance="?attr/textAppearanceBodyLarge"
                                 tools:text="account@example.com" />
 
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_copy_account"
+                                style="@style/Widget.Material3.Button.IconButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:icon="@drawable/ic_content_copy" />
                         </LinearLayout>
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_copy_account"
-                            style="@style/Widget.Material3.Button.IconButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:contentDescription="复制账号"
-                            app:icon="@drawable/ic_content_copy"
-                            app:iconTint="?attr/colorOnSurfaceVariant" />
-
                     </LinearLayout>
 
-                    <!-- 密码区域 -->
+                    <!-- 密码信息卡片 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="密码"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="?android:textColorSecondary" />
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="密码"
-                                android:textAppearance="?attr/textAppearanceBodySmall"
-                                android:textColor="?android:textColorSecondary" />
+                            android:layout_marginTop="4dp"
+                            android:gravity="center_vertical">
 
                             <TextView
                                 android:id="@+id/tv_password"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="••••••••"
-                                android:textAppearance="?attr/textAppearanceBodyLarge" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                                android:layout_weight="1"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:text="••••••••" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btn_toggle_password"
                                 style="@style/Widget.Material3.Button.IconButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:contentDescription="显示/隐藏密码"
-                                app:icon="@drawable/ic_visibility"
-                                app:iconTint="?attr/colorOnSurfaceVariant" />
+                                app:icon="@drawable/ic_visibility" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btn_copy_password"
                                 style="@style/Widget.Material3.Button.IconButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:contentDescription="复制密码"
-                                app:icon="@drawable/ic_content_copy"
-                                app:iconTint="?attr/colorOnSurfaceVariant" />
-
+                                app:icon="@drawable/ic_content_copy" />
                         </LinearLayout>
-
                     </LinearLayout>
-
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
             <!-- 关联应用部分 -->
@@ -181,15 +160,24 @@
                 android:text="@string/linked_apps"
                 android:textAppearance="?attr/textAppearanceTitleSmall" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_linked_apps"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="2"
-                tools:listitem="@layout/item_linked_app" />
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_linked_apps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="2"
+                    tools:listitem="@layout/item_linked_app" />
+
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- 其他信息部分 -->
             <TextView
@@ -220,7 +208,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:visibility="gone">
-                        
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -265,7 +253,7 @@
                         android:layout_marginTop="16dp"
                         android:orientation="vertical"
                         android:visibility="gone">
-                        
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -296,9 +284,7 @@
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
 
     <!-- 底部删除按钮 -->

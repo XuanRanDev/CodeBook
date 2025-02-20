@@ -21,6 +21,8 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.view.animation.LinearInterpolator
+import android.content.Intent
+import android.net.Uri
 
 class TotpDetailDialogFragment : DialogFragment() {
 
@@ -72,18 +74,37 @@ class TotpDetailDialogFragment : DialogFragment() {
             tvPeriod.text = "${totp.period} 秒"
             tvIssuer.text = totp.issuer ?: "未设置"
             
-            // 处理 URL 的显示
+            // 处理 URL 的显示和按钮事件
             if (!totp.url.isNullOrBlank()) {
                 layoutUrl.visibility = View.VISIBLE
                 tvUrl.text = totp.url
+                
+                btnCopyUrl.setOnClickListener {
+                    copyToClipboard(totp.url!!)
+                    showCopySuccessMessage("URL已复制到剪贴板")
+                }
+                
+                btnOpenUrl.setOnClickListener {
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(totp.url))
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        showCopySuccessMessage("无法打开此URL")
+                    }
+                }
             } else {
                 layoutUrl.visibility = View.GONE
             }
             
-            // 处理备注的显示
+            // 处理备注的显示和复制功能
             if (!totp.remark.isNullOrBlank()) {
                 layoutRemark.visibility = View.VISIBLE
                 tvRemark.text = totp.remark
+                
+                btnCopyRemark.setOnClickListener {
+                    copyToClipboard(totp.remark!!)
+                    showCopySuccessMessage("备注已复制到剪贴板")
+                }
             } else {
                 layoutRemark.visibility = View.GONE
             }
