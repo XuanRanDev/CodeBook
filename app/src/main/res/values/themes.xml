@@ -33,6 +33,10 @@
         <!-- Menu 配置 -->
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
 
+        <!-- 设置状态栏为透明 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- 设置状态栏文字颜色为暗色 -->
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <!-- 自定义 AppBarLayout 样式 -->

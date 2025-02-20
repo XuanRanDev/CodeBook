@@ -20,9 +20,11 @@ import dev.xuanran.codebook.ui.dialog.TotpEditDialog
 import dev.xuanran.codebook.ui.interfaces.FabClickListener
 import dev.xuanran.codebook.ui.viewmodel.TotpUiState
 import dev.xuanran.codebook.ui.viewmodel.TotpViewModel
+import dev.xuanran.codebook.utils.TotpGenerator
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.isActive
 
 class TotpListFragment : Fragment(), FabClickListener {
     private var _binding: FragmentTotpListBinding? = null
@@ -51,14 +53,22 @@ class TotpListFragment : Fragment(), FabClickListener {
     private fun setupRecyclerView() {
         adapter = TotpAdapter(
             onCopyClick = { totp ->
-                // TODO: 获取当前有效的TOTP代码
-                val code = "123456" // 这里需要实现真实的TOTP生成逻辑
+                val code = TotpGenerator.generateTOTP(
+                    secret = viewModel.getDecryptedSecretKey(totp),
+                    algorithm = totp.algorithm,
+                    digits = totp.digits,
+                    period = totp.period
+                )
                 copyToClipboard(code)
                 viewModel.updateLastUsed(totp)
                 Toast.makeText(requireContext(), "验证码已复制", Toast.LENGTH_SHORT).show()
             },
             onItemLongClick = { totp ->
                 showEditDialog(totp)
+            },
+            onItemClick = { totp ->
+                TotpDetailDialogFragment.newInstance(totp)
+                    .show(childFragmentManager, "TotpDetail")
             },
             onTotpCodeGenerated = { totp, code ->
                 // 可以在这里处理新生成的TOTP代码
@@ -137,9 +147,10 @@ class TotpListFragment : Fragment(), FabClickListener {
 
     private fun startPeriodicUpdate() {
         updateJob = viewLifecycleOwner.lifecycleScope.launch {
-            while (true) {
-                adapter.notifyDataSetChanged() // 更新所有项目以刷新进度条
-                delay(1000) // 每秒更新一次
+            while (isActive) {
+                // 每个周期更新一次代码
+                delay(30000) // 30秒更新一次
+                adapter.notifyDataSetChanged()
             }
         }
     }
