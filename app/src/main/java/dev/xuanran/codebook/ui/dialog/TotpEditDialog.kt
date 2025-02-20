@@ -82,7 +82,7 @@ class TotpEditDialog : BottomSheetDialogFragment() {
                 val accountName = etAccountName.text?.isNotBlank() == true
                 val secretKey = etSecretKey.text?.isNotBlank() == true
                 val digits = etDigits.text?.toString()?.toIntOrNull() in 6..8
-                val period = etPeriod.text?.toString()?.toIntOrNull() in 15..60
+                val period = etPeriod.text?.toString()?.toIntOrNull() in 5..60
 
                 btnSave.isEnabled = appName && accountName && secretKey && digits && period
             }
